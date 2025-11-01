@@ -1,0 +1,145 @@
+### Rider / IntelliJ ###
+# User-specific stuff
+.idea/
+.idea/*
+*.iml
+
+# Rider project files (keep .sln and .csproj!)
+.idea/.idea.*
+.idea/shelf/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/httpRequests/
+.idea/dataSources/
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+.idea/gradle.xml
+.idea/compiler.xml
+.idea/sonarlint/
+
+# JetBrains caches
+.idea/.idea.*.directory
+.idea/.idea.*.iml
+.idea/.idea.*.iws
+.idea/.idea.*.ipr
+
+# Rider plugin caches
+.idea/.idea_modules/
+.idea/.idea-build/
+.idea/.idea-backup/
+.idea/.idea-cache/
+.idea/deployment.xml
+.idea/.dotnetToolStore/
+
+# Rider logs and local history
+.idea/system/
+.idea/log/
+.idea/httpRequests/
+.idea/scopes/
+.idea/.ideaHistory/
+
+### .NET / ASP.NET Core ###
+# Build results
+bin/
+obj/
+out/
+publish/
+artifacts/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Visual Studio / Rider generated
+.vs/
+*.sln.iml
+*.vscode/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+# Uncomment below if you don’t want to commit packages
+# packages/
+# **/packages/*
+# !**/packages/build/
+# !**/packages/repositories.config
+
+# DotCover & ReSharper
+_ReSharper*/
+*.DotSettings.user
+.idea/.idea.DotSettings.user
+.idea/.idea.DotSettings
+.idea/.idea.DotSettings.user
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Logs
+*.log
+logs/
+Logs/
+log/
+
+# Entity Framework Core
+Migrations/__EFMigrationsHistory
+*.dbmdl
+
+# Configuration
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json
+
+# User Secrets
+secrets.json
+**/secrets.json
+**/UserSecrets/
+**/.microsoft.usersecrets/
+*.usersecrets
+
+# Environment variables files
+.env
+.env.*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docker / Containers
+docker-compose.override.yml
+.docker/
+docker-data/
+.dockerignore
+
+# Publish outputs
+wwwroot/dist/
+wwwroot/node_modules/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# JetBrains build system
+.idea/.riderBuild/
+.idea/.riderBuildCache/
+
+# Optional: Uncomment if you use Rider HTTP Client
+# .idea/httpRequests/
+
+### END ###
