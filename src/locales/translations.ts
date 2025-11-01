@@ -27,9 +27,9 @@
     'features.progress.title': 'Progress Tracking',
     'features.progress.description': 'Track your progress and statistics in real-time',
 
-    // Stats
-    'stats.title': 'Our Achievements',
-    'stats.subtitle': 'Join thousands of successful learners',
+    // Stats (made neutral / concise per request)
+    'stats.title': 'Statistics',
+    'stats.subtitle': '',
     'stats.completion': 'Completion Rate',
     'stats.instructors': 'Expert Instructors',
     'stats.countries': 'Countries',
@@ -67,8 +67,8 @@
     'features.progress.description': 'Monitoruj swoje postępy i statystyki w czasie rzeczywistym',
 
     // Stats
-    'stats.title': 'Nasze osiągnięcia',
-    'stats.subtitle': 'Dołącz do tysięcy pomyślnych uczniów',
+    'stats.title': 'Statystyki',
+    'stats.subtitle': '',
     'stats.completion': 'Wskaźnik ukończenia',
     'stats.instructors': 'Eksperci instruktorzy',
     'stats.countries': 'Kraje',
@@ -81,4 +81,3 @@
 
 export type Language = keyof typeof translations
 export type TranslationKey = keyof typeof translations.en
-

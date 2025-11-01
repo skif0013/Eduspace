@@ -20,7 +20,7 @@ export function LanguageToggle() {
       className="px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors font-semibold text-sm"
       aria-label="Toggle language"
     >
-      {language === 'en' ? '🇵🇱 PL' : '🇬🇧 EN'}
+      {language === 'en' ? 'PL' : ' EN'}
     </motion.button>
   )
 }

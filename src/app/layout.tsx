@@ -12,20 +12,22 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({
-  children,
-}: {
+                                     children,
+                                   }: {
   children: React.ReactNode
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider>
-          <LanguageProvider>
-            {children}
-          </LanguageProvider>
-        </ThemeProvider>
-      </body>
+    <body className={inter.className}>
+    <ThemeProvider>
+      <LanguageProvider>
+        {/* Оптимизирован отступ под компактный Header */}
+        <div className="pt-16 min-h-screen">
+          {children}
+        </div>
+      </LanguageProvider>
+    </ThemeProvider>
+    </body>
     </html>
   )
 }
-
