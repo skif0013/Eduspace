@@ -1,0 +1,84 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Tt]estResults/
+*.exe
+*.dll
+*.app
+*.pdb
+*.cache
+*.mdb
+
+# Rider / JetBrains IDE
+.idea/
+*.sln.iml
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+
+# Backup and temporary files
+*.bak
+*.tmp
+*.temp
+~$*
+*.swp
+*.lock
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+*.vsix
+*.psess
+*.vsp
+*.vspx
+*.coverage
+*.coveragexml
+packages/
+.nuget/
+*.lock.json
+
+# DotNet tools
+*.dotCover
+*.dotTrace
+*.dotMemory
+*.dotSettings
+*.dotsettings.user
+
+# Logs
+*.log
+logs/
+log/
+
+# Environment files
+.env
+.env.*
+
+# Publish output
+publish/
+out/
+
+# Rider project caches
+.idea/
+*.sln.iml
+
+# Test coverage tools
+coverage/
+*.coverage
+*.coveragexml
+
+# Misc
+_ReSharper*/
+*_ReSharper.Caches/
