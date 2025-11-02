@@ -1,0 +1,15 @@
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\bin\Debug\net8.0\NotificationService.Application.deps.json
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\bin\Debug\net8.0\NotificationService.Application.dll
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\bin\Debug\net8.0\NotificationService.Application.pdb
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\bin\Debug\net8.0\NotificationService.Domain.dll
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\bin\Debug\net8.0\NotificationService.Domain.pdb
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\NotificationService.Application.csproj.AssemblyReference.cache
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\NotificationService.Application.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\NotificationService.Application.AssemblyInfoInputs.cache
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\NotificationService.Application.AssemblyInfo.cs
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\NotificationService.Application.csproj.CoreCompileInputs.cache
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\Notifica.DAFDC56B.Up2Date
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\NotificationService.Application.dll
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\refint\NotificationService.Application.dll
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\NotificationService.Application.pdb
+c:\Users\danik\RiderProjects\NotificationService\NotificationService.Application\obj\Debug\net8.0\ref\NotificationService.Application.dll
