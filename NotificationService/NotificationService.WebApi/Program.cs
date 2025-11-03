@@ -33,6 +33,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddTransient<IEmailCreateClient, ClientFactory>();
 
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

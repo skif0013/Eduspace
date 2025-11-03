@@ -1,4 +1,5 @@
 ﻿using System.Net.Mail;
+using Microsoft.Extensions.Configuration;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
 using NotificationService.Domainn.Models;
@@ -9,9 +10,11 @@ public class EmailService : IEmailService
 {
     private readonly EmailSettings _emailSettings;
     private readonly IEmailCreateClient _emailCreateClient;
+    private readonly EmailTemplates _emailTemplates;
     
-    public EmailService(EmailSettings emailSettings, IEmailCreateClient emailCreateClient)
+    public EmailService(EmailSettings emailSettings, IEmailCreateClient emailCreateClient, IConfiguration configuration)
     {
+        _emailTemplates = configuration.GetSection("EmailTemplates:Verification").Get<EmailTemplates>();
         _emailSettings = emailSettings;
         _emailCreateClient = emailCreateClient;
     }
@@ -20,6 +23,11 @@ public class EmailService : IEmailService
     {
         using var client = _emailCreateClient.CreateClient();
 
+        var body = _emailTemplates.body
+            .Replace("{VerificationCode}", dto.Body ?? "");
+            
+
+        
         var emailMessage = new MailMessage
         {
             From = new MailAddress(_emailSettings.FromAddress, _emailSettings.Username),
@@ -36,14 +44,17 @@ public class EmailService : IEmailService
     public async Task SendVerifyEmailAsync(EmailVerifyDTO dto)
     {
         using var client = _emailCreateClient.CreateClient();
-
+        
+        var body = _emailTemplates.body
+            .Replace("{VerificationCode}", dto.Code ?? "");
+        
         var subject = "Verify your email address";
 
         var emailMessage = new MailMessage
         {
             From = new MailAddress(_emailSettings.FromAddress, _emailSettings.Username),
             Subject = subject,
-            Body = $"Ваш код подтверждения: <b>{dto.Code}</b>",
+            Body = body,
             IsBodyHtml = true
         };
         
