@@ -1,7 +1,7 @@
 using DotNetEnv;
 using Microsoft.OpenApi.Models;
 using NotificationService.Application.Contracts;
-using NotificationService.Domainn.Models;
+using NotificationService.Domain.Models;
 using NotificationService.Infrastructure.Service;
 using NotificationService.Infrastructure.SmtpClientFactory;
 

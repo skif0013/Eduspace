@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using NotificationService.Application.Contracts;
-using NotificationService.Domainn.Models;
+using NotificationService.Domain.Models;
 
 namespace NotificationService.Infrastructure.SmtpClientFactory;
 

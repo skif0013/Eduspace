@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
-using NotificationService.Domainn.Models;
+using NotificationService.Domain.Models;
 
 namespace NotificationService.Infrastructure.Service;
 
@@ -22,10 +22,6 @@ public class EmailService : IEmailService
     public async Task SendEmailAsync(EmailSendDTO dto)
     {
         using var client = _emailCreateClient.CreateClient();
-
-        var body = _emailTemplates.body
-            .Replace("{VerificationCode}", dto.Body ?? "");
-            
 
         
         var emailMessage = new MailMessage
@@ -57,7 +53,6 @@ public class EmailService : IEmailService
             Body = body,
             IsBodyHtml = true
         };
-        
         emailMessage.To.Add(dto.To);
 
         await client.SendMailAsync(emailMessage); 
