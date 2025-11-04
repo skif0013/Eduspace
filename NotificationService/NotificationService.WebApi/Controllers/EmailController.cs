@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
-using NotificationService.Infrastructure.Service;
-
 namespace NotificationService.WebApi.Controllers;
 
 [ApiController]
