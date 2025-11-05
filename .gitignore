@@ -33,7 +33,7 @@ ScaffoldingReadMe.txt
 
 # NuGet Packages
 *.nupkg
-# NuGet Symbol Packages
+# NuGet ymbol Packages
 *.snupkg
 
 # Others
@@ -51,4 +51,8 @@ CodeCoverage/
 # NUnit
 *.VisualState.xml
 TestResult.xml
-nunit-*.xml
+nunit-*.xm
+*./idea
+/AuthService/.idea
+AuthService/.idea/.idea.AuthService/.idea/copilot.data.migration.agent.xml
+AuthService/.idea/.idea.AuthService/.idea/copilot.data.migration.ask2agent.xml
