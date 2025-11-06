@@ -45,7 +45,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("ConfirmEmail")]
-    public async Task<Result<string>> ConfimEmailAsync(string email, [FromHeader] string token)
+    public async Task<Result<string>> ConfirmEmailAsync(string email, [FromHeader] string token)
     {
         var result = await _userService.ConfirmEmailAsync(email, token);
         return result;
