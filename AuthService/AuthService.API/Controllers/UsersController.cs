@@ -38,7 +38,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("ResetPassword")]
-    public async Task<Result<string>> ResetPasswordAsync(ResetPsswordDto request)
+    public async Task<Result<string>> ResetPasswordAsync(ResetPasswordDto request)
     {
         var result = await _userService.ResetPasswordAsync(request);
         return result;
