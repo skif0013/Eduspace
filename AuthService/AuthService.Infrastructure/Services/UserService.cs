@@ -107,7 +107,7 @@ public class UserService : IUserService
         return Result<string>.Success("Password reset successfully");
     }
 
-    public async Task<Result<string>> ResetPasswordAsync(ResetPsswordDto request)
+    public async Task<Result<string>> ResetPasswordAsync(ResetPasswordDto request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
