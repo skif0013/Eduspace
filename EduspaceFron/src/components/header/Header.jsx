@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const Header = () => {
 	const [user, setUser] = useState(true)
@@ -40,7 +41,10 @@ const Header = () => {
 				<ul className='flex gap-6'>
 					{headerPage.map(item => (
 						<li key={item.id}>
-							<a href={item.href} className='text-base font-normal text-white transition-all duration-300 ease-in-out hover:text-blue-800 '>
+							<a
+								href={item.href}
+								className='text-base font-normal text-white transition-all duration-300 ease-in-out hover:text-blue-800 '
+							>
 								{item.title}
 							</a>
 						</li>
@@ -54,13 +58,26 @@ const Header = () => {
 						alt=''
 						onClick={prev => prev(setUser)}
 					/>
-					<button
-						className='py-3 px-12 rounded-2xl text-white border border-blue-900
+
+					{user ? (
+						<Link to="/register" >
+							<button
+								className='py-3 px-12 rounded-2xl text-white border border-blue-900
 						transition-all duration-300 ease-in-out
 						hover:bg-blue-900 hover:border-blue-950 hover:shadow-lg hover:shadow-blue-500/30'
-					>
-						{user ? 'Registration' : 'Login'}
-					</button>
+							>
+								Registration
+							</button>
+						</Link>
+					) : (
+						<button
+							className='py-3 px-12 rounded-2xl text-white border border-blue-900
+						transition-all duration-300 ease-in-out
+						hover:bg-blue-900 hover:border-blue-950 hover:shadow-lg hover:shadow-blue-500/30'
+						>
+							SignIN
+						</button>
+					)}
 				</div>
 			</div>
 		</div>
