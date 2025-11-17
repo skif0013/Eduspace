@@ -57,3 +57,6 @@ nunit-*.xm
 AuthService/.idea/.idea.AuthService/.idea/copilot.data.migration.agent.xml
 AuthService/.idea/.idea.AuthService/.idea/copilot.data.migration.ask2agent.xml
 AuthService/AuthService.API/AuthService.API.http
+/.idea
+/UserService/.idea
+*.http
