@@ -16,6 +16,14 @@ public class UserController : ControllerBase
     {
         _userService = userService;
     }
+
+    [HttpGet]
+    [Route("{userId}")]
+    public async Task<Result<User>> GetUserById(Guid userId)
+    {
+        var result = await _userService.GetUserByIdAsync(userId);
+        return result;
+    }
     
     [HttpPost]
     [Route("create")]

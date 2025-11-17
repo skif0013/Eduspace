@@ -15,6 +15,17 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
     
+    public async Task<Result<User>> GetUserByIdAsync(Guid userId)
+    {
+        var user = await _userRepository.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return Result<User>.Failure("User not found");
+        }
+        
+        return Result<User>.Success(user);
+    }
+    
     public async Task<Result<string>> CreateUserAsync(CreateUserDTO request)
     {
         var existingUser = await _userRepository.GetUserByIdAsync(request.UserId);
