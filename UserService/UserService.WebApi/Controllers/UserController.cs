@@ -37,8 +37,8 @@ public class UserController : ControllerBase
     [Route("update")]
     public async Task<Result<User>> UpdateUser(UpdateUserDTO request)
     {
-        //var userIdFromClaims = User.FindFirst("userId")?.Value;
-        var userId = Guid.Parse("26dc04eb-193d-4c65-973f-de8500c22994");
+        var userIdString = User.FindFirst("userId")?.Value;
+        var userId = Guid.Parse(userIdString);
         var result = await _userService.UpdateUserAsync(request, userId);
         return result;
     }
