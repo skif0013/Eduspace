@@ -1,11 +1,14 @@
 using System.Text;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using UserService.Application.Interfaces.Repositories;
 using UserService.Application.Interfaces.Services;
 using UserService.Infrastructure.Data;
+using UserService.Infrastructure.Redis;
 using UserService.Infrastructure.Repositories;
 using UserService.Infrastructure.Services;
 
@@ -21,6 +24,40 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IUserService, UserService.Infrastructure.Services.UserService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+//builder.Services.AddSingleton<IUserEventService, UserEventService>();
+//builder.Services.AddSingleton<ConsumerServices>();
+
+//builder.Services.AddSingleton(new RedisMessageBroker(builder.Configuration.GetConnectionString("Redis")));
+builder.Services.AddSingleton<IMessageHandler, UserCreatedHandler>();
+//builder.Services.AddSingleton<IMessageHandler, UserUpdatedHandler>();
+builder.Services.AddHostedService<RedisSubscriberService>();
+
+
+//builder.Services.AddScoped<IEventHandler, UserCreatedEventHandler>();
+//builder.Services.AddScoped<IEventHandler, UserUpdatedEventHandler>();
+
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+Env.Load(envPath);
+
+
+var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
+var redisUser = Environment.GetEnvironmentVariable("RedisUser");
+var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
+
+builder.Services.AddSingleton<RedisMessageBroker>(sb =>
+{
+    var config = new StackExchange.Redis.ConfigurationOptions
+    {
+        EndPoints = { redisEndPoint },
+        User = redisUser,
+        Password = redisPassword,
+        AbortOnConnectFail = false
+    };
+    var connectionString = config.ToString();
+    return new RedisMessageBroker(connectionString);
+});
+
 
 #region config jwt
 var validIssuer = builder.Configuration.GetValue<string>("JwtTokenSettings:ValidIssuer");

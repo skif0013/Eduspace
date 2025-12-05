@@ -1,5 +1,5 @@
 using UserService.Application.DTO;
-using UserService.Domain.Models;
+using UserService.Domain.Entities;
 using UserService.Domain.Results;
 
 namespace UserService.Application.Interfaces.Services;

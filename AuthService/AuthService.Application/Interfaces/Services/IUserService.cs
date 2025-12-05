@@ -10,4 +10,5 @@ public interface IUserService
     Task<Result<string>> ForgotPasswordAsync(ForgotPasswordRequest request);
     Task<Result<string>> ResetPasswordAsync(ResetPasswordDto request);
     Task<Result<string>> ConfirmEmailAsync(string email, string token);
+    Task<Result<string>> UpdateUserAsync(UpdateUserDTO userDto);
 }

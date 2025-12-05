@@ -1,11 +1,14 @@
 using System.Text;
 using AuthService.API.Middleware;
 using AuthService.Application.Interfaces;
+using AuthService.Application.Interfaces.Services;
 using AuthService.Domain.Entities;
 using AuthService.Infrastructure.Database;
 using AuthService.Infrastructure.Database.InitialData;
 using AuthService.Infrastructure.Identity;
+using AuthService.Infrastructure.Redis;
 using AuthService.Infrastructure.Services;
+using DotNetEnv;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -60,6 +63,27 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+Env.Load(envPath);
+
+var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
+var redisUser = Environment.GetEnvironmentVariable("RedisUser");
+var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
+
+builder.Services.AddSingleton<RedisMessageBroker>(sb =>
+{
+    var config = new StackExchange.Redis.ConfigurationOptions
+    {
+        EndPoints = { redisEndPoint },
+        User = redisUser,
+        Password = redisPassword,
+        AbortOnConnectFail = false
+    };
+    var connectionString = config.ToString();
+    return new RedisMessageBroker(connectionString);
+});
+
+
 builder.Services.AddIdentity<User, RoleIdentity>(options =>
 {
     options.Password.RequireDigit = true;
@@ -81,6 +105,12 @@ builder.Services.AddIdentity<User, RoleIdentity>(options =>
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+//builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddSingleton<IMessageHandler, UserUpdatedHandler>();
+builder.Services.AddHostedService<RedisSubscriberService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+
 
 var app = builder.Build();
 
@@ -110,6 +140,8 @@ using (var scope = app.Services.CreateScope())
     
     await RoleInitData.InitializeAsync(roleManager);
 }
+
+
 
 app.MapControllers();
 

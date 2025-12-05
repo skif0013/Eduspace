@@ -1,10 +1,12 @@
 using AuthService.Application.DTOs;
 using AuthService.Application.Interfaces;
+using AuthService.Application.Interfaces.Services;
 using AuthService.Domain.Entities;
 using AuthService.Domain.Results;
 using AuthService.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shared.Messages;
 
 namespace AuthService.Infrastructure.Services;
 
@@ -14,16 +16,19 @@ public class UserService : IUserService
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<RoleIdentity> _roleManager;
     private readonly ITokenService _tokenService;
+    private readonly IMessageService _messageService;
 
     public UserService(
         UserManager<User> userManager,
         RoleManager<RoleIdentity> roleManager,
-        ITokenService tokenService
+        ITokenService tokenService,
+        IMessageService messageService
     )
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _tokenService = tokenService;
+        _messageService = messageService;
     }
     
     public async Task<Result<string>> RegisterAsync(CreateUserDto createUserDto)
@@ -81,6 +86,7 @@ public class UserService : IUserService
         var userDto = new UserDto
         {
             Id = user.Id,
+            UserName = user.UserName,
             Email = user.Email
         };
         
@@ -88,7 +94,6 @@ public class UserService : IUserService
         
         return Result<AuthResponse>.Success(new AuthResponse
         {
-            
             Token = tokens.AccessToken
         });
     }
@@ -143,6 +148,37 @@ public class UserService : IUserService
 
         await _userManager.AddToRoleAsync(user, roleExists.Result.Name.ToString());
         
+        var message = new CreateUserDTO()
+        {
+            UserId = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            EventType = "user:created"
+        };
+        await _messageService.SendMessageAsync("user:created", message);
+        
         return Result<string>.Success("Email confirmed");
+    }
+    
+    public async Task<Result<string>> UpdateUserAsync(UpdateUserDTO userDto)
+    {
+        var user = await _userManager.FindByIdAsync(userDto.Id.ToString());
+        if (user == null)
+        {
+            return Result<string>.Failure("User not found");
+        }
+
+        user.UserName = userDto.UserName;
+        user.Email = userDto.Email;
+        user.LastModified = DateTime.UtcNow;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return Result<string>.Failure($"Error updating user: {errors}");
+        }
+
+        return Result<string>.Success("User updated successfully");
     }
 }

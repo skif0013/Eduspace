@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UserService.Application.Interfaces.Repositories;
-using UserService.Domain.Models;
+using UserService.Domain.Entities;
 using UserService.Infrastructure.Data;
 
 namespace UserService.Infrastructure.Repositories;
