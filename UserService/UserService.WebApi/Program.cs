@@ -16,6 +16,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5003);
+    options.ListenAnyIP(5004);
+});
+
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

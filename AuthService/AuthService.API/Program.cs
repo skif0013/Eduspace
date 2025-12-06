@@ -29,6 +29,12 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5001);
+    options.ListenAnyIP(5002);
+});
+
 #region config jwt
 var validIssuer = builder.Configuration.GetValue<string>("JwtTokenSettings:ValidIssuer");
 var validAudience = builder.Configuration.GetValue<string>("JwtTokenSettings:ValidAudience");
