@@ -1,7 +1,7 @@
 using UserService.Application.DTO;
 using UserService.Application.Interfaces.Repositories;
 using UserService.Application.Interfaces.Services;
-using UserService.Domain.Models;
+using UserService.Domain.Entities;
 using UserService.Domain.Results;
 
 namespace UserService.Infrastructure.Services;
@@ -9,10 +9,12 @@ namespace UserService.Infrastructure.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IMessageService _messageService;
     
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, IMessageService messageService)
     {
         _userRepository = userRepository;
+        _messageService = messageService;
     }
     
     public async Task<Result<User>> GetUserByIdAsync(Guid userId)
@@ -59,6 +61,13 @@ public class UserService : IUserService
         user.AvatarURL = request.AvatarURL;
         
         await _userRepository.UpdateUserAsync(user);
+        
+        await _messageService.SendMessageAsync("user:updated", new Shared.Messages.UpdateUserEvent
+        {
+            Id = userId,
+            UserName = request.UserName,
+            Email = request.Email,
+        });
         
         return Result<User>.Success(user);
     }

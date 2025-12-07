@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using UserService.Application.DTO;
 using UserService.Application.Interfaces.Services;
-using UserService.Domain.Models;
+using UserService.Domain.Entities;
 using UserService.Domain.Results;
 
 namespace UserService.WebApi.Controllers;
@@ -37,8 +37,9 @@ public class UserController : ControllerBase
     [Route("update")]
     public async Task<Result<User>> UpdateUser(UpdateUserDTO request)
     {
-        var userIdString = User.FindFirst("userId")?.Value;
-        var userId = Guid.Parse(userIdString);
+        //var userIdString = User.FindFirst("userId")?.Value;
+        //var userId = Guid.Parse("019ae437-9389-78e2-a48f-2309db82fa59");
+        var userId = Guid.Parse(Request.Headers["X-User-Id"]);
         var result = await _userService.UpdateUserAsync(request, userId);
         return result;
     }

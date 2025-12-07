@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using UserService.Domain.Models;
+using UserService.Domain.Entities;
 
 namespace UserService.Infrastructure.Data;
 

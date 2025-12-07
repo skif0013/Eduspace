@@ -1,6 +1,6 @@
 using UserService.Domain.Abstractions;
 
-namespace UserService.Domain.Models;
+namespace UserService.Domain.Entities;
 
 public class User : Entity
 {
