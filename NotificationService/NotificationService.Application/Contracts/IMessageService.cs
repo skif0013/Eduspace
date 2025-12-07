@@ -1,6 +1,4 @@
-using Shared.Messages;
-
-namespace AuthService.Application.Interfaces.Services;
+namespace NotificationService.Application.Interfaces.Services;
 
 public interface IMessageService
 {

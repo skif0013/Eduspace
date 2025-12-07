@@ -3,10 +3,11 @@
     image: ${DOCKER_REGISTRY-}usersevice
     build:
       context: .
-      dockerfile: UserService.WebApi.API.WebApi/Dockerfile
+      dockerfile: UserService.WebApi/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=localhost;Database=UserDB;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=UserDB;Username=postgres;Password=postgres
+    
     ports:
       - "5003:5003"
       - "5004:5004"

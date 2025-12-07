@@ -60,6 +60,15 @@ public class UserService : IUserService
 
         //var response = await client.PostAsync(url, content);
         
+        var confirmEmailEvent = new EmailVerifyEvent()
+        {
+            To = user.Email,
+            UserName = user.UserName,
+            VerificationLink = "",
+            Code = token
+        };
+        await _messageService.SendMessageAsync("email:verify", confirmEmailEvent);
+        
         return Result<string>.Success("user created successfully");
     }
 

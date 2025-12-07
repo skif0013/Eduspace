@@ -1,11 +1,8 @@
 using System.Text.Json;
-using AuthService.Application.Interfaces.Services;
+using NotificationService.Application.Interfaces.Services;
+using NotificationService.Infrastructure.Redis;
 
-using AuthService.Infrastructure.Redis;
-using Shared.Messages;
-
-
-namespace AuthService.Infrastructure.Services;
+namespace NotificationService.Infrastructure.Services;
 
 public class MessageService : IMessageService
 {
@@ -18,5 +15,10 @@ public class MessageService : IMessageService
     public async Task SendMessageAsync<T>(string actiom ,T message)
     {
         var res = await _redisMessageBroker.Publish(actiom, JsonSerializer.Serialize(message));
+        if(res is true)
+        {
+            return ;
+        }
+        return ;    
     }
 }

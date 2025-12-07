@@ -1,13 +1,23 @@
 using DotNetEnv;
 using Microsoft.OpenApi.Models;
 using NotificationService.Application.Contracts;
+using NotificationService.Application.Interfaces.Services;
 using NotificationService.Domain.Models;
+using NotificationService.Infrastructure.Redis;
 using NotificationService.Infrastructure.Service;
+using NotificationService.Infrastructure.Services;
 using NotificationService.Infrastructure.SmtpClientFactory;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddEnvironmentVariables();
-Env.Load();
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5005);
+    options.ListenAnyIP(5006);
+});
+
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+Env.Load(envPath);
 
 
 var emailSettings = new EmailSettings
@@ -19,6 +29,32 @@ var emailSettings = new EmailSettings
     Password = Environment.GetEnvironmentVariable("SmtpSettings__Password") ?? "default-password",
     FromAddress = Environment.GetEnvironmentVariable("SmtpSettings__SenderEmail") ?? "no-reply@domain.com"
 };
+
+
+builder.Services.AddScoped<IMessageService, MessageService>();
+
+builder.Services.AddSingleton<IMessageHandler, ConfimEmailHandler>();
+builder.Services.AddHostedService<RedisSubscriberService>();
+
+var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
+var redisUser = Environment.GetEnvironmentVariable("RedisUser");
+var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
+
+builder.Services.AddSingleton<RedisMessageBroker>(sb =>
+{
+    var config = new StackExchange.Redis.ConfigurationOptions
+    {
+        EndPoints = { redisEndPoint },
+        User = redisUser,
+        Password = redisPassword,
+        AbortOnConnectFail = false
+    };
+    var connectionString = config.ToString();
+    return new RedisMessageBroker(connectionString);
+});
+
+
+
 
 builder.Services.AddSingleton(emailSettings);
 
