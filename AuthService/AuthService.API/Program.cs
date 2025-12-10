@@ -72,6 +72,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
 Env.Load(envPath);
 
+var DefaultConnection = Environment.GetEnvironmentVariable("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(DefaultConnection));
+
 var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
 var redisUser = Environment.GetEnvironmentVariable("RedisUser");
 var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");

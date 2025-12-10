@@ -25,8 +25,7 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -46,6 +45,11 @@ builder.Services.AddHostedService<RedisSubscriberService>();
 
 var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
 Env.Load(envPath);
+
+
+var DefaultConnection = Environment.GetEnvironmentVariable("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(DefaultConnection));
 
 
 var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
