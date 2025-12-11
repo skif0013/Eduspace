@@ -1,0 +1,22 @@
+# This is a generated file. Not intended for manual editing.
+version: "3.8"
+services:
+  webapi:
+    build:
+      context: "C:\\Users\\danik\\RiderProjects\\ContentService\\ContentService"
+      dockerfile: "ContentService.WebApi/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/ContentService.WebApi.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "contentservice.webapi:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\danik\\RiderProjects\\ContentService\\ContentService\\ContentService.WebApi:/app:rw"
+    - "C:\\Users\\danik\\RiderProjects\\ContentService\\ContentService:/src:rw"
+    - "C:\\Users\\danik\\AppData\\Roaming\\Microsoft\\UserSecrets:/root/.microsoft/usersecrets"
+    - "C:\\Users\\danik\\.nuget\\packages:/root/.nuget/packages"
+    working_dir: "/app"
