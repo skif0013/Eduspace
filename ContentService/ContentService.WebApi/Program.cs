@@ -3,6 +3,7 @@ using ContentService.Infrastructure.Data;
 using ContentService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Azure.Storage.Blobs;
+using ContentService.Application.Contracts.Repositories;
 using ContentService.Application.DTOs.GroupDTOs;
 using ContentService.Application.Service;
 using Microsoft.OpenApi.Models;
@@ -60,6 +61,7 @@ builder.Services.AddScoped<IGroupService, ContentService.Application.Service.Gro
 builder.Services.AddScoped<BlobStorageService>();
 builder.Services.AddScoped<IFileRepository, FileRepository>();
 builder.Services.AddScoped<MappingService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
 

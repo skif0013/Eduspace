@@ -10,5 +10,4 @@ public interface IFileRepository
     
     Task<UserFileMetadata> GetFileByIdAsync(Guid fileId, Guid userId);
     
-    Task SaveChangesAsync();
 }

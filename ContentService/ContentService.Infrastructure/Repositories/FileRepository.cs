@@ -18,7 +18,6 @@ public class FileRepository : IFileRepository
     public async Task AddAsync(UserFileMetadata userFile)
     {
        await _dbContext.UserFileMetadatas.AddAsync(userFile);
-       await _dbContext.SaveChangesAsync();
     }
     
     public async Task<List<UserFileMetadata>> GetFilesByUserIdAsync(Guid userId)
@@ -31,7 +30,6 @@ public class FileRepository : IFileRepository
     public async Task DeleteAsync(UserFileMetadata userFile)
     {
        userFile.IsDeleted = true;
-       await _dbContext.SaveChangesAsync();
     }
     
     public async Task<UserFileMetadata?> GetFileByIdAsync(Guid fileId, Guid userId)
@@ -39,6 +37,4 @@ public class FileRepository : IFileRepository
         return await _dbContext.UserFileMetadatas
             .FirstOrDefaultAsync(f => f.Id == fileId && f.UserId == userId);
     }
-    
-    public async Task SaveChangesAsync() => await _dbContext.SaveChangesAsync();
 }

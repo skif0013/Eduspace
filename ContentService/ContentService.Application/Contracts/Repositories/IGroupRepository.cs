@@ -6,7 +6,6 @@ public interface IGroupRepository
 {
     Task<Group?> GetByIdAsync(Guid Id);
     Task AddAsync(Group group);
-    Task SaveChangesAsync();
     Task DeleteAsync(Group group);
     Task<List<Group>> GetAllForUserAsync(Guid userId);
 }

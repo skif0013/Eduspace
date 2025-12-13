@@ -18,8 +18,6 @@ public class GroupRepository : IGroupRepository
     
     public async Task AddAsync(Group group) => await _context.Groups.AddAsync(group);
     
-    public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
-    
     public async Task DeleteAsync(Group group)
     {
         _context.Groups.Remove(group);

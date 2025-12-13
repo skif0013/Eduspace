@@ -1,4 +1,5 @@
 ﻿using ContentService.Application.Contracts;
+using ContentService.Application.Contracts.Repositories;
 using ContentService.Application.DTOs.GroupDTOs;
 using ContentService.Domain.Models;
 
@@ -7,10 +8,12 @@ namespace ContentService.Application.Service;
 public class GroupService : IGroupService
 {
     private readonly IGroupRepository _groupRepository;
+    private readonly IUnitOfWork _uow;
     
     
-    public GroupService(IGroupRepository groupRepository)
+    public GroupService(IGroupRepository groupRepository, IUnitOfWork uow)
     {
+        _uow = uow;
         _groupRepository = groupRepository;
         
     }
@@ -31,7 +34,7 @@ public class GroupService : IGroupService
         };
       
         await _groupRepository.AddAsync(group);
-        await _groupRepository.SaveChangesAsync();
+        await _uow.SaveChangesAsync();
 
         return group;
     }
@@ -51,7 +54,7 @@ public class GroupService : IGroupService
         }
         
         await _groupRepository.DeleteAsync(group);
-        await _groupRepository.SaveChangesAsync();
+        await _uow.SaveChangesAsync();
         
         return group;
     }
@@ -91,7 +94,7 @@ public class GroupService : IGroupService
         group.GroupName = dto.GroupName;
         group.Description = dto.Description;
         
-        await _groupRepository.SaveChangesAsync();
+        await _uow.SaveChangesAsync();
         
         return group;
     }

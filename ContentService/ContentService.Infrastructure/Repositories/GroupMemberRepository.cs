@@ -20,11 +20,9 @@ public class GroupMemberRepository : IGroupMemberRepository
     
     public async Task AddAsync(GroupMember groupMember) => await _context.GroupMembers.AddAsync(groupMember);
     
-    public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
-
-    public async Task<GroupMember> DeleteAsync(Guid userId, Guid groupId) 
+    public async Task<GroupMember> DeleteAsync(Guid userId, Guid groupId)
     {
-        var member =  await GetAsync(userId, groupId) ?? throw new Exception("Group member not found");
+        var member = await GetAsync(userId, groupId);
         
         _context.GroupMembers.Remove(member);
         

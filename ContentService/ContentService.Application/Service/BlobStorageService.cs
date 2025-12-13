@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
+using ContentService.Application.Contracts.Repositories;
 using ContentService.Application.DTOs.GroupDTOs;
 using ContentService.Domain.Models;
 
@@ -9,9 +10,11 @@ public class BlobStorageService
 {
    private readonly BlobServiceClient _blobServiceClient;
    private readonly IFileRepository _fileRepository;
+   private readonly IUnitOfWork _uow;
    
-   public BlobStorageService(BlobServiceClient blobServiceClient, IFileRepository fileRepository)
+   public BlobStorageService(BlobServiceClient blobServiceClient, IFileRepository fileRepository, IUnitOfWork uow)
    {
+         _uow = uow;
        _fileRepository = fileRepository;
        _blobServiceClient = blobServiceClient;
    }
@@ -37,6 +40,7 @@ public class BlobStorageService
         };
 
         await _fileRepository.AddAsync(file);
+        await _uow.SaveChangesAsync();
         
         return file.Id.ToString();
     }
@@ -76,7 +80,7 @@ public class BlobStorageService
         var deleted = await blobClient.DeleteIfExistsAsync();
         
         await _fileRepository.DeleteAsync(file);
-        await _fileRepository.SaveChangesAsync();
+        await  _uow.SaveChangesAsync();
 
         return deleted;
     }
