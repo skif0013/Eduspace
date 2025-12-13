@@ -60,5 +60,3 @@ AuthService/AuthService.API/AuthService.API.http
 /.idea
 /UserService/.idea
 *.http
-
-*.env
