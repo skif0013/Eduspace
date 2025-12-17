@@ -12,7 +12,7 @@ const Header = () => {
 		},
 		{
 			id: 2,
-			title: 'About',
+			title: 'About Us',
 			href: '/about',
 		},
 		{
