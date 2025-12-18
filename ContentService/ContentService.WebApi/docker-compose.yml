@@ -1,0 +1,59 @@
+﻿version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: contentservice_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - contentservice-net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: contentservice_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - contentservice-net
+
+  webapi:
+    build:
+      context: ..
+      dockerfile: ContentService.WebApi/Dockerfile
+    container_name: contentservice_webapi
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
+      - AzureStorage__ConnectionString=${AzureStorage__ConnectionString}
+      - AuthServiceJwt__Issuer=${AuthServiceJwt__Issuer}
+      - AuthServiceJwt__Audience=${AuthServiceJwt__Audience}
+      - AuthServiceJwt__Key=${AuthServiceJwt__Key}
+      - AuthServiceJwt__RequireHttpsMetadata=${AuthServiceJwt__RequireHttpsMetadata}
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - contentservice-net
+
+volumes:
+  pgdata:
+
+networks:
+  contentservice-net:
+    driver: bridge
