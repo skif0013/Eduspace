@@ -1,82 +1,19 @@
-# Environment / secrets
-**/.env
-
 # User-specific files
-*.rsuser
 *.suo
 *.user
-*.userosscache
 *.sln.docstates
-*.csproj.user
-
-# Visual Studio / Rider / IDE
-.vs/
-**/.vs/
-
-.idea/
-**/.idea/
-
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 
 # Build results
 [Dd]ebug/
-[Dd]ebugPublic/
 [Rr]elease/
-[Rr]eleases/
 x64/
-x86/
-arm/
-arm64/
-[Bb]in/
-[Oo]bj/
-
-# Logs and temp files
 *.log
-logs/
-*.tmp
-*.temp
-*.cache
 
-# Test results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
 
-# Code coverage
-coverage*.xml
-coverage*.json
-coverage*.info
 
-# NuGet
-*.nupkg
-*.snupkg
-**/[Pp]ackages/*
-!**/[Pp]ackages/build/
-*.nuget.props
-*.nuget.targets
 
-# .NET artifacts
-project.lock.json
-project.fragment.lock.json
-artifacts/
-BenchmarkDotNet.Artifacts/
 
-# Docker
-docker-compose.override.yml
 
-# Node.js (if used)
-node_modules/
 
-# OS generated files
-# Windows
-Thumbs.db
-Desktop.ini
 
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
 

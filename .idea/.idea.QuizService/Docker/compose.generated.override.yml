@@ -1,0 +1,20 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  quizservice.webapi:
+    build:
+      context: "C:\\Users\\danik\\RiderProjects\\QuizService.WebApi"
+      dockerfile: "QuizService.WebApi/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/QuizService.WebApi.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "quizservice.webapi:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\danik\\RiderProjects\\QuizService.WebApi\\QuizService.WebApi:/app:rw"
+    - "C:\\Users\\danik\\RiderProjects\\QuizService.WebApi:/src:rw"
+    - "C:\\Users\\danik\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
