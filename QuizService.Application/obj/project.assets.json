@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net8.0": {}
+    "net8.0": {
+      "QuizService.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/QuizService.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/QuizService.Domain.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "QuizService.Domain/1.0.0": {
+      "type": "project",
+      "path": "../QuizService.Domain/QuizService.Domain.csproj",
+      "msbuildProject": "../QuizService.Domain/QuizService.Domain.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net8.0": []
+    "net8.0": [
+      "QuizService.Domain >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\danik\\.nuget\\packages\\": {},
@@ -38,7 +57,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\danik\\RiderProjects\\QuizService.WebApi\\QuizService.Domain\\QuizService.Domain.csproj": {
+              "projectPath": "C:\\Users\\danik\\RiderProjects\\QuizService.WebApi\\QuizService.Domain\\QuizService.Domain.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
