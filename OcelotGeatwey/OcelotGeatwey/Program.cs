@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using Microsoft.IdentityModel.Tokens;
 using MMLib.Ocelot.Provider.AppConfiguration;
 using MMLib.SwaggerForOcelot.DependencyInjection;
@@ -34,6 +35,30 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 
+
+//Rate limiter
+builder.Services.AddMemoryCache();
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); // Add this line
+builder.Services.Configure<IpRateLimitOptions>(options =>
+{
+    options.EnableEndpointRateLimiting = true;
+    options.StackBlockedRequests = false; // Do not stack blocked requests
+    options.HttpStatusCode = 429; // Use HTTP 429 Too Many Requests status code
+    options.RealIpHeader = "X-Real-IP"; // Use this header to get the real IP address
+    options.ClientIdHeader = "X-ClientId"; // Use this header to identify clients
+    options.GeneralRules =
+    [
+        new RateLimitRule
+        {
+            Endpoint = "*", //rate limit effective for all API endpoints
+            Period = "10s",
+            Limit = 2 // 2 requests per 10 seconds
+        }
+    ];
+});
+
+
 builder.Services.AddRazorPages();
 
 builder.Services.AddControllers();
@@ -57,5 +82,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.UseIpRateLimiting();
 
 app.Run();
