@@ -2,9 +2,7 @@
 
 public class AnswerOption
 {
-    public Guid Id { get; set; }
-    
-    public Guid QuestionId { get; set; }
+    public Question question { get; set; }
     
     public string Text { get; set; }
     
@@ -12,6 +10,7 @@ public class AnswerOption
     
     public int Order { get; set; }
     
+    public double Score { get; set; }
     
     public decimal? CorrectnessPercentage { get; set; }
 }
