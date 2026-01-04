@@ -2,9 +2,11 @@
 
 public class Quiz
 {
-    public Guid Id {get; set;}
+    public Guid QuizId {get; set;}
     
     public Guid CreatorId { get; set; }
+    
+    public string Category { get; set; }
     
     public string Name { get; set; }
     

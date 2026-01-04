@@ -13,8 +13,9 @@ public class Question
     
     public DateTime ModifiedOn { get; set; }
     
-    
     public int Order { get; set; }
+    
+    public int MaxScore { get; set; }
     
     public QuestionType QuestionType { get; set; }
     
