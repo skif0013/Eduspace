@@ -1,5 +1,6 @@
 ﻿using QuizService.Application.Contracts;
 using QuizService.Application.DTOs;
+using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
 using QuizService.Application.Repositories;
 using QuizService.Domain.Models;
 
@@ -15,7 +16,7 @@ public class QuizService : IQuizService
     }
 
 
-    public async Task<Quiz> AddQuizAsync(CretingQuizRequestDTO response, Guid userId)
+    public async Task<QuizResponseDTO> CreateQuizAsync(CretingQuizRequestDTO response, Guid userId)
     {
         
         var quiz = new Quiz()
@@ -86,6 +87,5 @@ public class QuizService : IQuizService
         var deletedQuiz = await _quizRepository.DeleteQuizAsync(quizId);
         return deletedQuiz;
     }
-    
     
 }

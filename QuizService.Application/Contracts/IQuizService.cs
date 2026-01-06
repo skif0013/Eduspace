@@ -1,17 +1,18 @@
-﻿using QuizService.Domain.Models;
-using QuizService.Application.DTOs;
+﻿using QuizService.Application.DTOs;
+using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
+using QuizService.Application.DTOs.ResponseDTOs;
+
 namespace QuizService.Application.Contracts;
 
 public interface IQuizService
 {
+    Task<IReadOnlyCollection<QuizResponseDTO>> GetAllQuizzesAsync(Guid userId, Guid quizId);
     
-    Task<List<Quiz>> GetQuizzes();
+    Task<QuizResponseDTO> GetQuizByIdAsync(Guid userId, Guid quizId);
     
-    Task<Quiz> AddQuizAsync(CretingQuizRequestDTO response, Guid userId);
+    Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizResponseDTO request,  Guid userId);
     
-    Task<Quiz> UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request, Guid userId);
+    Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request, Guid userId);
     
-    Task<Quiz> DeleteQuizAsync(Guid QuizId, Guid userId);
-    
-    Task<Quiz> FindByIdAsync(Guid QuizId, Guid userId);
+    Task DeleteQuizAsync(Guid userId, Guid quizId);
 }
