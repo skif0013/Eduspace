@@ -4,13 +4,10 @@ namespace QuizService.Application.Repositories;
 
 public interface IQuizRepository
 {
-    Task<IEnumerable<Quiz>> GetAllQuizzesAsync();
+    Task<IReadOnlyCollection<Quiz>> GetAllQuizzesAsync();
     
-    Task<Quiz> FindByIdAsync(Guid QuizId);
+    Task AddQuizAsync(Quiz quiz);
     
-    Task<Quiz> AddQuizAsync(Quiz quiz);
-    
-    Task<Quiz> UpdateQuizAsync(Guid QuizId);
-    
-    Task<Quiz> DeleteQuizAsync(Guid id);
+    Task<Quiz?> FindByIdAsync(Guid quizId);
+    Task RemoveAsync(Quiz quiz);
 }
