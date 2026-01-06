@@ -2,7 +2,7 @@
 
 namespace QuizService.Application.DTOs;
 
-public class CretingQuizDTO
+public class CretingQuizRequestDTO
 {
     public string QuizName { get; set; }
     

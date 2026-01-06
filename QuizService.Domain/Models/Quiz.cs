@@ -21,4 +21,5 @@ public class Quiz
     public DateTime ModifiedOn { get; set; }
     
     public ICollection<Question> Questions { get; set; } = new List<Question>();
+    
 }

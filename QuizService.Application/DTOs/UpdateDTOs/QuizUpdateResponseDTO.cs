@@ -1,6 +1,6 @@
 ﻿namespace QuizService.Application.DTOs;
 
-public class QuizUpdateRequest
+public class QuizUpdateResponseDTO
 {
     public string Title { get; set; }
     
