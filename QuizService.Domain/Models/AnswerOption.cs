@@ -12,5 +12,4 @@ public class AnswerOption
     
     public double Score { get; set; }
     
-    public decimal? CorrectnessPercentage { get; set; }
 }
