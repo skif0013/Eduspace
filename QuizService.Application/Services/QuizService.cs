@@ -9,83 +9,55 @@ namespace QuizService.Application.Services;
 public class QuizService : IQuizService
 {
     private readonly IQuizRepository _quizRepository;
+    private readonly IUnitOfWork _unitOfWork; 
 
-    public QuizService(IQuizRepository quizRepository)
+    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork)
     {
+        _unitOfWork = unitOfWork;
         _quizRepository = quizRepository;
     }
 
 
-    public async Task<QuizResponseDTO> CreateQuizAsync(CretingQuizRequestDTO response, Guid userId)
+    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid userId)
     {
-        
         var quiz = new Quiz()
         {
             QuizId = Guid.NewGuid(),
             CreatorId = userId,
-            Description = response.Text,
+            Description = request.Text,
             IsPublished = true,
             IsActive = true,
             ModifiedOn = DateTime.Now,
-            Name = response.QuizName,
+            Name = request.QuizName,
             CreatedOn = DateTime.Now,
         };
-
-        var add = await _quizRepository.AddQuizAsync(quiz);
-
-        return add;
+        
+        await _quizRepository.AddQuizAsync(quiz);
+        await _unitOfWork.SaveChangesAsync();
+        
     }
 
     public async Task<Quiz> FindByIdAsync(Guid userId, Guid quizId)
     {
-        var findQuiz = await _quizRepository.FindByIdAsync(quizId);
         
-        
-        return findQuiz;
     }
   
     
     //for developming
     public async Task<List<Quiz>> GetQuizzes()
     {
-        var getAll = await _quizRepository.GetAllQuizzesAsync();
         
-        
-        //change
-        return new List<Quiz>();
     }
     
     public async Task<Quiz?> UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request, Guid userId)
     {
         
-        var quiz = await _quizRepository.FindByIdAsync(quizId);
-
-        
-        
-        var creatorId = quiz?.CreatorId;
-        
-        if (quiz != null)
-        {
-            quiz.Name = request.Title;
-            quiz.Description = request.Description;
-            quiz.IsActive = request.IsActive;
-            quiz.IsPublished = request.IsPublished;
-            quiz.ModifiedOn = DateTime.Now;
-
-            var updatedQuiz = await _quizRepository.UpdateQuizAsync(quizId);
-            return updatedQuiz;
-        }
-        
-        // should be  request dto
-
-        return quiz;
     }
     
     
     public async Task<Quiz> DeleteQuizAsync(Guid quizId, Guid userId)
     {
-        var deletedQuiz = await _quizRepository.DeleteQuizAsync(quizId);
-        return deletedQuiz;
+        
     }
     
 }
