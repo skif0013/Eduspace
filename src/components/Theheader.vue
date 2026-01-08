@@ -9,9 +9,11 @@
                     @mouseenter="isMenuOpen = true"
                     @mouseleave="isMenuOpen = false"
                 >
-                   <span class="bg-green-100 text-green-800 px-4 py-1 rounded-full text-2xl font-bold select-none">
+                  <router-link to="/" class="inline-block mb-4 hover:scale-105 transition-transform cursor-pointer">
+                      <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xl font-bold">
                         Edu-space
-                    </span>
+                      </span>
+                  </router-link>
 
                     <Transition
                         enter-active-class="transition duration-300 ease-out"
