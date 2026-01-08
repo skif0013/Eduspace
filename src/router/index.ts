@@ -1,17 +1,22 @@
-import HomeView from '../views/HomeView.vue'
-import Login from "../Auth/Login.vue"; // <-- Важно!
+import { createRouter, createWebHistory } from 'vue-router'
+
+import HeroSection from '../components/HeroSection.vue'
+import LoginView from '../Auth/LoginView.vue'
 
 const router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
             path: '/',
             name: 'home',
-            component: HomeView
+            component: HeroSection
         },
         {
             path: '/login',
             name: 'login',
-            component: Login
+            component: LoginView
         }
     ]
 })
+
+export default router
