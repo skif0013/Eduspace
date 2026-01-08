@@ -56,16 +56,16 @@
                     </Transition>
                 </div>
 
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 hidden md:block">
-                    <button
-                        class="bg-black text-white px-6 py-2 rounded-full font-medium
-                        hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5
-                        active:scale-95 transition-all duration-200 ease-in-out"
-                        @click="handleClick"
-                    >
-                        Get Started
-                    </button>
-                </div>
+              <div class="absolute right-0 top-1/2 -translate-y-1/2 hidden md:block">
+                <router-link
+                    to="/login"
+                    class="bg-black text-white px-6 py-2 rounded-full font-medium
+        hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5
+        active:scale-95 transition-all duration-200 ease-in-out inline-block"
+                >
+                  Get Started
+                </router-link>
+              </div>
 
             </div>
         </div>

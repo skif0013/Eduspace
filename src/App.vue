@@ -1,11 +1,11 @@
-
 <template>
-    <TheHeader/>
-    <main>
-        <HeroSection/>
-    </main>
+  <TheHeader/>
+
+  <main>
+    <router-view />
+  </main>
 </template>
-<script setup>
+
+<script setup lang="ts">
 import TheHeader from "./components/Theheader.vue"
-import HeroSection from "./components/HeroSection.vue"
 </script>
