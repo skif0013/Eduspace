@@ -10,6 +10,6 @@ public class IQuizMapper
     Quiz MapToDomain(CreatingQuizRequestDTO request, Guid userId);
     
     void MapToDomain(QuizUpdateRequestDTO request, Quiz quiz);
-    
-    QuizResponseDTO MapToResponseDTO(Quiz quiz);
+
+    public QuizResponseDTO MapToResponseDTO(Quiz quiz);
 }

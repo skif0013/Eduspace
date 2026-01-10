@@ -10,9 +10,11 @@ public class QuizService : IQuizService
 {
     private readonly IQuizRepository _quizRepository;
     private readonly IUnitOfWork _unitOfWork; 
+    private readonly IQuizMapper _mapper;
 
-    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork)
+    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper)
     {
+        _mapper = mapper;
         _unitOfWork = unitOfWork;
         _quizRepository = quizRepository;
     }
@@ -35,29 +37,59 @@ public class QuizService : IQuizService
         await _quizRepository.AddQuizAsync(quiz);
         await _unitOfWork.SaveChangesAsync();
         
+        return _mapper.MapToResponseDTO(quiz);
     }
 
-    public async Task<Quiz> FindByIdAsync(Guid userId, Guid quizId)
+    public async Task<QuizResponseDTO> GetQuizByIdAsync(Guid userId, Guid quizId)
     {
+        var find = await _quizRepository.FindByIdAsync(quizId);
         
+        if (find == null)
+        {
+            throw new Exception("Quiz not found");
+        }
+        
+        return _mapper.MapToResponseDTO(find);
     }
   
     
-    //for developming
-    public async Task<List<Quiz>> GetQuizzes()
+    //for develop 
+    public async Task<IReadOnlyCollection<QuizResponseDTO>> GetAllQuizzesAsync()
     {
+        var getAll = await _quizRepository.GetAllQuizzesAsync();
         
+        return getAll.Select(q => _mapper.MapToResponseDTO(q)).ToList();
     }
     
-    public async Task<Quiz?> UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request, Guid userId)
+    public async Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request, Guid userId)
     {
+        var update = await _quizRepository.FindByIdAsync(quizId);
         
+        if (update == null)
+        {
+            throw new Exception("Quiz not found");
+        }
+        
+        update.Name = request.Title;
+        update.Description = request.Description;
+        update.IsActive = request.IsActive;
+        update.IsPublished = request.IsPublished;
+        update.ModifiedOn = DateTime.Now;
+        await _unitOfWork.SaveChangesAsync();
     }
     
     
-    public async Task<Quiz> DeleteQuizAsync(Guid quizId, Guid userId)
+    public async Task DeleteQuizAsync(Guid quizId, Guid userId)
     {
+        var delete = await _quizRepository.FindByIdAsync(quizId);
         
+        if (delete == null)
+        {
+            throw new Exception("Quiz not found");
+        }
+        
+        await _quizRepository.RemoveAsync(delete);
+        await _unitOfWork.SaveChangesAsync();
     }
     
 }

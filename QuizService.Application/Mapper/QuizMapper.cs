@@ -7,7 +7,7 @@ namespace QuizService.Application.Services;
 
 public class QuizMapper : IQuizMapper
 {
-    public Quiz MapToQuizDomainModel(CreatingQuizRequestDTO dto, Guid userId)
+    public Quiz MapToDomain(CreatingQuizRequestDTO dto, Guid userId)
     {
         return new Quiz
         {
@@ -33,7 +33,7 @@ public class QuizMapper : IQuizMapper
         quiz.ModifiedOn = DateTime.UtcNow;
     }
     
-    public QuizResponseDTO MapToResponse(Quiz quiz)
+    public QuizResponseDTO MapToResponseDTO(Quiz quiz)
     {
         return new QuizResponseDTO
         {
