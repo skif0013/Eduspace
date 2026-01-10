@@ -21,23 +21,32 @@ public class GroupController : ControllerBase
     }
     
     [HttpGet("get-all-groups")]
-    public async Task<IActionResult> GetAllGroups(Guid userId)
+    public async Task<IActionResult> GetAllGroups()
     {
+        var userIdFromClaims = User.FindFirst("userId")?.Value;
+        Guid userId = Guid.Parse(userIdFromClaims);
+        
         var groups = await _groupService.GetAllGroupsAsync(userId);
 
         return Ok(_mappingService.ToGroupResponseList(groups));
     }
 
     [HttpGet("{groupId}")]
-    public async Task<IActionResult> GetGroup(Guid groupId, Guid userId)
+    public async Task<IActionResult> GetGroup(Guid groupId)
     {
+        var userIdFromClaims = User.FindFirst("userId")?.Value;
+        Guid userId = Guid.Parse(userIdFromClaims);
+        
         var group = await _groupService.GetGroupAsync(groupId, userId);
         return Ok(_mappingService.ToGroupResponseDTO(group)); 
     }
 
     [HttpPost("CreateGroup")]
-    public async Task<IActionResult> CreateGroup([FromBody] CreatingGroupRequestDTO requestDto,[FromHeader(Name = "X-User_id")] Guid userId, [FromHeader(Name = "X-User-Email")] string email)
+    public async Task<IActionResult> CreateGroup([FromBody] CreatingGroupRequestDTO requestDto, [FromHeader(Name = "X-User-Email")] string email)
     {
+        var userIdFromClaims = User.FindFirst("userId")?.Value;
+        Guid userId = Guid.Parse(userIdFromClaims);
+        
         var group = await _groupService.CreateGroupAsync(requestDto, userId, email);
         
         var responseDto = _mappingService.ToGroupResponseDTO(group);
@@ -46,23 +55,32 @@ public class GroupController : ControllerBase
     }
 
     [HttpPut("update/{groupId}")]
-    public async Task<IActionResult> UpdateGroup([FromRoute] Guid groupId, [FromBody] UpdateGroupDTO dto, [FromHeader(Name = "X-User-Id")]Guid userId)
+    public async Task<IActionResult> UpdateGroup([FromRoute] Guid groupId, [FromBody] UpdateGroupDTO dto)
     {
+        var userIdFromClaims = User.FindFirst("userId")?.Value;
+        Guid userId = Guid.Parse(userIdFromClaims);
+        
         var updated = await _groupService.UpdateGroupAsync(dto, groupId, userId);
         return Ok(_mappingService.ToUpdateGroupDTO(updated));
     }
 
     [HttpDelete("{groupId}")]
-    public async Task<IActionResult> DeleteGroup(Guid groupId,Guid userId)
+    public async Task<IActionResult> DeleteGroup(Guid groupId)
     {
+        var userIdFromClaims = User.FindFirst("userId")?.Value;
+        Guid userId = Guid.Parse(userIdFromClaims);
+        
         var deleted = await _groupService.DeleteGroupAsync(groupId, userId);
         return Ok(_mappingService.ToGroupResponseDTO(deleted));
     }
 
     [HttpPost("{groupId}/members")]
-    public async Task<IActionResult> AddMemberToGroup(Guid groupId, [FromBody] AddGroupMemberRequestDTO requestDto,Guid UserId)
+    public async Task<IActionResult> AddMemberToGroup(Guid groupId, [FromBody] AddGroupMemberRequestDTO requestDto)
     {
-        var groupMember = await _groupMemberService.AddMemberToGroupAsync(requestDto, groupId,UserId);
+        var userIdFromClaims = User.FindFirst("userId")?.Value;
+        Guid userId = Guid.Parse(userIdFromClaims);
+        
+        var groupMember = await _groupMemberService.AddMemberToGroupAsync(requestDto, groupId, userId);
         return Ok(_mappingService.ToGroupMemberResponseDTO(groupMember));
     }
 

@@ -131,7 +131,7 @@ app.UseSwagger();
 app.UseSwaggerUI(options =>
 { 
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "AuthService API v1");
-    options.RoutePrefix = "swagger/index.html"; 
+    options.RoutePrefix = "swagger/docs/v1/auth"; 
 });
 
 app.UseHttpsRedirection();

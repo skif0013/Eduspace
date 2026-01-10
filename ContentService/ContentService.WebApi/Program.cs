@@ -1,3 +1,4 @@
+using System.Text;
 using ContentService.Application.Contracts;
 using ContentService.Infrastructure.Data;
 using ContentService.Infrastructure.Repositories;
@@ -6,9 +7,40 @@ using Azure.Storage.Blobs;
 using ContentService.Application.Contracts.Repositories;
 using ContentService.Application.DTOs.GroupDTOs;
 using ContentService.Application.Service;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+#region config jwt
+var validIssuer = Environment.GetEnvironmentVariable("AuthServiceJwt__Issuer");
+var validAudience = Environment.GetEnvironmentVariable("AuthServiceJwt__Audience");
+var symmetricSecurityKey = Environment.GetEnvironmentVariable("AuthServiceJwt__Key");
+
+builder.Services.AddAuthentication(options => {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.IncludeErrorDetails = true;
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ClockSkew = TimeSpan.Zero,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = validIssuer,
+            ValidAudience = validAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(symmetricSecurityKey)
+            ),
+        };
+    });
+#endregion
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
