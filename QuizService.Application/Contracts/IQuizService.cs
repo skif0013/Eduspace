@@ -6,11 +6,11 @@ namespace QuizService.Application.Contracts;
 
 public interface IQuizService
 {
-    Task<IReadOnlyCollection<QuizResponseDTO>> GetAllQuizzesAsync(Guid userId, Guid quizId);
+    Task<IReadOnlyCollection<QuizResponseDTO>> GetAllQuizzesAsync();
     
     Task<QuizResponseDTO> GetQuizByIdAsync(Guid userId, Guid quizId);
     
-    Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizResponseDTO request,  Guid userId);
+    Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request,  Guid userId);
     
     Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request, Guid userId);
     
