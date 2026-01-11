@@ -21,7 +21,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\FileService.Application\FileService.Application.csproj" />
-        <ProjectReference Include="..\ContentService.Infrastructure\ContentService.Infrastructure.csproj" />
+        <ProjectReference Include="..\FileService.Infrastructure\FileService.Infrastructure.csproj" />
         <ProjectReference Include="..\FileService.Infrastructure\FileService.Infrastructure.csproj" />
     </ItemGroup>
 
