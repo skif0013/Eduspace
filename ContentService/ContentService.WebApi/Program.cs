@@ -54,14 +54,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddScoped<IGroupRepository, GroupRepository>();
-builder.Services.AddScoped<IGroupMemberService, ContentService.Application.Service.GroupMemberService>();
-builder.Services.AddScoped<IGroupMemberRepository, GroupMemberRepository>();
-builder.Services.AddScoped<IGroupService, ContentService.Application.Service.GroupService>();
 builder.Services.AddScoped<BlobStorageService>();
 builder.Services.AddScoped<IFileRepository, FileRepository>();
-builder.Services.AddScoped<MappingService>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 
 

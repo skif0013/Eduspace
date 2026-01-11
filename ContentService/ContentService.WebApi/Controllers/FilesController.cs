@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace ContentService.WebApi.Controllers;
 
 [ApiController]
-public class FilesContoller : ControllerBase
+public class FilesController : ControllerBase
 {
     private readonly BlobStorageService _blobService;
     
     
-    public FilesContoller(BlobStorageService blobService)
+    public FilesController(BlobStorageService blobService)
     {
         _blobService = blobService;
     }
