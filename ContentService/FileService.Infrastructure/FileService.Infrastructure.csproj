@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ContentService.Domain\ContentService.Domain.csproj" />
-        <ProjectReference Include="..\ContentService.Application\ContentService.Application.csproj" />
+        <ProjectReference Include="..\FileService.Domain\FileService.Domain.csproj" />
+        <ProjectReference Include="..\FileService.Application\FileService.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>

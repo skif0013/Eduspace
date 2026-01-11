@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ContentService.Infrastructure.Migrations
+namespace FileService.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialWitchDocker : Migration

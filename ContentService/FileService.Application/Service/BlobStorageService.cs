@@ -1,10 +1,10 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
-using ContentService.Application.Contracts.Repositories;
-using ContentService.Application.DTOs.GroupDTOs;
-using ContentService.Domain.Models;
+using FileService.Domain.Models;
+using FileService.Application.Contracts.Repositories;
+using FileService.Application.DTOs.GroupDTOs;
 
-namespace ContentService.Application.Service;
+namespace FileService.Application.Service;
 
 public class BlobStorageService
 {

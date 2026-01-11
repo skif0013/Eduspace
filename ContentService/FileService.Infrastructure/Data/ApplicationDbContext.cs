@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ContentService.Domain.Models;
+using FileService.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ContentService.Infrastructure.Data;
+namespace FileService.Infrastructure.Data;
 
 public class ApplicationDbContext : DbContext
 {

@@ -1,4 +1,4 @@
-﻿using ContentService.Application.Service;
+﻿using FileService.Application.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContentService.WebApi.Controllers;
@@ -7,8 +7,8 @@ namespace ContentService.WebApi.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly BlobStorageService _blobService;
-    
-    
+
+
     public FilesController(BlobStorageService blobService)
     {
         _blobService = blobService;
@@ -30,7 +30,7 @@ public class FilesController : ControllerBase
     public async Task<IActionResult> GetFileLink(Guid fileId, Guid userId)
     {
         var url = await _blobService.GetFileLinkAsync(fileId, userId);
-        
+
         return Ok(url);
     }
 
@@ -38,7 +38,8 @@ public class FilesController : ControllerBase
     public async Task<IActionResult> DeleteFile(Guid fileId, Guid userId)
     {
         await _blobService.DeleteFileAsync(fileId, userId);
-        
+
         return NoContent();
     }
 }
+    

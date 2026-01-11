@@ -1,11 +1,9 @@
-using ContentService.Application.Contracts;
-using ContentService.Infrastructure.Data;
-using ContentService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Azure.Storage.Blobs;
-using ContentService.Application.Contracts.Repositories;
-using ContentService.Application.DTOs.GroupDTOs;
-using ContentService.Application.Service;
+using ContentService.Infrastructure.Repositories;
+using FileService.Application.DTOs.GroupDTOs;
+using FileService.Application.Service;
+using FileService.Infrastructure.Data;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,6 +1,6 @@
-﻿using ContentService.Application.DTOs.GroupDTOs;
-using ContentService.Domain.Models;
-using ContentService.Infrastructure.Data;
+﻿using FileService.Domain.Models;
+using FileService.Application.DTOs.GroupDTOs;
+using FileService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContentService.Infrastructure.Repositories;
@@ -8,7 +8,7 @@ namespace ContentService.Infrastructure.Repositories;
 public class FileRepository : IFileRepository
 {
     private readonly ApplicationDbContext _dbContext;
-    
+
     public FileRepository(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -17,21 +17,21 @@ public class FileRepository : IFileRepository
 
     public async Task AddAsync(UserFileMetadata userFile)
     {
-       await _dbContext.UserFileMetadatas.AddAsync(userFile);
+        await _dbContext.UserFileMetadatas.AddAsync(userFile);
     }
-    
+
     public async Task<List<UserFileMetadata>> GetFilesByUserIdAsync(Guid userId)
     {
         return await _dbContext.UserFileMetadatas
             .Where(f => f.UserId == userId && !f.IsDeleted)
             .ToListAsync();
     }
-    
+
     public async Task DeleteAsync(UserFileMetadata userFile)
     {
-       userFile.IsDeleted = true;
+        userFile.IsDeleted = true;
     }
-    
+
     public async Task<UserFileMetadata?> GetFileByIdAsync(Guid fileId, Guid userId)
     {
         return await _dbContext.UserFileMetadatas

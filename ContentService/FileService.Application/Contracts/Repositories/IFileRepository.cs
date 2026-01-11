@@ -1,6 +1,6 @@
-﻿using ContentService.Domain.Models;
+﻿using FileService.Domain.Models;
 
-namespace ContentService.Application.DTOs.GroupDTOs;
+namespace FileService.Application.DTOs.GroupDTOs;
 
 public interface IFileRepository
 {

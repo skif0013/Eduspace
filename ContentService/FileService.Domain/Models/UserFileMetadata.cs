@@ -1,4 +1,4 @@
-﻿namespace ContentService.Domain.Models;
+﻿namespace FileService.Domain.Models;
 
 public class UserFileMetadata
 {

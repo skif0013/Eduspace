@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.WebApi", "ContentService.WebApi\ContentService.WebApi.csproj", "{A3A0B41A-A1D4-458D-B989-EC64F07C1D2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileService.WebApi", "FileService.WebApi\FileService.WebApi.csproj", "{A3A0B41A-A1D4-458D-B989-EC64F07C1D2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.Domain", "ContentService.Domain\ContentService.Domain.csproj", "{092E07A5-8CA4-47F4-ACD7-2B7D08F319CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileService.Domain", "FileService.Domain\FileService.Domain.csproj", "{092E07A5-8CA4-47F4-ACD7-2B7D08F319CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.Application", "ContentService.Application\ContentService.Application.csproj", "{102DD286-AAD8-4FB0-AADE-53B81AACD4E1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileService.Application", "FileService.Application\FileService.Application.csproj", "{102DD286-AAD8-4FB0-AADE-53B81AACD4E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.Infrastructure", "ContentService.Infrastructure\ContentService.Infrastructure.csproj", "{FE9082FD-B50F-450B-95F2-3318861C4B00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileService.Infrastructure", "FileService.Infrastructure\FileService.Infrastructure.csproj", "{FE9082FD-B50F-450B-95F2-3318861C4B00}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0756491D-50F0-43FE-BE9F-3CC4B9A2F198}"
 	ProjectSection(SolutionItems) = preProject
