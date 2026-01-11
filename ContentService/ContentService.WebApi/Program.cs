@@ -13,6 +13,13 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5010);
+    options.ListenAnyIP(5011);
+});
+
+
 #region config jwt
 var validIssuer = Environment.GetEnvironmentVariable("AuthServiceJwt__Issuer");
 var validAudience = Environment.GetEnvironmentVariable("AuthServiceJwt__Audience");

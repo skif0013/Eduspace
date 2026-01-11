@@ -1,59 +1,34 @@
-﻿version: '3.8'
-services:
-  db:
-    image: postgres:15
-    container_name: contentservice_postgres
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - contentservice-net
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: contentservice_pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
-    networks:
-      - contentservice-net
-
-  webapi:
+﻿services:
+  content.server:
+    image: ${DOCKER_REGISTRY-}contentservice
     build:
-      context: ..
-      dockerfile: ContentService.WebApi/Dockerfile
-    container_name: contentservice_webapi
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=ContentDB;Username=postgres;Password=postgres
+    
+    ports:
+      - "5010:5010"
+      - "5011:5011"
+    depends_on:
+      - postgres
     env_file:
       - .env
+    restart: always
+
+  postgres:
+    image: postgres:16
     environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
-      - AzureStorage__ConnectionString=${AzureStorage__ConnectionString}
-      - AuthServiceJwt__Issuer=${AuthServiceJwt__Issuer}
-      - AuthServiceJwt__Audience=${AuthServiceJwt__Audience}
-      - AuthServiceJwt__Key=${AuthServiceJwt__Key}
-      - AuthServiceJwt__RequireHttpsMetadata=${AuthServiceJwt__RequireHttpsMetadata}
+      POSTGRES_DB: ContentDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "8080:80"
-    depends_on:
-      - db
-    networks:
-      - contentservice-net
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
 
 volumes:
-  pgdata:
-
-networks:
-  contentservice-net:
-    driver: bridge
+  postgres_data:
+    driver: local
