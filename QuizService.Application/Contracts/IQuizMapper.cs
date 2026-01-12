@@ -1,15 +1,20 @@
 ﻿using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
-using QuizService.Application.DTOs.ResponseDTOs;
 using QuizService.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace QuizService.Application.Contracts;
-
-public class IQuizMapper
+namespace QuizService.Application.Contracts
 {
-    Quiz MapToDomain(CreatingQuizRequestDTO request, Guid userId);
-    
-    void MapToDomain(QuizUpdateRequestDTO request, Quiz quiz);
+    public  interface IQuizMapper
+    {
+        Quiz MapToDomain(CreatingQuizRequestDTO request, Guid userId);
 
-    public QuizResponseDTO MapToResponseDTO(Quiz quiz);
+        void MapToDomain(QuizUpdateRequestDTO request, Quiz quiz);
+
+        public QuizResponseDTO MapToResponseDTO(Quiz quiz);
+    }
 }

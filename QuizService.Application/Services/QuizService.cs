@@ -11,16 +11,18 @@ public class QuizService : IQuizService
     private readonly IQuizRepository _quizRepository;
     private readonly IUnitOfWork _unitOfWork; 
     private readonly IQuizMapper _mapper;
+    private readonly ITokenService _tokenService;
 
-    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper)
+    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper, ITokenService tokenService)
     {
+        _tokenService = tokenService;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _quizRepository = quizRepository;
     }
 
 
-    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid userId)
+    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid userId, string token)
     {
         var quiz = new Quiz()
         {
@@ -33,6 +35,8 @@ public class QuizService : IQuizService
             Name = request.QuizName,
             CreatedOn = DateTime.Now,
         };
+        
+        var userContext = _tokenService.GetUserFromToken(token);
         
         await _quizRepository.AddQuizAsync(quiz);
         await _unitOfWork.SaveChangesAsync();
@@ -91,5 +95,4 @@ public class QuizService : IQuizService
         await _quizRepository.RemoveAsync(delete);
         await _unitOfWork.SaveChangesAsync();
     }
-    
 }
