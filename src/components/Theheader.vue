@@ -14,7 +14,6 @@
                         Edu-space
                       </span>
                   </router-link>
-
                     <Transition
                         enter-active-class="transition duration-300 ease-out"
                         enter-from-class="transform scale-95 opacity-0 translate-y-2"
@@ -41,7 +40,7 @@
                                     <li>
                                         <a href="#" class="block px-4 py-2 rounded-lg text-gray-600 font-medium
                                        hover:bg-green-50 hover:text-green-700
-                                       active:bg-green-100 transition-colors duration-200">
+                                           active:bg-green-100 transition-colors duration-200">
                                             Mentors
                                         </a>
                                     </li>
@@ -51,6 +50,11 @@
                                        active:bg-green-100 transition-colors duration-200">
                                             Pricing
                                         </a>
+                                    </li>
+                                    <li>
+                                        <router-link to="/profile" class="block px-4 py-2 rounded-lg text-gray-600 font-medium
+                                       hover:bg-green-50 hover:text-green-700
+                                       active:bg-green-100 transition-colors duration-200">Profile</router-link>
                                     </li>
                                 </ul>
                             </nav>
