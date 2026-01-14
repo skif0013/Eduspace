@@ -11,18 +11,16 @@ public class QuizService : IQuizService
     private readonly IQuizRepository _quizRepository;
     private readonly IUnitOfWork _unitOfWork; 
     private readonly IQuizMapper _mapper;
-    private readonly ITokenService _tokenService;
 
-    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper, ITokenService tokenService)
+    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper)
     {
-        _tokenService = tokenService;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _quizRepository = quizRepository;
     }
 
 
-    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid userId, string token)
+    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid userId)
     {
         var quiz = new Quiz()
         {
@@ -35,8 +33,6 @@ public class QuizService : IQuizService
             Name = request.QuizName,
             CreatedOn = DateTime.Now,
         };
-        
-        var userContext = _tokenService.GetUserFromToken(token);
         
         await _quizRepository.AddQuizAsync(quiz);
         await _unitOfWork.SaveChangesAsync();

@@ -10,15 +10,19 @@ namespace QuizService.WebApi.Controller;
 public class QuizController : ControllerBase
 {
     private readonly IQuizService _quizService;
+    private readonly ITokenService _tokenService;
 
-    public QuizController(IQuizService quizService)
+    public QuizController(IQuizService quizService, ITokenService tokenService)
     {
+        _tokenService = tokenService;
         _quizService = quizService;
     }
     
-    [HttpPost]
-    public async Task<ActionResult<QuizResponseDTO>> Create([FromBody] CreatingQuizRequestDTO request, [FromRoute] Guid userId)
+    [HttpPost("Create")]
+    public async Task<ActionResult<QuizResponseDTO>> Create([FromBody] CreatingQuizRequestDTO request, [FromRoute] string token )
     {
+        var userId = _tokenService.GetUserIdFromToken(token);
+        
         var result = await _quizService.CreateQuizAsync(request, userId);
         return CreatedAtAction(nameof(GetById), new { id = result.QuizId }, result);
     }
