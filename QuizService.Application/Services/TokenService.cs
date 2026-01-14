@@ -24,4 +24,18 @@ public class TokenService : ITokenService
             Roles = rolesClaims
         };
     }
+
+
+    public Guid GetUserIdFromToken(string token)
+    {
+        
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jwtToken = tokenHandler.ReadJwtToken(token);
+        var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            throw new Exception("UserId claim is missing");
+        }
+        return Guid.Parse(userIdClaim.Value);
+    }
 }
