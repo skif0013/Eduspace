@@ -8,6 +8,9 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["QuizService.WebApi/QuizService.WebApi.csproj", "QuizService.WebApi/"]
+COPY ["QuizService.Application/QuizService.Application.csproj", "QuizService.Application/"]
+COPY ["QuizService.Domain/QuizService.Domain.csproj", "QuizService.Domain/"]
+COPY ["QuizService.Infrastructure/QuizService.Infrastructure.csproj", "QuizService.Infrastructure/"]
 RUN dotnet restore "QuizService.WebApi/QuizService.WebApi.csproj"
 COPY . .
 WORKDIR "/src/QuizService.WebApi"
