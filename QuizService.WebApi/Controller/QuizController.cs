@@ -21,14 +21,14 @@ public class QuizController : ControllerBase
     [HttpPost("Create")]
     public async Task<ActionResult<QuizResponseDTO>> Create([FromBody] CreatingQuizRequestDTO request, [FromRoute] string token )
     {
-        var userId = _tokenService.GetUserIdFromToken(token);
+        //   var userId = _tokenService.GetUserIdFromToken(token);
         
-        var result = await _quizService.CreateQuizAsync(request, userId);
+        var result = await _quizService.CreateQuizAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = result.QuizId }, result);
     }
 
     
-    [HttpGet("{id}")]
+    [HttpGet("GetById")]
     public async Task<ActionResult<QuizResponseDTO>> GetById([FromRoute] Guid quizId, Guid userId)
     {
         var get = await _quizService.GetQuizByIdAsync(quizId,userId);
@@ -37,7 +37,7 @@ public class QuizController : ControllerBase
     }
 
     
-    [HttpGet]
+    [HttpGet("getAll")]
     public async Task<ActionResult<IReadOnlyCollection<QuizResponseDTO>>> GetAll()
     {
         var result = await _quizService.GetAllQuizzesAsync();
@@ -46,17 +46,17 @@ public class QuizController : ControllerBase
     
     
     [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromQuery] Guid quizId, Guid userId, [FromBody] QuizUpdateRequestDTO request)
+    public async Task<IActionResult> Update([FromRoute] Guid quizId,[FromBody] QuizUpdateRequestDTO request)
     {
-        await _quizService.UpdateQuizAsync(quizId,userId, request);
+        await _quizService.UpdateQuizAsync(quizId, request);
         
         return NoContent();
     }
     
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid quizId, Guid userId)
+    [HttpDelete("Delete")]
+    public async Task<IActionResult> Delete([FromRoute] Guid quizId)
     {
-        var delete = await _quizService.DeleteQuizAsync(quizId, userId);
+        await _quizService.DeleteQuizAsync(quizId);
         
         return NoContent();
     }
