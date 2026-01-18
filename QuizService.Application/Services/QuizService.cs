@@ -11,17 +11,23 @@ public class QuizService : IQuizService
     private readonly IQuizRepository _quizRepository;
     private readonly IUnitOfWork _unitOfWork; 
     private readonly IQuizMapper _mapper;
+    private readonly ITokenService _tokenService;
 
-    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper)
+    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper, ITokenService tokenService)
     {
+        _tokenService = tokenService;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _quizRepository = quizRepository;
     }
 
 
-    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid userId)
+    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request)
     {
+        
+        //temporarily
+        Guid userId = Guid.NewGuid();
+        
         var quiz = new Quiz()
         {
             QuizId = Guid.NewGuid(),
@@ -61,9 +67,10 @@ public class QuizService : IQuizService
         return getAll.Select(q => _mapper.MapToResponseDTO(q)).ToList();
     }
     
-    public async Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request, Guid userId)
+    public async Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request)
     {
         var update = await _quizRepository.FindByIdAsync(quizId);
+        
         
         if (update == null)
         {
@@ -79,7 +86,7 @@ public class QuizService : IQuizService
     }
     
     
-    public async Task DeleteQuizAsync(Guid quizId, Guid userId)
+    public async Task DeleteQuizAsync(Guid quizId)
     {
         var delete = await _quizRepository.FindByIdAsync(quizId);
         
