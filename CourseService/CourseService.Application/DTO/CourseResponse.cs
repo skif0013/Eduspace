@@ -1,16 +1,14 @@
-﻿using CourseService.Domain.Abstractions;
-using CourseService.Domain.Enums;
+﻿using CourseService.Domain.Enums;
 
-namespace CourseService.Domain.Entities;
+namespace CourseService.Application.DTO;
 
-public class Course : Entity
+public class CourseResponse
 {
-    public Guid OwnerId { get; set; }
+    public Guid Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public decimal Price { get; set; }
     public string? AvatarURL { get; set; }
     public CourseStatus Status { get; set; }
-
-    public Course() { }
+    public DateTime CreatedAt {  get; set; }
 }
