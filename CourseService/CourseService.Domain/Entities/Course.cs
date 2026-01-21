@@ -1,5 +1,6 @@
 ﻿using CourseService.Domain.Abstractions;
 using CourseService.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace CourseService.Domain.Entities;
 
@@ -12,5 +13,5 @@ public class Course : Entity
     public string? AvatarURL { get; set; }
     public CourseStatus Status { get; set; }
 
-    public Course() { }
+    public ICollection<CourseRating> CourseRatings { get; set; } = new List<CourseRating>();
 }

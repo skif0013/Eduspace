@@ -2,12 +2,12 @@
 
 namespace CourseService.Domain.Entities
 {
-    public class CourseReview : Entity
-    { 
+    public class CourseRating : Entity
+    {
         public Guid CourseId { get; set; }
         public Guid UserId { get; set; }
-        public int Value { get; set; }
+        public int Rating { get; set; }
 
-        private CourseReview() { }
+        public Course Course { get; set; } = null!;
     }
 }
