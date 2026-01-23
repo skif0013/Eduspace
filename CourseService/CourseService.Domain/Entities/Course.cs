@@ -1,6 +1,5 @@
 ﻿using CourseService.Domain.Abstractions;
 using CourseService.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace CourseService.Domain.Entities;
 

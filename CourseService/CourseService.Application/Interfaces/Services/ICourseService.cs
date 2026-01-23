@@ -4,7 +4,7 @@ using CourseService.Domain.Results;
 
 namespace CourseService.Application.Interfaces.Services;
 
-internal interface ICourseService
+public interface ICourseService
 {
     Task<Result<List<Course>>> GetAllCoursesAsync();
     Task<Result<Course>> GetCourseByIdAsync(Guid courseId);
