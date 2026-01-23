@@ -1,4 +1,5 @@
-﻿using CourseService.Application.DTO;
+﻿using AutoMapper;
+using CourseService.Application.DTO;
 using CourseService.Application.Interfaces.Repositories;
 using CourseService.Application.Interfaces.Services;
 using CourseService.Domain.Entities;
@@ -10,36 +11,21 @@ namespace CourseService.Application.Services;
 public class CourseService : ICourseService
 {
     private readonly ICourseRepository _courseRepository;
+    private readonly IMapper _mapper;
 
-    public CourseService(ICourseRepository courseRepository)
+    public CourseService(ICourseRepository courseRepository, IMapper mapper)
     {
         _courseRepository = courseRepository;
+        _mapper = mapper;
     }
 
     public async Task<Result<CourseResponse>> CreateCourseAsync(CreateCourseDTO courseDTO, Guid ownerId)
     {
-        var course = new Course()
-        {
-            OwnerId = Guid.NewGuid(),
-            Name = courseDTO.Name,
-            Description = courseDTO.Description,
-            Price = courseDTO.Price,
-            AvatarURL = courseDTO.AvatarURL,
-            Status = CourseStatus.Draft
-        };
-        
+        var course = _mapper.Map<Course>(courseDTO);
+
         var createdCourse = await _courseRepository.CreateCourseAsync(course);
 
-        var response = new CourseResponse()
-        {
-            Id = createdCourse.Id,
-            Name = createdCourse.Name,
-            Description = createdCourse.Description,
-            Price = createdCourse.Price,
-            AvatarURL = createdCourse.AvatarURL,
-            Status = createdCourse.Status,
-            CreatedAt = createdCourse.CreatedAt
-        };
+        var response = _mapper.Map<CourseResponse>(createdCourse);
         
         return Result<CourseResponse>.Success(response);
     }

@@ -18,6 +18,7 @@ namespace CourseService.Infrastructure.Repositories
         public async Task<Course> CreateCourseAsync(Course course)
         {
             course.CreatedAt = DateTime.Now;
+            course.Status = CourseStatus.Draft;
             _dbContext.Courses.AddAsync(course);
             await _dbContext.SaveChangesAsync();
 

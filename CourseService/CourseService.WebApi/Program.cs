@@ -1,3 +1,4 @@
+using CourseService.Application;
 using CourseService.Application.Interfaces.Repositories;
 using CourseService.Infrastructure.Data;
 using CourseService.Infrastructure.Repositories;
@@ -9,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+#region Dependency Injection Configuration
+builder.Services.AddApplicationServices(builder.Configuration);
+#endregion
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
