@@ -22,9 +22,7 @@ public class CourseService : ICourseService
     public async Task<Result<CourseResponse>> CreateCourseAsync(CreateCourseDTO courseDTO, Guid ownerId)
     {
         var course = _mapper.Map<Course>(courseDTO);
-
         var createdCourse = await _courseRepository.CreateCourseAsync(course);
-
         var response = _mapper.Map<CourseResponse>(createdCourse);
         
         return Result<CourseResponse>.Success(response);
