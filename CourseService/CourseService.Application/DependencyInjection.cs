@@ -12,6 +12,8 @@ public static class DependencyInjection
     {
         services.AddAutoMapper(typeof(CourseProfile).Assembly);
 
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+
         return services;
     }
 }
