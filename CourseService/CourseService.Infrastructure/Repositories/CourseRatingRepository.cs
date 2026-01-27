@@ -14,6 +14,13 @@ public class CourseRatingRepository : ICourseRatingRepository
         _dbContext = dbContext; 
     }
 
+    public async Task CreateRatingAsync(CourseRating rating)
+    {
+        rating.CreatedAt = DateTime.Now;
+        _dbContext.CourseRatings.AddAsync(rating);
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async Task<CourseRating?> GetRatingByCourseIdAdnUserIdAsync(Guid courseId, Guid userId)
     {
         var rating = await _dbContext.CourseRatings
@@ -22,13 +29,6 @@ public class CourseRatingRepository : ICourseRatingRepository
             x.CourseId == courseId);
 
         return rating;
-    }
-
-    public async Task CreateRatingAsync(CourseRating rating)
-    {
-        rating.CreatedAt = DateTime.Now;
-        _dbContext.CourseRatings.AddAsync(rating);
-        await _dbContext.SaveChangesAsync();
     }
 
     public async Task UpdateRatingAsync(CourseRating rating)

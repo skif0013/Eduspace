@@ -109,7 +109,7 @@ namespace CourseService.WebApi.Controllers
         /// </summary>
         /// <remarks>
         /// Removes the course from the public catalog.
-        /// New users cannot enroll, but existing students keep access.
+        /// The course becomes invisible.
         /// </remarks>
         /// <param name="courseId">Course identifier.</param>
         //[Authorize]

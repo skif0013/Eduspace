@@ -3,7 +3,6 @@ using CourseService.Application.DTO;
 using CourseService.Application.Interfaces.Repositories;
 using CourseService.Application.Interfaces.Services;
 using CourseService.Domain.Entities;
-using CourseService.Domain.Enums;
 using CourseService.Domain.Results;
 
 namespace CourseService.Application.Services;
@@ -49,7 +48,15 @@ public class CourseService : ICourseService
             return Result<List<CourseResponse>>.Failure("List is empty");
         }
 
-        var response = _mapper.Map<List<CourseResponse>>(courses);
+        var response = courses.Select(course =>
+        {
+            var (average, amount) = CalculateRating(course.CourseRatings);
+            var dto = _mapper.Map<CourseResponse>(course);
+            dto.AverageRating = average;
+            dto.AmountRatings = amount;
+
+            return dto;
+        }).ToList();
 
         return Result<List<CourseResponse>>.Success(response);
     }
@@ -62,7 +69,10 @@ public class CourseService : ICourseService
             return Result<CourseResponse>.Failure($"Course with {courseId} doesn`t exist");
         }
 
+        var (average, amount) = CalculateRating(course.CourseRatings);
         var response = _mapper.Map<CourseResponse>(course);
+        response.AverageRating = average;
+        response.AmountRatings = amount;
 
         return Result<CourseResponse>.Success(response);
     }
@@ -94,5 +104,18 @@ public class CourseService : ICourseService
         var response = _mapper.Map<CourseResponse>(updatedCourse);
 
         return Result<CourseResponse>.Success(response);
+    }
+
+    private static (double average, int amount) CalculateRating(ICollection<CourseRating> ratings)
+    {
+        if(ratings == null || ratings.Count == 0)
+        {
+            return (0, 0);
+        }
+
+        double average = ratings.Average(x => x.Rating);
+        int amount = ratings.Count;
+
+        return (Math.Round(average, 1), amount);
     }
 }
