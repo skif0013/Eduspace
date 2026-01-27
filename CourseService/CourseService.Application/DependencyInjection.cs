@@ -1,4 +1,5 @@
 ﻿using CourseService.Application.Mappings;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

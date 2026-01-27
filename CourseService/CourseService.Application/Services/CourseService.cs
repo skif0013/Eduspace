@@ -19,7 +19,12 @@ public class CourseService : ICourseService
         _mapper = mapper;
     }
 
-    public async Task<Result<CourseResponse>> CreateCourseAsync(CreateCourseDTO courseDTO, Guid ownerId)
+    public Task<Result<bool>> ArchiveCourse(Guid courseId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Result<CourseResponse>> CreateCourseAsync(CourseDTO courseDTO, Guid ownerId)
     {
         var course = _mapper.Map<Course>(courseDTO);
         var createdCourse = await _courseRepository.CreateCourseAsync(course);
@@ -28,15 +33,17 @@ public class CourseService : ICourseService
         return Result<CourseResponse>.Success(response);
     }
 
-    public async Task<Result<List<Course>>> GetAllCoursesAsync()
+    public async Task<Result<List<CourseResponse>>> GetAllCoursesAsync()
     {
         var courses = await _courseRepository.GetAllCoursesAsync();
         if(courses == null)
         {
-            return Result<List<Course>>.Failure("List is empty");
+            return Result<List<CourseResponse>>.Failure("List is empty");
         }
 
-        return Result<List<Course>>.Success(courses);
+        var response = _mapper.Map<CourseResponse>(courses);
+
+        return Result<List<CourseResponse>>.Success(response);
     }
 
     public async Task<Result<Course>> GetCourseByIdAsync(Guid courseId)
@@ -50,36 +57,23 @@ public class CourseService : ICourseService
         return Result<Course>.Success(course);
     }
 
-    public async Task<Result<CourseResponse>> UpdateCourseAsync(UpdateCourseDTO courseDTO, Guid ownerId)
+    public Task<Result<bool>> PublishCourse(Guid courseId)
     {
-        var isOwner = await _courseRepository.GetCourseByIdAsync(courseDTO.Id);
+        throw new NotImplementedException();
+    }
+
+    public async Task<Result<CourseResponse>> UpdateCourseAsync(CourseDTO courseDTO, Guid ownerId, Guid courseId)
+    {
+        var isOwner = await _courseRepository.GetCourseByIdAsync(ownerId);
 
         if(isOwner.OwnerId != ownerId)
         {
             return Result<CourseResponse>.Failure($"{ownerId} is not the creator of the course");
         }
-            
-        var course = new Course()
-        {
-            Name = courseDTO.Name,
-            Description = courseDTO.Description,
-            Price = courseDTO.Price,
-            AvatarURL = courseDTO.AvatarURL,
-            Status = CourseStatus.Draft
-        };
 
+        var course = _mapper.Map<Course>(courseDTO);
         var updatedCourse = await _courseRepository.UpdateCourseAsync(course);
-
-        var response = new CourseResponse()
-        {
-            Id = updatedCourse.Id,
-            Name = updatedCourse.Name,
-            Description = updatedCourse.Description,
-            Price = updatedCourse.Price,
-            AvatarURL = updatedCourse.AvatarURL,
-            Status = updatedCourse.Status,
-            CreatedAt = updatedCourse.CreatedAt
-        };
+        var response = _mapper.Map<CourseResponse>(updatedCourse);
 
         return Result<CourseResponse>.Success(response);
     }

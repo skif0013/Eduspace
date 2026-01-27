@@ -8,7 +8,8 @@ public class CourseProfile : Profile
 {
     public CourseProfile() 
     { 
-        CreateMap<CreateCourseDTO, Course>();
+        CreateMap<CourseDTO, Course>();
         CreateMap<Course, CourseResponse>();
+        CreateMap<List<Course>, List<CourseResponse>>();
     }
 }

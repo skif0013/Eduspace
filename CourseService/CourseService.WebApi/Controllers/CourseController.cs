@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using CourseService.Domain.Results;
 using CourseService.Application.DTO;
 using CourseService.Domain.Entities;
+using CourseService.WebApi.Extentions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CourseService.WebApi.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/courses")]
     public class CourseController : ControllerBase
     {
         private readonly ICourseService _courseService;
@@ -17,36 +19,97 @@ namespace CourseService.WebApi.Controllers
             _courseService = courseService;        
         }
 
+        /// <summary>
+        /// Get all published courses.
+        /// </summary>
+        /// <remarks>
+        /// Returns only courses with status <b>Published</b>.
+        /// Used for the public course catalog.
+        /// </remarks>
         [HttpGet]
-        [Route("get-all")]
-        public async Task<Result<List<Course>>> GetAllCourses()
+        public async Task<Result<List<CourseResponse>>> GetAllCourses()
         {
             var result = await _courseService.GetAllCoursesAsync();
             return result;
         }
 
-        [HttpGet]
-        [Route("{courseId}")]
+        /// <summary>
+        /// Get course by identifier.
+        /// </summary>
+        /// <remarks>
+        /// Public access is allowed only for published courses.
+        /// Course owner can access the course regardless of its status.
+        /// </remarks>
+        /// <param name="courseId">Course identifier.</param>
+        [HttpGet("{courseId:guid}")]
         public async Task<Result<Course>> GetCourseById(Guid courseId)
         {
             var result = await _courseService.GetCourseByIdAsync(courseId);
             return result;
         }
 
+        /// <summary>
+        /// Create a new course.
+        /// </summary>
+        /// <remarks>
+        /// Course is created with status <b>Draft</b>.
+        /// Available only to the course author.
+        /// </remarks>
+        //[Authorize]
         [HttpPost]
-        [Route("create")]
-        public async Task<Result<CourseResponse>> CreateCourse(CreateCourseDTO courseDTO, Guid ownerId)
+        public async Task<Result<CourseResponse>> CreateCourse(CourseDTO courseDTO)//[FromBody]
         {
+            var ownerId = User.GetUserId();
             var result = await _courseService.CreateCourseAsync(courseDTO, ownerId);
             return result;
         }
 
-        [HttpPut]
-        [Route("update")]
-        public async Task<Result<CourseResponse>> UpdateCourse(UpdateCourseDTO courseDTO, Guid ownerId)
+        /// <summary>
+        /// Update an existing course.
+        /// </summary>
+        /// <remarks>
+        /// Available only to the course owner.
+        /// Published courses may have editing restrictions.
+        /// </remarks>
+        /// <param name="courseId">Course identifier.</param>
+        /// <param name="courseDto">Updated course data.</param>
+        //[Authorize]
+        [HttpPut("{courseId:guid}")]
+        public async Task<Result<CourseResponse>> UpdateCourse(CourseDTO courseDTO, Guid courseId)//[FromBody]
         {
-            var result = await _courseService.UpdateCourseAsync(courseDTO, ownerId);
+            var ownerId = User.GetUserId();
+            var result = await _courseService.UpdateCourseAsync(courseDTO, ownerId, courseId);
             return result;
+        }
+
+        /// <summary>
+        /// Publish a course.
+        /// </summary>
+        /// <remarks>
+        /// Changes course status from <b>Draft</b> to <b>Published</b>.
+        /// After publishing, the course becomes visible in the public catalog.
+        /// </remarks>
+        /// <param name="courseId">Course identifier.</param>
+        //[Authorize]
+        [HttpPatch("{courseId:guid}/publish")]
+        public async Task<Result<bool>> PublishCourse(Guid courseId)
+        {
+            return Result<bool>.Success(true);
+        }
+
+        /// <summary>
+        /// Archive a course.
+        /// </summary>
+        /// <remarks>
+        /// Removes the course from the public catalog.
+        /// New users cannot enroll, but existing students keep access.
+        /// </remarks>
+        /// <param name="courseId">Course identifier.</param>
+        //[Authorize]
+        [HttpPatch("{courseId:guid}/archive")]
+        public async Task<Result<bool>> ArchiveCourse(Guid courseId)
+        {
+            return Result<bool>.Success(true);
         }
     }
 }

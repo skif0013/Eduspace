@@ -3,17 +3,16 @@ using FluentValidation;
 
 namespace CourseService.Application.Validators;
 
-public class CreateCourseDtoValidator : AbstractValidator<CreateCourseDTO>
+public class CourseDtoValidator : AbstractValidator<CourseDTO>
 {
-    public CreateCourseDtoValidator()
+    public CourseDtoValidator()
     {
-        RuleFor(x => x.OwnerId).NotEmpty();
-
-        RuleFor(x => x.Name).NotEmpty()
-            .MinimumLength(1)
+        RuleFor(x => x.Name)
+            .NotEmpty()
             .MaximumLength(100);
 
-        RuleFor(x => x.Description).MaximumLength(500);
+        RuleFor(x => x.Description)
+            .MaximumLength(500);
 
         RuleFor(x => x.Price)
             .GreaterThanOrEqualTo(0)

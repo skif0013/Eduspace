@@ -1,8 +1,7 @@
 ﻿namespace CourseService.Application.DTO;
 
-public class CreateCourseDTO
+public class CourseDTO
 {
-    public Guid OwnerId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public decimal Price { get; set; }

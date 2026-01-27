@@ -7,13 +7,12 @@ public class UpdateCourseDtoValidator : AbstractValidator<UpdateCourseDTO>
 {
     public UpdateCourseDtoValidator()
     {
-        RuleFor(x => x.Id).NotEmpty();
-
-        RuleFor(x => x.Name).NotEmpty()
-            .MinimumLength(1)
+        RuleFor(x => x.Name)
+            .NotEmpty()
             .MaximumLength(100);
 
-        RuleFor(x => x.Description).MaximumLength(500);
+        RuleFor(x => x.Description)
+            .MaximumLength(500);
 
         RuleFor(x => x.Price)
             .GreaterThanOrEqualTo(0)
@@ -25,5 +24,8 @@ public class UpdateCourseDtoValidator : AbstractValidator<UpdateCourseDTO>
             .Must(x => Uri.IsWellFormedUriString(x, UriKind.Absolute))
             .When(x => !string.IsNullOrWhiteSpace(x.AvatarURL))
             .WithMessage("AvatarURL must be a valid URL");
+
+        RuleFor(x => x.Status)
+            .IsInEnum();
     }
 }
