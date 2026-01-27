@@ -15,6 +15,13 @@ namespace CourseService.Infrastructure.Repositories
             _dbContext = context;       
         }
 
+        public async Task ArchiveCourseAsync(Course course)
+        {
+            course.Status = CourseStatus.Archived;
+            _dbContext.Update(course);
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task<Course> CreateCourseAsync(Course course)
         {
             course.CreatedAt = DateTime.Now;
@@ -42,6 +49,13 @@ namespace CourseService.Infrastructure.Repositories
                 .FirstOrDefaultAsync(x=>x.Id == courseId);
 
             return query;
+        }
+
+        public async Task PublishCourseAsync(Course course)
+        {
+            course.Status = CourseStatus.Published;
+            _dbContext.Update(course);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<Course> UpdateCourseAsync(Course course)

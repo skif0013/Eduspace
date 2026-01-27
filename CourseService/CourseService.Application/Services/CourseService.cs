@@ -19,12 +19,20 @@ public class CourseService : ICourseService
         _mapper = mapper;
     }
 
-    public Task<Result<bool>> ArchiveCourse(Guid courseId)
+    public async Task<Result<bool>> ArchiveCourseAsync(Guid courseId, Guid authorId)
     {
-        throw new NotImplementedException();
+        var course = await _courseRepository.GetCourseByIdAsync(courseId);
+        if (course.AuthorId != authorId)
+        {
+            return Result<bool>.Failure($"Forbidden! {authorId} is not the creator of the course");
+        }
+
+        await _courseRepository.ArchiveCourseAsync(course);
+
+        return Result<bool>.Success(true);
     }
 
-    public async Task<Result<CourseResponse>> CreateCourseAsync(CourseDTO courseDTO, Guid ownerId)
+    public async Task<Result<CourseResponse>> CreateCourseAsync(CourseDTO courseDTO, Guid authorId)
     {
         var course = _mapper.Map<Course>(courseDTO);
         var createdCourse = await _courseRepository.CreateCourseAsync(course);
@@ -41,34 +49,44 @@ public class CourseService : ICourseService
             return Result<List<CourseResponse>>.Failure("List is empty");
         }
 
-        var response = _mapper.Map<CourseResponse>(courses);
+        var response = _mapper.Map<List<CourseResponse>>(courses);
 
         return Result<List<CourseResponse>>.Success(response);
     }
 
-    public async Task<Result<Course>> GetCourseByIdAsync(Guid courseId)
+    public async Task<Result<CourseResponse>> GetCourseByIdAsync(Guid courseId)
     {
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if(course == null)
         {
-            return Result<Course>.Failure($"Course with {courseId} doesn`t exist");
+            return Result<CourseResponse>.Failure($"Course with {courseId} doesn`t exist");
         }
 
-        return Result<Course>.Success(course);
+        var response = _mapper.Map<CourseResponse>(course);
+
+        return Result<CourseResponse>.Success(response);
     }
 
-    public Task<Result<bool>> PublishCourse(Guid courseId)
+    public async Task<Result<bool>> PublishCourseAsync(Guid courseId, Guid authorId)
     {
-        throw new NotImplementedException();
-    }
-
-    public async Task<Result<CourseResponse>> UpdateCourseAsync(CourseDTO courseDTO, Guid ownerId, Guid courseId)
-    {
-        var isOwner = await _courseRepository.GetCourseByIdAsync(ownerId);
-
-        if(isOwner.OwnerId != ownerId)
+        var course = await _courseRepository.GetCourseByIdAsync(courseId);
+        if(course.AuthorId != authorId)
         {
-            return Result<CourseResponse>.Failure($"{ownerId} is not the creator of the course");
+            return Result<bool>.Failure($"Forbidden! {authorId} is not the creator of the course");
+        }
+
+        await _courseRepository.PublishCourseAsync(course);
+
+        return Result<bool>.Success(true);
+    }
+
+    public async Task<Result<CourseResponse>> UpdateCourseAsync(CourseDTO courseDTO, Guid authorId, Guid courseId)
+    {
+        var isAuthor = await _courseRepository.GetCourseByIdAsync(authorId);
+
+        if(isAuthor.AuthorId != authorId)
+        {
+            return Result<CourseResponse>.Failure($"{authorId} is not the creator of the course");
         }
 
         var course = _mapper.Map<Course>(courseDTO);

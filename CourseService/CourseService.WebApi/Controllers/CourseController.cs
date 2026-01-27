@@ -30,6 +30,7 @@ namespace CourseService.WebApi.Controllers
         public async Task<Result<List<CourseResponse>>> GetAllCourses()
         {
             var result = await _courseService.GetAllCoursesAsync();
+
             return result;
         }
 
@@ -42,9 +43,10 @@ namespace CourseService.WebApi.Controllers
         /// </remarks>
         /// <param name="courseId">Course identifier.</param>
         [HttpGet("{courseId:guid}")]
-        public async Task<Result<Course>> GetCourseById(Guid courseId)
+        public async Task<Result<CourseResponse>> GetCourseById(Guid courseId)
         {
             var result = await _courseService.GetCourseByIdAsync(courseId);
+
             return result;
         }
 
@@ -59,8 +61,9 @@ namespace CourseService.WebApi.Controllers
         [HttpPost]
         public async Task<Result<CourseResponse>> CreateCourse(CourseDTO courseDTO)//[FromBody]
         {
-            var ownerId = User.GetUserId();
-            var result = await _courseService.CreateCourseAsync(courseDTO, ownerId);
+            var authorId = User.GetUserId();
+            var result = await _courseService.CreateCourseAsync(courseDTO, authorId);
+
             return result;
         }
 
@@ -77,8 +80,9 @@ namespace CourseService.WebApi.Controllers
         [HttpPut("{courseId:guid}")]
         public async Task<Result<CourseResponse>> UpdateCourse(CourseDTO courseDTO, Guid courseId)//[FromBody]
         {
-            var ownerId = User.GetUserId();
-            var result = await _courseService.UpdateCourseAsync(courseDTO, ownerId, courseId);
+            var authorId = User.GetUserId();
+            var result = await _courseService.UpdateCourseAsync(courseDTO, authorId, courseId);
+
             return result;
         }
 
@@ -94,7 +98,10 @@ namespace CourseService.WebApi.Controllers
         [HttpPatch("{courseId:guid}/publish")]
         public async Task<Result<bool>> PublishCourse(Guid courseId)
         {
-            return Result<bool>.Success(true);
+            var authorId = User.GetUserId();
+            var result = await _courseService.PublishCourseAsync(courseId, authorId);
+
+            return result;
         }
 
         /// <summary>
@@ -109,7 +116,10 @@ namespace CourseService.WebApi.Controllers
         [HttpPatch("{courseId:guid}/archive")]
         public async Task<Result<bool>> ArchiveCourse(Guid courseId)
         {
-            return Result<bool>.Success(true);
+            var authorId = User.GetUserId();
+            var result = await _courseService.ArchiveCourseAsync(courseId, authorId);
+
+            return result;
         }
     }
 }

@@ -5,7 +5,7 @@ namespace CourseService.Domain.Entities;
 
 public class Course : Entity
 {
-    public Guid OwnerId { get; set; }
+    public Guid AuthorId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public decimal Price { get; set; }
