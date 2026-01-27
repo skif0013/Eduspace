@@ -11,11 +11,11 @@ namespace CourseService.WebApi.Controllers
     [Route("api/courses/{courseId:guid}/ratings")]
     public class CourseRatingController : ControllerBase
     {
-        private readonly ICourseRatingService _ratingService;
+        private readonly ICourseRatingService _courseRatingService;
 
         public CourseRatingController(ICourseRatingService ratingService)
         {
-            _ratingService = ratingService;
+            _courseRatingService = ratingService;
         }
 
         /// <summary>
@@ -28,10 +28,11 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         //[Authorize]
         [HttpPost]
-        public async Task<Result<CourseRatingResponse>> CreateRating(CourseRatingDTO ratingDTO, Guid courseId)//[FromBody]
+        public async Task<Result<bool>> CreateRating(CourseRatingDTO ratingDTO, Guid courseId)//[FromBody]
         {
             var userId = User.GetUserId();
-            var result = await _ratingService.CreateCourseRatingAsync(ratingDTO, courseId, userId);
+            var result = await _courseRatingService.CreateRatingAsync(ratingDTO, courseId, userId);
+            
             return result;
         }
 
@@ -44,10 +45,11 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         //[Authorize]
         [HttpPut]
-        public async Task<Result<CourseRatingResponse>> UpdateRating(CourseRatingDTO ratingDTO, Guid courseId)
+        public async Task<Result<bool>> UpdateRating(CourseRatingDTO ratingDTO, Guid courseId)
         {
             var userId = User.GetUserId();
-            var result = await _ratingService.UpdateCourseRatingAsync(ratingDTO, courseId, userId);
+            var result = await _courseRatingService.UpdateRatingAsync(ratingDTO, courseId, userId);
+            
             return result;
         }
     }

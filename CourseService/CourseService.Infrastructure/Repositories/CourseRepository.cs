@@ -22,6 +22,13 @@ namespace CourseService.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<bool> CourseExistAsync(Guid courseId)
+        {
+            var exist = await _dbContext.Courses.AnyAsync(x => x.Id == courseId);
+
+            return exist;
+        }
+
         public async Task<Course> CreateCourseAsync(Course course)
         {
             course.CreatedAt = DateTime.Now;

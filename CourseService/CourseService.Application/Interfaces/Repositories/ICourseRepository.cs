@@ -6,6 +6,7 @@ namespace CourseService.Application.Interfaces.Repositories;
 public interface ICourseRepository
 {
     Task ArchiveCourseAsync(Course course);
+    Task<bool> CourseExistAsync(Guid courseId);
     Task<Course> CreateCourseAsync(Course course);
     Task<Course> GetCourseByIdAsync(Guid courseId);
     Task<List<Course>> GetAllCoursesAsync();

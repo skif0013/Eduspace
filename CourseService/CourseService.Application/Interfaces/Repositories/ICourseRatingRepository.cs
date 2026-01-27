@@ -4,6 +4,7 @@ namespace CourseService.Application.Interfaces.Repositories;
 
 public interface ICourseRatingRepository
 {
-    Task<Course> CreateRatingAsync(Course course);
-    Task<Course> UpdateRatingAsync(Course course);
+    Task<CourseRating> GetRatingByCourseIdAdnUserIdAsync(Guid courseId, Guid userId);
+    Task CreateRatingAsync(CourseRating rating);
+    Task UpdateRatingAsync(CourseRating newRating);
 }
