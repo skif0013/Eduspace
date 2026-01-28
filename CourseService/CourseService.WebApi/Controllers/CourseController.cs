@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using CourseService.Domain.Results;
 using CourseService.Application.DTO;
-using CourseService.Domain.Entities;
 using CourseService.WebApi.Extentions;
 using Microsoft.AspNetCore.Authorization;
 

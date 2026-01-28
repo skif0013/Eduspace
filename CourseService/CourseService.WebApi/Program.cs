@@ -2,11 +2,11 @@ using CourseService.Application;
 using CourseService.Application.Interfaces.Repositories;
 using CourseService.Infrastructure.Data;
 using CourseService.Infrastructure.Repositories;
+using CourseService.WebApi;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -18,6 +18,7 @@ builder.Services.AddSwaggerGen(options =>
 
 #region Dependency Injection Configuration
 builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddWebApiServices(builder.Configuration);
 #endregion
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
