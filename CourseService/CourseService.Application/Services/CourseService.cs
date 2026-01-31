@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using CourseService.Application.DTO;
+using CourseService.Application.Extentions;
 using CourseService.Application.Interfaces.Repositories;
 using CourseService.Application.Interfaces.Services;
+using CourseService.Application.Mappings;
 using CourseService.Domain.Entities;
+using CourseService.Domain.Enums;
 using CourseService.Domain.Results;
 
 namespace CourseService.Application.Services;
@@ -18,22 +21,29 @@ public class CourseService : ICourseService
         _mapper = mapper;
     }
 
-    public async Task<Result<bool>> ArchiveCourseAsync(Guid courseId, Guid authorId)
+    public async Task<Result<string>> ArchiveCourseAsync(Guid courseId, Guid authorId)
     {
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
-        if (course.AuthorId != authorId)
+        if (course == null)
         {
-            return Result<bool>.Failure($"Forbidden! {authorId} is not the creator of the course");
+            return Result<string>.Failure($"Course with {courseId} not found.");
         }
 
-        await _courseRepository.ArchiveCourseAsync(course);
+        if (course.AuthorId != authorId)
+        {
+            return Result<string>.Failure($"Forbidden! {authorId} is not the creator of the course");
+        }
+        course.Status = CourseStatus.Archived;
+        await _courseRepository.UpdateCourseAsync(course);
 
-        return Result<bool>.Success(true);
+        return Result<string>.Success("Course has been archived");
     }
 
     public async Task<Result<CourseResponse>> CreateCourseAsync(CourseDTO courseDTO, Guid authorId)
     {
         var course = _mapper.Map<Course>(courseDTO);
+        course.AuthorId = authorId;
+        course.Status = CourseStatus.Draft;
         var createdCourse = await _courseRepository.CreateCourseAsync(course);
         var response = _mapper.Map<CourseResponse>(createdCourse);
         
@@ -50,7 +60,7 @@ public class CourseService : ICourseService
 
         var response = courses.Select(course =>
         {
-            var (average, amount) = CalculateRating(course.CourseRatings);
+            var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
             var dto = _mapper.Map<CourseResponse>(course);
             dto.AverageRating = average;
             dto.AmountRatings = amount;
@@ -69,7 +79,7 @@ public class CourseService : ICourseService
             return Result<CourseResponse>.Failure($"Course with {courseId} doesn`t exist");
         }
 
-        var (average, amount) = CalculateRating(course.CourseRatings);
+        var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
         var response = _mapper.Map<CourseResponse>(course);
         response.AverageRating = average;
         response.AmountRatings = amount;
@@ -77,45 +87,49 @@ public class CourseService : ICourseService
         return Result<CourseResponse>.Success(response);
     }
 
-    public async Task<Result<bool>> PublishCourseAsync(Guid courseId, Guid authorId)
+    public async Task<Result<string>> PublishCourseAsync(Guid courseId, Guid authorId)
     {
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
-        if(course.AuthorId != authorId)
+        if(course == null)
         {
-            return Result<bool>.Failure($"Forbidden! {authorId} is not the creator of the course");
+            return Result<string>.Failure($"Course with {courseId} not found.");
         }
 
-        await _courseRepository.PublishCourseAsync(course);
+        if (course.AuthorId != authorId)
+        {
+            return Result<string>.Failure($"Forbidden! {authorId} is not the creator of the course.");
+        }
 
-        return Result<bool>.Success(true);
+        course.Status = CourseStatus.Published;
+        await _courseRepository.UpdateCourseAsync(course);
+
+        return Result<string>.Success("Course has been published.");
     }
 
-    public async Task<Result<CourseResponse>> UpdateCourseAsync(CourseDTO courseDTO, Guid authorId, Guid courseId)
+    public async Task<Result<CourseResponse>> UpdateCourseAsync(CourseDTO courseDTO, Guid courseId, Guid authorId)
     {
-        var isAuthor = await _courseRepository.GetCourseByIdAsync(authorId);
+        var course = await _courseRepository.GetCourseByIdAsync(courseId);
+        if (course == null)
+        {
+            return Result<CourseResponse>.Failure($"Course with {courseId} not found.");
+        }
 
-        if(isAuthor.AuthorId != authorId)
+        if (course.AuthorId != authorId)
         {
             return Result<CourseResponse>.Failure($"{authorId} is not the creator of the course");
         }
+        
+        course.Name = courseDTO.Name;
+        course.Description = courseDTO.Description;
+        course.Price = courseDTO.Price;
+        course.AvatarURL = courseDTO.AvatarURL;
+        await _courseRepository.UpdateCourseAsync(course);
 
-        var course = _mapper.Map<Course>(courseDTO);
-        var updatedCourse = await _courseRepository.UpdateCourseAsync(course);
-        var response = _mapper.Map<CourseResponse>(updatedCourse);
+        var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
+        var response = _mapper.Map<CourseResponse>(course);
+        response.AverageRating = average;
+        response.AmountRatings = amount;
 
         return Result<CourseResponse>.Success(response);
-    }
-
-    private static (double average, int amount) CalculateRating(ICollection<CourseRating> ratings)
-    {
-        if(ratings == null || ratings.Count == 0)
-        {
-            return (0, 0);
-        }
-
-        double average = ratings.Average(x => x.Rating);
-        int amount = ratings.Count;
-
-        return (Math.Round(average, 1), amount);
     }
 }

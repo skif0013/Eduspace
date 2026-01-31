@@ -1,15 +1,24 @@
 using CourseService.Application;
 using CourseService.Application.Interfaces.Repositories;
+using CourseService.Application.Interfaces.Services;
+using CourseService.Application.Services;
 using CourseService.Infrastructure.Data;
 using CourseService.Infrastructure.Repositories;
 using CourseService.WebApi;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddFluentValidationAutoValidation();
+
 builder.Services.AddSwaggerGen(options =>
 {
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -26,6 +35,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
+
+builder.Services.AddScoped<ICourseService, CourseService.Application.Services.CourseService>();
+builder.Services.AddScoped<ICourseRatingService, CourseRatingService>();
 
 var app = builder.Build();
 

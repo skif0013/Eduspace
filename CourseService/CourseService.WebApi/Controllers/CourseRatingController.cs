@@ -28,9 +28,10 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         //[Authorize]
         [HttpPost]
-        public async Task<Result<bool>> CreateRating(CourseRatingDTO ratingDTO, Guid courseId)//[FromBody]
+        public async Task<Result<CourseRatingResponse>> CreateRating(CourseRatingDTO ratingDTO, Guid courseId)//[FromBody]
         {
-            var userId = User.GetUserId();
+            //var userId = User.GetUserId();
+            var userId = Guid.Parse("019ae437-1189-78e2-a48f-2309db82fa78");
             var result = await _courseRatingService.CreateRatingAsync(ratingDTO, courseId, userId);
             
             return result;
@@ -45,9 +46,10 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         //[Authorize]
         [HttpPut]
-        public async Task<Result<bool>> UpdateRating(CourseRatingDTO ratingDTO, Guid courseId)
+        public async Task<Result<CourseRatingResponse>> UpdateRating(CourseRatingDTO ratingDTO, Guid courseId)
         {
-            var userId = User.GetUserId();
+            //var userId = User.GetUserId();
+            var userId = Guid.Parse("019ae437-1189-78e2-a48f-2309db82fa78");
             var result = await _courseRatingService.UpdateRatingAsync(ratingDTO, courseId, userId);
             
             return result;

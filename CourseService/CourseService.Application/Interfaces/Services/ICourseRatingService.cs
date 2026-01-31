@@ -5,6 +5,6 @@ namespace CourseService.Application.Interfaces.Services;
 
 public interface ICourseRatingService
 {
-    Task<Result<bool>> CreateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId);
-    Task<Result<bool>> UpdateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId);
+    Task<Result<CourseRatingResponse>> CreateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId);
+    Task<Result<CourseRatingResponse>> UpdateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId);
 }

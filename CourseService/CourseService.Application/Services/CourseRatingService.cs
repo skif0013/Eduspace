@@ -1,4 +1,5 @@
 ﻿using CourseService.Application.DTO;
+using CourseService.Application.Extentions;
 using CourseService.Application.Interfaces.Repositories;
 using CourseService.Application.Interfaces.Services;
 using CourseService.Domain.Entities;
@@ -19,18 +20,18 @@ public class CourseRatingService : ICourseRatingService
         _courseRepository = courseRepository;
     }
 
-    public async Task<Result<bool>> CreateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId)
+    public async Task<Result<CourseRatingResponse>> CreateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId)
     {
-        var courseExists = await _courseRepository.CourseExistAsync(courseId);
-        if (!courseExists)
+        var course = await _courseRepository.GetCourseByIdAsync(courseId);
+        if (course == null)
         {
-            return Result<bool>.Failure($"Course with {courseId} not found");
+            return Result<CourseRatingResponse>.Failure($"Course with {courseId} not found");
         }
 
-        var ratingExists = await _ratingRepository.GetRatingByCourseIdAdnUserIdAsync(courseId, userId);   
-        if(ratingExists != null)
+        var exists = await _ratingRepository.GetRatingByCourseIdAndUserIdAsync(courseId, userId);   
+        if(exists != null)
         {
-            return Result<bool>.Failure($"User with {userId} has already rated this course.");
+            return Result<CourseRatingResponse>.Failure($"User with {userId} has already rated this course.");
         }
 
         var rating = new CourseRating
@@ -39,29 +40,39 @@ public class CourseRatingService : ICourseRatingService
             UserId = userId,
             Rating = ratingDTO.Rating,
         };
-
         await _ratingRepository.CreateRatingAsync(rating);
 
-        return Result<bool>.Success(true);
+        //course.CourseRatings.Add(rating);
+        var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
+
+
+        return Result<CourseRatingResponse>.Success(
+            new CourseRatingResponse
+            {
+                AverageRating = average,
+                AmountRatings = amount
+            });
     }
 
-    public async Task<Result<bool>> UpdateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId)
+    public async Task<Result<CourseRatingResponse>> UpdateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId)
     {
-        var courseExists = await _courseRepository.CourseExistAsync(courseId);
-        if (!courseExists)
+        var rating = await _ratingRepository.GetRatingByCourseIdAndUserIdAsync(courseId, userId);
+        if (rating == null)
         {
-            return Result<bool>.Failure($"Course with {courseId} not found");
+            return Result<CourseRatingResponse>.Failure($"User with {userId} hasn`t already rated this course.");
         }
 
-        var existingRating = await _ratingRepository.GetRatingByCourseIdAdnUserIdAsync(courseId, userId);
-        if (existingRating == null)
-        {
-            return Result<bool>.Failure($"User with {userId} hasn`t already rated this course.");
-        }
-        existingRating.Rating = ratingDTO.Rating;
+        rating.Rating = ratingDTO.Rating;
+        await _ratingRepository.UpdateRatingAsync(rating);
 
-        await _ratingRepository.UpdateRatingAsync(existingRating);
+        var ratings = await _ratingRepository.GetRatingsByCourseIdAsync(courseId);
+        var (average, amount) = CourseRatingExtensions.CalculateRating(ratings);
 
-        return Result<bool>.Success(true);
+        return Result<CourseRatingResponse>.Success(
+            new CourseRatingResponse
+            {
+                AverageRating = average,
+                AmountRatings = amount
+            });
     }
 }

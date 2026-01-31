@@ -10,6 +10,5 @@ public class CourseProfile : Profile
     { 
         CreateMap<CourseDTO, Course>();
         CreateMap<Course, CourseResponse>();
-        CreateMap<List<Course>, List<CourseResponse>>().ReverseMap();
     }
 }

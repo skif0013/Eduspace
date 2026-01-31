@@ -16,12 +16,11 @@ public class CourseRatingRepository : ICourseRatingRepository
 
     public async Task CreateRatingAsync(CourseRating rating)
     {
-        rating.CreatedAt = DateTime.Now;
-        _dbContext.CourseRatings.AddAsync(rating);
+        await _dbContext.CourseRatings.AddAsync(rating);
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<CourseRating?> GetRatingByCourseIdAdnUserIdAsync(Guid courseId, Guid userId)
+    public async Task<CourseRating?> GetRatingByCourseIdAndUserIdAsync(Guid courseId, Guid userId)
     {
         var rating = await _dbContext.CourseRatings
             .FirstOrDefaultAsync(x =>
@@ -31,9 +30,17 @@ public class CourseRatingRepository : ICourseRatingRepository
         return rating;
     }
 
+    public Task<List<CourseRating>> GetRatingsByCourseIdAsync(Guid courseId)
+    {
+        var ratings = _dbContext.CourseRatings
+            .Where(x => x.CourseId == courseId)
+            .ToListAsync();
+
+        return ratings;
+    }
+
     public async Task UpdateRatingAsync(CourseRating rating)
     {
-        rating.UpdatedAt = DateTime.Now;
         _dbContext.Update(rating);
         await _dbContext.SaveChangesAsync();
     }
