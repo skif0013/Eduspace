@@ -24,7 +24,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         {
             ur.HasKey(r => new { r.UserId, r.RoleId });
             ur.HasOne<RoleIdentity>().WithMany(r => r.UserRoles).HasForeignKey(ur => ur.RoleId);
-            //ur.HasOne<User>().WithMany().HasForeignKey(ur => ur.UserId);
         });
         
         modelBuilder.Entity<RefreshToken>(entity =>
