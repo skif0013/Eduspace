@@ -141,14 +141,14 @@ public class UserService : IUserService
         return Result<string>.Success("Password reset successfully");
     }
 
-    public async Task<Result<string>> ConfirmEmailAsync(string email, string token)
+    public async Task<Result<string>> ConfirmEmailAsync(ConfirmEmailRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
             return Result<string>.Failure("Invalid email address");
         }
-        await _userManager.ConfirmEmailAsync(user, token);
+        await _userManager.ConfirmEmailAsync(user, request.Token);
         
         var roleExists = _roleManager.FindByNameAsync("User".ToString());
         if (!roleExists.IsCompletedSuccessfully)

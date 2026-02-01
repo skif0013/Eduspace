@@ -9,8 +9,8 @@
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=UserDB;Username=postgres;Password=postgres
     
     ports:
-      - "5003:5003"
-      - "5004:5004"
+      - "5012:5012"
+      - "5013:5013"
     depends_on:
       - postgres
     env_file:
