@@ -1,10 +1,14 @@
 using CourseService.Application;
 using CourseService.Application.Interfaces.Repositories;
 using CourseService.Application.Interfaces.Services;
+using CourseService.Application.Messaging;
 using CourseService.Application.Services;
 using CourseService.Infrastructure.Data;
+using CourseService.Infrastructure.Messaging.Redis;
 using CourseService.Infrastructure.Repositories;
 using CourseService.WebApi;
+using CourseService.WebApi.Middlewares;
+using DotNetEnv;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -39,7 +43,30 @@ builder.Services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
 builder.Services.AddScoped<ICourseService, CourseService.Application.Services.CourseService>();
 builder.Services.AddScoped<ICourseRatingService, CourseRatingService>();
 
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+Env.Load(envPath);
+
+var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
+var redisUser = Environment.GetEnvironmentVariable("RedisUser");
+var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
+
+builder.Services.AddSingleton<RedisMessageBroker>(sb =>
+{
+    var config = new StackExchange.Redis.ConfigurationOptions
+    {
+        EndPoints = { redisEndPoint },
+        User = redisUser,
+        Password = redisPassword,
+        AbortOnConnectFail = false
+    };
+    var connectionString = config.ToString();
+    return new RedisMessageBroker(connectionString);
+});
+builder.Services.AddSingleton<IMessagePublisher, RedisMessagePublisher>();
+
 var app = builder.Build();
+
+app.UseMiddleware<CustomExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using CourseService.Application.DTO;
+using CourseService.Application.Events;
 using CourseService.Application.Extentions;
 using CourseService.Application.Interfaces.Repositories;
 using CourseService.Application.Interfaces.Services;
-using CourseService.Application.Mappings;
+using CourseService.Application.Messaging;
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using CourseService.Domain.Results;
+using System.Text.Json;
 
 namespace CourseService.Application.Services;
 
@@ -14,11 +16,16 @@ public class CourseService : ICourseService
 {
     private readonly ICourseRepository _courseRepository;
     private readonly IMapper _mapper;
+    private readonly IMessagePublisher _publisher;
 
-    public CourseService(ICourseRepository courseRepository, IMapper mapper)
+    public CourseService(
+        ICourseRepository courseRepository, 
+        IMapper mapper, 
+        IMessagePublisher publisher)
     {
         _courseRepository = courseRepository;
         _mapper = mapper;
+        _publisher = publisher;
     }
 
     public async Task<Result<string>> ArchiveCourseAsync(Guid courseId, Guid authorId)
@@ -36,6 +43,10 @@ public class CourseService : ICourseService
         course.Status = CourseStatus.Archived;
         await _courseRepository.UpdateCourseAsync(course);
 
+        var @event = new CourseArchivedEvent(course.Id, course.AuthorId);
+        var json = JsonSerializer.Serialize(@event);
+        await _publisher.PublishAsync("course.archived", json);
+
         return Result<string>.Success("Course has been archived");
     }
 
@@ -45,7 +56,12 @@ public class CourseService : ICourseService
         course.AuthorId = authorId;
         course.Status = CourseStatus.Draft;
         var createdCourse = await _courseRepository.CreateCourseAsync(course);
+
         var response = _mapper.Map<CourseResponse>(createdCourse);
+
+        var @event = new CourseCreatedEvent(course.Id, course.AuthorId);
+        var json = JsonSerializer.Serialize(@event);
+        await _publisher.PublishAsync("course.created", json);
         
         return Result<CourseResponse>.Success(response);
     }
@@ -102,6 +118,10 @@ public class CourseService : ICourseService
 
         course.Status = CourseStatus.Published;
         await _courseRepository.UpdateCourseAsync(course);
+
+        var @event = new CoursePublishedEvent(course.Id, course.AuthorId);
+        var json = JsonSerializer.Serialize(@event);
+        await _publisher.PublishAsync("course.published", json);
 
         return Result<string>.Success("Course has been published.");
     }
