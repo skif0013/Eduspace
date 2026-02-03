@@ -8,12 +8,9 @@ namespace QuizService.Infrastructure.Repositories;
 public class QuizRepository : IQuizRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly IUnitOfWork _unitOfWork;
-
-
-    public QuizRepository(ApplicationDbContext context, IUnitOfWork unitOfWork)
+    
+    public QuizRepository(ApplicationDbContext context)
     {
-        _unitOfWork = unitOfWork;
         _context = context;
     }
     
@@ -24,7 +21,6 @@ public class QuizRepository : IQuizRepository
     public async Task AddQuizAsync(Quiz quiz)
     {
         _context.Quizzes.Add(quiz);
-        await _unitOfWork.SaveChangesAsync();
     }
     
     public async Task<Quiz?> FindByIdAsync(Guid QuizId) =>
