@@ -9,8 +9,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=authservice;Username=postgres;Password=postgres
     ports:
-      - "5001:5001"
-      - "5002:5002"
+      - "5010:5010"
+      - "5011:5011"
     depends_on:
         - postgres
     env_file:

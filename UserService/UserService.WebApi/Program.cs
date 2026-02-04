@@ -19,8 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(5003);
-    options.ListenAnyIP(5004);
+    options.ListenAnyIP(5012);
+    options.ListenAnyIP(5013);
 });
 
 builder.Services.AddSwaggerGen();

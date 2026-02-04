@@ -1,18 +1,21 @@
+// AuthService.Infrastructure/Redis/RedisMessageBroker.cs
+using AuthService.Application.Interfaces.Services;
 using StackExchange.Redis;
 
 namespace AuthService.Infrastructure.Redis;
 
-public class RedisMessageBroker
+public class RedisMessageBroker : IRedisMessageBroker
 {
-    private readonly ConnectionMultiplexer _redis;
+    private readonly IConnectionMultiplexer _redis;
     private readonly ISubscriber _subscriber;
-    public RedisMessageBroker(string connectionString)
+
+    public RedisMessageBroker(IConnectionMultiplexer redis)
     {
-        _redis = ConnectionMultiplexer.Connect(connectionString);
+        _redis = redis;
         _subscriber = _redis.GetSubscriber();
     }
-    
-    public async Task<bool> Publish(string channel, string message)
+
+    public async Task<bool> PublishAsync(string channel, string message)
     {
         try
         {
@@ -24,12 +27,13 @@ public class RedisMessageBroker
             return false;
         }
     }
-    
-    public async Task<bool> Subscribe(string channel, Action<RedisChannel, RedisValue> handle)
+
+    public async Task<bool> SubscribeAsync(string channel, Action<string, string> handler)
     {
         try
         {
-            await _subscriber.SubscribeAsync(RedisChannel.Literal(channel), handle);
+            await _subscriber.SubscribeAsync(RedisChannel.Literal(channel), (ch, val) =>
+                handler(ch.ToString(), val.ToString()));
             return true;
         }
         catch
