@@ -7,11 +7,11 @@ namespace AuthService.Infrastructure.Redis;
 
 public class RedisSubscriberService : BackgroundService
 {
-    private readonly RedisMessageBroker _broker;
+    private readonly IRedisMessageBroker _broker;
     private readonly IEnumerable<IMessageHandler> _handlers;
 
     public RedisSubscriberService(
-        RedisMessageBroker broker,
+        IRedisMessageBroker broker,
         IEnumerable<IMessageHandler> handlers)
     {
         _broker = broker;
@@ -22,7 +22,7 @@ public class RedisSubscriberService : BackgroundService
     {
         foreach (var handler in _handlers)
         {
-            await _broker.Subscribe(handler.Channel, async (channel, message) =>
+            await _broker.SubscribeAsync(handler.Channel, async (channel, message) =>
             {
                 await handler.HandleAsync(message.ToString());
             });

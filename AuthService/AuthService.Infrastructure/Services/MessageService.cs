@@ -9,14 +9,14 @@ namespace AuthService.Infrastructure.Services;
 
 public class MessageService : IMessageService
 {
-    private readonly RedisMessageBroker _redisMessageBroker;
-    public MessageService(RedisMessageBroker redisMessageBroker)
+    private readonly IRedisMessageBroker _redisMessageBroker;
+    public MessageService(IRedisMessageBroker redisMessageBroker)
     {
         _redisMessageBroker = redisMessageBroker;
     }
 
     public async Task SendMessageAsync<T>(string actiom ,T message)
     {
-        var res = await _redisMessageBroker.Publish(actiom, JsonSerializer.Serialize(message));
+        var res = await _redisMessageBroker.PublishAsync(actiom, JsonSerializer.Serialize(message));
     }
 }

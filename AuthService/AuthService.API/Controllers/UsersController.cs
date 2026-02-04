@@ -24,30 +24,30 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<Result<AuthResponse>> LoginAsync(AuthRequest request)
+    public async Task<Result<TokenResponseDto>> LoginAsync([FromBody] AuthRequest request)
     {
         var result = await _userService.AuthenticateAsync(request);
         return result;
     }
 
     [HttpPost("ForgotPassword")]
-    public async Task<Result<string>> ForgotPasswordAsync(ForgotPasswordRequest request)
+    public async Task<Result<string>> ForgotPasswordAsync([FromBody ]ForgotPasswordRequest request)
     {
         var result = await _userService.ForgotPasswordAsync(request);
         return result;
     }
 
     [HttpPost("ResetPassword")]
-    public async Task<Result<string>> ResetPasswordAsync(ResetPasswordDto request)
+    public async Task<Result<string>> ResetPasswordAsync([FromBody] ResetPasswordDto request)
     {
         var result = await _userService.ResetPasswordAsync(request);
         return result;
     }
 
     [HttpPost("ConfirmEmail")]
-    public async Task<Result<string>> ConfirmEmailAsync(string email, [FromHeader] string token)
+    public async Task<Result<string>> ConfirmEmailAsync([FromBody] ConfirmEmailRequest request)
     {
-        var result = await _userService.ConfirmEmailAsync(email, token);
+        var result = await _userService.ConfirmEmailAsync(request);
         return result;
     }
 }

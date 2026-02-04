@@ -1,22 +1,23 @@
 using System.Text;
 using AuthService.API.Middleware;
 using AuthService.Application.Interfaces;
+using AuthService.Application.Interfaces.Repositories;
 using AuthService.Application.Interfaces.Services;
 using AuthService.Domain.Entities;
 using AuthService.Infrastructure.Database;
 using AuthService.Infrastructure.Database.InitialData;
 using AuthService.Infrastructure.Identity;
 using AuthService.Infrastructure.Redis;
+using AuthService.Infrastructure.Repositories;
 using AuthService.Infrastructure.Services;
 using DotNetEnv;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
@@ -31,8 +32,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(5001);
-    options.ListenAnyIP(5002);
+    options.ListenAnyIP(5010);
+    options.ListenAnyIP(5011);
 });
 
 #region config jwt
@@ -69,14 +70,20 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
-Env.Load(envPath);
+if (builder.Environment.IsDevelopment())
+{
+    var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+    Env.Load(envPath);
+}
+
 
 var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
 var redisUser = Environment.GetEnvironmentVariable("RedisUser");
 var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
 
-builder.Services.AddSingleton<RedisMessageBroker>(sb =>
+
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var config = new StackExchange.Redis.ConfigurationOptions
     {
@@ -85,10 +92,10 @@ builder.Services.AddSingleton<RedisMessageBroker>(sb =>
         Password = redisPassword,
         AbortOnConnectFail = false
     };
-    var connectionString = config.ToString();
-    return new RedisMessageBroker(connectionString);
+    return ConnectionMultiplexer.Connect(config);
 });
 
+builder.Services.AddSingleton<IRedisMessageBroker, RedisMessageBroker>();
 
 builder.Services.AddIdentity<User, RoleIdentity>(options =>
 {
@@ -100,8 +107,7 @@ builder.Services.AddIdentity<User, RoleIdentity>(options =>
     
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.MaxFailedAccessAttempts = 5;
-
-    // User settings
+    
     options.User.RequireUniqueEmail = true;
     options.User.AllowedUserNameCharacters = null;
 })
@@ -112,7 +118,9 @@ builder.Services.AddIdentity<User, RoleIdentity>(options =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-//builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+
+
 builder.Services.AddSingleton<IMessageHandler, UserUpdatedHandler>();
 builder.Services.AddHostedService<RedisSubscriberService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
@@ -124,15 +132,13 @@ app.UseMiddleware<CustomExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
-    
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    { 
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "AuthService API v1");
+        options.RoutePrefix = "swagger"; 
+    });
 }
-
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{ 
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "AuthService API v1");
-    options.RoutePrefix = "swagger/docs/v1/auth"; 
-});
 
 app.UseHttpsRedirection();
 
@@ -146,8 +152,6 @@ using (var scope = app.Services.CreateScope())
     
     await RoleInitData.InitializeAsync(roleManager);
 }
-
-
 
 app.MapControllers();
 

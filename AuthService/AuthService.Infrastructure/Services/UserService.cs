@@ -72,24 +72,24 @@ public class UserService : IUserService
         return Result<string>.Success("user created successfully");
     }
 
-    public async Task<Result<AuthResponse>> AuthenticateAsync(AuthRequest request)
+    public async Task<Result<TokenResponseDto>> AuthenticateAsync(AuthRequest request)
     {
         var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
         if (user == null)
         {
-            return Result<AuthResponse>.Failure("Invalid Email");
+            return Result<TokenResponseDto>.Failure("Invalid Email");
         }
 
         var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
         if (!isEmailConfirmed)
         {
-            return Result<AuthResponse>.Failure("Email not confirmed");
+            return Result<TokenResponseDto>.Failure("Email not confirmed");
         }
 
         var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, request.Password);
         if (!isPasswordCorrect)
         {
-            return Result<AuthResponse>.Failure("Invalid Password");
+            return Result<TokenResponseDto>.Failure("Invalid Password");
         }
         
         var userDto = new UserDto
@@ -99,11 +99,12 @@ public class UserService : IUserService
             Email = user.Email
         };
         
-        var tokens = await _tokenService.CreateAccessTokenAsync(userDto);
+        var tokens = await _tokenService.GetTokens(userDto);
         
-        return Result<AuthResponse>.Success(new AuthResponse
+        return Result<TokenResponseDto>.Success(new TokenResponseDto
         {
-            Token = tokens.AccessToken
+            AccessToken = tokens.AccessToken,
+            RefreshToken = tokens.RefreshToken
         });
     }
     
@@ -140,14 +141,14 @@ public class UserService : IUserService
         return Result<string>.Success("Password reset successfully");
     }
 
-    public async Task<Result<string>> ConfirmEmailAsync(string email, string token)
+    public async Task<Result<string>> ConfirmEmailAsync(ConfirmEmailRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
             return Result<string>.Failure("Invalid email address");
         }
-        await _userManager.ConfirmEmailAsync(user, token);
+        await _userManager.ConfirmEmailAsync(user, request.Token);
         
         var roleExists = _roleManager.FindByNameAsync("User".ToString());
         if (!roleExists.IsCompletedSuccessfully)

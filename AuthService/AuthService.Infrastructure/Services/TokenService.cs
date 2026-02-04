@@ -1,4 +1,3 @@
-
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -6,29 +5,108 @@ using System.Security.Cryptography;
 using System.Text;
 using AuthService.Application.DTOs;
 using AuthService.Application.Interfaces;
+using AuthService.Application.Interfaces.Repositories;
+using AuthService.Domain.Entities;
 using AuthService.Domain.Results;
 using AuthService.Infrastructure.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using AuthService.Domain;
 
 namespace AuthService.Infrastructure.Services;
 
 public class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
-    private readonly ApplicationDbContext _context;
+    private readonly ITokenRepository _tokenRepository;
+    private readonly UserManager<User> _userManager;
 
-    public TokenService(
-        IConfiguration configuration,
-
-        ApplicationDbContext context)
+    public TokenService(IConfiguration configuration, ITokenRepository tokenRepository, UserManager<User> userManager)
     {
         _configuration = configuration;
-        _context = context;
+        _tokenRepository = tokenRepository;
+        _userManager = userManager;
+    }
+    
+    public async Task<TokenResponseDto> GetTokens(UserDto user)
+    {
+        var accessToken = await CreateTokenAsync(user);
+        var refreshToken = await CreateRefreshTokenAsync(user.Id);
+
+        return new TokenResponseDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        };
     }
 
+    public async Task<string> CreateRefreshTokenAsync(Guid userId)
+    {
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        
+        var refreshToken = new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            Token = token,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddDays(30)
+        };
+        
+        await _tokenRepository.AddRefreshTokenAsync(refreshToken);
+        
+        return token;
+    } 
+    
+    public async Task<Result<TokenResponseDto>> GetNewAccessTokenAsync(RefreshTokenRequest request)
+    {
+        var storedRefreshToken = await _tokenRepository.GetRefreshTokenAsync(request.RefreshToken);
+        if (storedRefreshToken == null || storedRefreshToken.ExpiresAt <= DateTime.UtcNow)
+        {
+            return Result<TokenResponseDto>.Failure("Invalid or expired refresh token.");
+        }
+        
+        storedRefreshToken.Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        storedRefreshToken.ExpiresAt = DateTime.UtcNow.AddDays(30);
+        
+        await _tokenRepository.UpdateRefreshTokenAsync(storedRefreshToken);
+        
+        var user = await _userManager.FindByIdAsync(storedRefreshToken.UserId.ToString());
+        if (user == null)
+        {
+            return Result<TokenResponseDto>.Failure("User not found.");
+        }
+
+        var userDto = new UserDto
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email
+        };
+
+        var accessToken = await CreateTokenAsync(userDto);
+        
+        return Result<TokenResponseDto>.Success(new TokenResponseDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = storedRefreshToken.Token
+        });
+    }
+    
+    public async Task<Result<bool>> RevokeRefreshTokenAsync(RefreshTokenRequest request)
+    {
+        var RefreshToken = await _tokenRepository.GetRefreshTokenAsync(request.RefreshToken);
+        if(RefreshToken == null)
+        {
+            return Result<bool>.Failure("Invalid refresh token.");
+        }
+        
+        RefreshToken.ExpiresAt = DateTime.UtcNow;
+        await _tokenRepository.UpdateRefreshTokenAsync(RefreshToken);
+        
+        return Result<bool>.Success(true);
+    }
+    
     private async Task<string> CreateTokenAsync(UserDto user)
     {
         int expirationMinutes = int.Parse(_configuration["JwtTokenSettings:ExparingTimeMinute"]!);
@@ -42,84 +120,39 @@ public class TokenService : ITokenService
         return tokenHandler.WriteToken(token);
     }
     
-    public async Task<TokenResponseDto> CreateAccessTokenAsync(UserDto user)
-    {
-        //var refreshToken = await GenereteRefreshTokenAsync();
-        var accessToken = await CreateTokenAsync(user);
-
-
-
-        return new TokenResponseDto
-        {
-            AccessToken = accessToken,
-        };
-    }
-
-    /*public async Task<Result<RefreshTokenResponseDto>> UploadTokensAsync(string refreshToken)
-    {
-        var refreshTokenFromDb = _context.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
-        if (refreshTokenFromDb == null)
-        {
-            return Result<RefreshTokenResponseDto>.Failure("Invalid refresh token");
-        }
-        refreshTokenFromDb.DeletedAt = DateTime.UtcNow;
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == refreshTokenFromDb.UserId);
-
-        var newAccessToken = await CreateTokenAsync(user);
-        var newRefreshToken = await GenereteRefreshTokenAsync();
-
-        RefreshToken RefreshToken = new RefreshToken
-        {
-            Id = Guid.NewGuid(),
-            Token = newRefreshToken,
-            UserId = user.Id,
-            ExpiresOnUtc = DateTime.UtcNow.AddDays(7)
-        };
-
-        _context.RefreshTokens.Add(RefreshToken);
-        await _context.SaveChangesAsync();
-
-        return Result<RefreshTokenResponseDto>.Success(new RefreshTokenResponseDto
-        {
-            AccessToken = newAccessToken,
-            RefreshToken = newRefreshToken
-        });
-    }*/
-    
-
-    private async Task<string> GenereteRefreshTokenAsync()
-    {
-        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
-    }
-
-    private JwtSecurityToken CreateJwtToken(List<Claim> claims, SigningCredentials credentials, DateTime expiration) =>
-        new(
-            _configuration["JwtTokenSettings:ValidIssuer"],
-            _configuration["JwtTokenSettings:ValidAudience"],
+private JwtSecurityToken CreateJwtToken(List<Claim> claims, SigningCredentials credentials, DateTime expiration) =>
+    new(
+        _configuration["JwtTokenSettings:ValidIssuer"], 
+    _configuration["JwtTokenSettings:ValidAudience"],
             claims,
             expires: expiration,
             signingCredentials: credentials
         );
 
-    private async Task<List<Claim>> CreateClaimsAsync(UserDto user)
-    {
-        var jwtSub = _configuration["JwtTokenSettings:JwtRegisteredClaimNamesSub"];
+private async Task<List<Claim>> CreateClaimsAsync(UserDto user)
+   {
+       var jwtSub = _configuration["JwtTokenSettings:JwtRegisteredClaimNamesSub"];
+   
+       var claims = new List<Claim>
+       {
+           new Claim("userId", user.Id.ToString()),
+           new Claim(ClaimTypes.Name, user.UserName),
+           new Claim(ClaimTypes.Email, user.Email),
+       };
+   
+       var userEntity = await _userManager.FindByIdAsync(user.Id.ToString());
 
-        var claims = new List<Claim>
-        {
-            new Claim("userId", user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Email, user.Email),
-        };
-
-        /*var roles = await _userManager.GetRolesAsync(user);
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }*/
-
-        return claims;
-    }
+       if (userEntity != null)
+       {
+           var roles = await _userManager.GetRolesAsync(userEntity);
+           foreach (var role in roles)
+           {
+               claims.Add(new Claim(ClaimTypes.Role, role));
+           }
+       }
+   
+       return claims;
+   }
 
     private SigningCredentials CreateSigningCredentials()
     {
