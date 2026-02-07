@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CourseService.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/courses")]
     public class CourseController : ControllerBase
@@ -56,12 +57,11 @@ namespace CourseService.WebApi.Controllers
         /// Course is created with status <b>Draft</b>.
         /// Available only to the course author.
         /// </remarks>
-        //[Authorize]
+        [Authorize]
         [HttpPost]
-        public async Task<Result<CourseResponse>> CreateCourse(CourseDTO courseDTO)//[FromBody]
+        public async Task<Result<CourseResponse>> CreateCourse(CourseDTO courseDTO)
         {
-            //var authorId = User.GetUserId();
-            var authorId = Guid.Parse("019ae437-9389-78e2-a48f-2309db82fa53");
+            var authorId = User.GetUserId();
             var result = await _courseService.CreateCourseAsync(courseDTO, authorId);
 
             return result;
@@ -76,12 +76,11 @@ namespace CourseService.WebApi.Controllers
         /// </remarks>
         /// <param name="courseId">Course identifier.</param>
         /// <param name="courseDto">Updated course data.</param>
-        //[Authorize]
+        [Authorize]
         [HttpPut("{courseId:guid}")]
-        public async Task<Result<CourseResponse>> UpdateCourse(CourseDTO courseDTO, Guid courseId)//[FromBody]
+        public async Task<Result<CourseResponse>> UpdateCourse(CourseDTO courseDTO, Guid courseId)
         {
-            //var authorId = User.GetUserId();
-            var authorId = Guid.Parse("019ae437-9389-78e2-a48f-2309db82fa53");
+            var authorId = User.GetUserId();
             var result = await _courseService.UpdateCourseAsync(courseDTO, courseId, authorId);
 
             return result;
@@ -95,12 +94,11 @@ namespace CourseService.WebApi.Controllers
         /// After publishing, the course becomes visible in the public catalog.
         /// </remarks>
         /// <param name="courseId">Course identifier.</param>
-        //[Authorize]
+        [Authorize]
         [HttpPatch("{courseId:guid}/publish")]
         public async Task<Result<string>> PublishCourse(Guid courseId)
         {
-            //var authorId = User.GetUserId();
-            var authorId = Guid.Parse("019ae437-9389-78e2-a48f-2309db82fa53");
+            var authorId = User.GetUserId();
             var result = await _courseService.PublishCourseAsync(courseId, authorId);
 
             return result;
@@ -114,12 +112,11 @@ namespace CourseService.WebApi.Controllers
         /// The course becomes invisible.
         /// </remarks>
         /// <param name="courseId">Course identifier.</param>
-        //[Authorize]
+        [Authorize]
         [HttpPatch("{courseId:guid}/archive")]
         public async Task<Result<string>> ArchiveCourse(Guid courseId)
         {
-            //var authorId = User.GetUserId();
-            var authorId = Guid.Parse("019ae437-9389-78e2-a48f-2309db82fa53");
+            var authorId = User.GetUserId();
             var result = await _courseService.ArchiveCourseAsync(courseId, authorId);
 
             return result;

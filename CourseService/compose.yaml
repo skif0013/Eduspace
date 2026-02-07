@@ -9,8 +9,8 @@ services:
       ConnectionString__DefaultConnection: Host=postgres;Port=5432;Database=CourseDB;Username=postgres;Password=postgres
       Redis__ConnectionString: redis:6379
     ports:
-      - "5009:5009"
-      - "5010:5010"
+      - "5016:5016"
+      - "5017:5017"
     depends_on:
       - postgres
       - redis

@@ -42,9 +42,7 @@ public class CourseRatingService : ICourseRatingService
         };
         await _ratingRepository.CreateRatingAsync(rating);
 
-        //course.CourseRatings.Add(rating);
         var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
-
 
         return Result<CourseRatingResponse>.Success(
             new CourseRatingResponse

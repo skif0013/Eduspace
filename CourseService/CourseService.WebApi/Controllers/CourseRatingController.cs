@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CourseService.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/courses/{courseId:guid}/ratings")]
     public class CourseRatingController : ControllerBase
@@ -26,12 +27,11 @@ namespace CourseService.WebApi.Controllers
         /// Each user can have only one rating per course.
         /// </remarks>
         /// <param name="courseId">Course identifier.</param>
-        //[Authorize]
+        [Authorize]
         [HttpPost]
-        public async Task<Result<CourseRatingResponse>> CreateRating(CourseRatingDTO ratingDTO, Guid courseId)//[FromBody]
+        public async Task<Result<CourseRatingResponse>> CreateRating(CourseRatingDTO ratingDTO, Guid courseId)
         {
-            //var userId = User.GetUserId();
-            var userId = Guid.Parse("019ae437-1189-78e2-a48f-2309db82fa78");
+            var userId = User.GetUserId();
             var result = await _courseRatingService.CreateRatingAsync(ratingDTO, courseId, userId);
             
             return result;
@@ -44,12 +44,11 @@ namespace CourseService.WebApi.Controllers
         /// Available only to the user who created the rating.
         /// </remarks>
         /// <param name="courseId">Course identifier.</param>
-        //[Authorize]
+        [Authorize]
         [HttpPut]
         public async Task<Result<CourseRatingResponse>> UpdateRating(CourseRatingDTO ratingDTO, Guid courseId)
         {
-            //var userId = User.GetUserId();
-            var userId = Guid.Parse("019ae437-1189-78e2-a48f-2309db82fa78");
+            var userId = User.GetUserId();
             var result = await _courseRatingService.UpdateRatingAsync(ratingDTO, courseId, userId);
             
             return result;
