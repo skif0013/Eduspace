@@ -7,6 +7,7 @@ public class Question
 
     public Guid Id { get; set; }
     
+    public Guid QuizId { get; set; }
     public string Text { get; set; } 
     
     public DateTime CreatedOn { get; set; }
