@@ -4,6 +4,7 @@ namespace QuizService.Application.DTOs.QuestionsDTOs.CreateRequestDTOs;
 
 public class CreateQuestionRequestDTO
 {
+    public Guid QuizId { get; set; }
     public string Text { get; set; }
     
     public int Order { get; set; }

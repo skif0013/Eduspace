@@ -21,7 +21,6 @@ public class QuizService : IQuizService
         _quizRepository = quizRepository;
     }
 
-
     public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request)
     {
         
@@ -35,9 +34,10 @@ public class QuizService : IQuizService
             Description = request.Text,
             IsPublished = true,
             IsActive = true,
-            ModifiedOn = DateTime.Now,
+            ModifiedOn = DateTime.UtcNow,
             Name = request.QuizName,
-            CreatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
+            Category = request.Category
         };
         
         await _quizRepository.AddQuizAsync(quiz);
@@ -45,6 +45,7 @@ public class QuizService : IQuizService
         
         return _mapper.MapToResponseDTO(quiz);
     }
+
 
     public async Task<QuizResponseDTO> GetQuizByIdAsync(Guid userId, Guid quizId)
     {
