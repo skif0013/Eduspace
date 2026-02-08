@@ -19,9 +19,9 @@ public class QuizController : ControllerBase
     }
     
     [HttpPost("Create")]
-    public async Task<ActionResult<QuizResponseDTO>> Create([FromBody] CreatingQuizRequestDTO request, [FromRoute] string token )
+    public async Task<ActionResult<QuizResponseDTO>> Create([FromBody] CreatingQuizRequestDTO request)
     {
-        //   var userId = _tokenService.GetUserIdFromToken(token);
+        // var userId = _tokenService.GetUserIdFromToken(token);
         
         var result = await _quizService.CreateQuizAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = result.QuizId }, result);

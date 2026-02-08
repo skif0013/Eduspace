@@ -4,15 +4,29 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using QuizService.Infrastructure.Data;
+using QuizService.Application.Contracts;
+using QuizService.Infrastructure.Repositories;
+using QuizService.Infrastructure.Persistence.UnitOfWork;
+using QuizService.Application.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 var connectionString = configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+}
 
 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddScoped<IQuizService, QuizService.Application.Services.QuizService>();
+builder.Services.AddScoped<IQuizRepository, QuizRepository>();
+builder.Services.AddScoped<QuizService.Application.Repositories.IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IQuizMapper, QuizService.Application.Services.QuizMapper>();
+builder.Services.AddScoped<ITokenService, QuizService.Application.Services.TokenService>();
 
 
 
@@ -25,18 +39,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "your_issuer",
-            ValidAudience = "your_audience",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("super_secret_key"))
+            ValidIssuer = configuration["JwtTokenSettings:ValidIssuer"] ?? "your_issuer",
+            ValidAudience = configuration["JwtTokenSettings:ValidAudience"] ?? "your_audience",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtTokenSettings:Secret"] ?? "super_secret_key"))
         };
     });
 
+builder.Services.AddAuthorization();
 
 
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
-
-
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -45,46 +58,51 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1"
     });
 
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    var securityScheme = new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer {token}'",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    };
+
+    options.AddSecurityDefinition("Bearer", securityScheme);
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+        { securityScheme, Array.Empty<string>() }
     });
 });
 
-builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 
+
+using(var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
+
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz Service API v1");
-    c.RoutePrefix = "swagger"; 
+    c.RoutePrefix = ""; 
 });
-
-
 
 app.UseHttpsRedirection();
 
-app.Run();
+app.UseAuthentication();
+app.UseAuthorization();
 
+app.MapControllers();
+
+app.Run();
