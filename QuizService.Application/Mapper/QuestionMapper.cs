@@ -19,6 +19,4 @@ public class QuestionMapper : IQuestionMapper
 ,            QuizId = question.QuizId
         };
     }
-    
-    
 }
