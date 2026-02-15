@@ -4,8 +4,9 @@ public class AnswerOption
 {
     public Guid Id { get; set; }
     
-    public Question question { get; set; }
+    public Guid QuestionId { get; set; }
     
+    public Question Question { get; set; }
     public string Text { get; set; }
     
     public bool IsCorrectAnswer { get; set; }
@@ -13,5 +14,9 @@ public class AnswerOption
     public int Order { get; set; }
     
     public double Score { get; set; }
+    
+    public  DateTime CreatedOn { get; set; }
+    
+    public  DateTime ModifiedOn { get; set; }
     
 }
