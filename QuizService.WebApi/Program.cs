@@ -5,9 +5,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using QuizService.Infrastructure.Data;
 using QuizService.Application.Contracts;
+using QuizService.Application.Contracts.AnswerOptionContracts;
 using QuizService.Infrastructure.Repositories;
 using QuizService.Infrastructure.Persistence.UnitOfWork;
 using QuizService.Application.Repositories;
+using QuizService.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -27,6 +29,7 @@ builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<QuizService.Application.Repositories.IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IQuizMapper, QuizService.Application.Services.QuizMapper>();
 builder.Services.AddScoped<ITokenService, QuizService.Application.Services.TokenService>();
+builder.Services.AddScoped<IAnswerOption, AnswerOptionService>();
 
 
 
