@@ -6,7 +6,7 @@ namespace QuizService.WebApi.Controller;
 
 [ApiController]
 [Route("api/[controller]")]
-public class QuestionController
+public class QuestionController : ControllerBase
 {
     private readonly IQuestionService _questionService;
     
@@ -45,8 +45,8 @@ public class QuestionController
     public async Task<IActionResult> DeleteQuestionFromQuiz(Guid questionId)
     {
         var delete = _questionService.DeleteQuestionFromQuizAsync(questionId);
-        
-        return new JsonResult(delete);
+
+        return NoContent();
     }
 
     [HttpPut("UpdateQuestionToQuiz")]
