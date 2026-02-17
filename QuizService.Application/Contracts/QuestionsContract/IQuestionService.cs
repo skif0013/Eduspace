@@ -1,6 +1,5 @@
 ﻿using QuizService.Application.DTOs.QuestionsDTOs.CreateRequestDTOs;
 using QuizService.Application.DTOs.QuestionsDTOs.ResponseDTO;
-using QuizService.Application.DTOs.QuestionsDTOs.UpdateDTOs;
 
 namespace QuizService.Application.Contracts.QuestionsContract;
 
