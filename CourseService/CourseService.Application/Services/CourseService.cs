@@ -66,15 +66,11 @@ public class CourseService : ICourseService
         return Result<CourseResponse>.Success(response);
     }
 
-    public async Task<Result<List<CourseResponse>>> GetAllCoursesAsync()
+    public async Task<Result<PagedCoursesResponse>> GetPagedCoursesAsync(int page, int pageSize)
     {
-        var courses = await _courseRepository.GetAllCoursesAsync();
-        if(courses == null)
-        {
-            return Result<List<CourseResponse>>.Failure("List is empty");
-        }
+        var pagedCourses = await _courseRepository.GetPagedCoursesAsync(page, pageSize);
 
-        var response = courses.Select(course =>
+        var coursesRating = pagedCourses.Items.Select(course =>
         {
             var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
             var dto = _mapper.Map<CourseResponse>(course);
@@ -84,7 +80,18 @@ public class CourseService : ICourseService
             return dto;
         }).ToList();
 
-        return Result<List<CourseResponse>>.Success(response);
+        var totalPages = (int)Math.Ceiling(pagedCourses.TotalCount / (double)pageSize);
+
+        var response = new PagedCoursesResponse
+        {
+            Courses = coursesRating,
+            TotalCount = totalPages,
+            Page = page,
+            PageSize = pageSize,
+            TotalPages = totalPages
+        };
+
+        return Result<PagedCoursesResponse>.Success(response);
     }
 
     public async Task<Result<CourseResponse>> GetCourseByIdAsync(Guid courseId)

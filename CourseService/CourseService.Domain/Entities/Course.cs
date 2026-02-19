@@ -9,7 +9,7 @@ public class Course : Entity
     public string Name { get; set; }
     public string Description { get; set; }
     public decimal Price { get; set; }
-    public string? AvatarURL { get; set; }
+    public string? AvatarURL { get; set; } // ToDo
     public CourseStatus Status { get; set; }
 
     public ICollection<CourseRating> CourseRatings { get; set; } = new List<CourseRating>();

@@ -20,16 +20,20 @@ namespace CourseService.WebApi.Controllers
         }
 
         /// <summary>
-        /// Get all published courses.
+        /// Get a paginated list of published courses.
         /// </summary>
+        /// <param name="request">
+        /// Pagination parameters (page number and page size).
+        /// </param>
         /// <remarks>
         /// Returns only courses with status <b>Published</b>.
         /// Used for the public course catalog.
+        /// Results are ordered by creation date (newest first).
         /// </remarks>
         [HttpGet]
-        public async Task<Result<List<CourseResponse>>> GetAllCourses()
+        public async Task<Result<PagedCoursesResponse>> GetPagedCourses([FromQuery] PaginationRequest request)   
         {
-            var result = await _courseService.GetAllCoursesAsync();
+            var result = await _courseService.GetPagedCoursesAsync(request.Page, request.PageSize);
 
             return result;
         }

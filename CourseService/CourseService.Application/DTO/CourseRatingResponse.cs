@@ -1,8 +1,7 @@
-﻿namespace CourseService.Application.DTO
+﻿namespace CourseService.Application.DTO;
+
+public class CourseRatingResponse
 {
-    public class CourseRatingResponse
-    {
-        public double AverageRating { get; set; }
-        public int AmountRatings { get; set; }
-    }
+    public double AverageRating { get; set; }
+    public int AmountRatings { get; set; }
 }
