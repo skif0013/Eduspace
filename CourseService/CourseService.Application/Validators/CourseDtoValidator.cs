@@ -21,8 +21,6 @@ public class CourseDtoValidator : AbstractValidator<CourseDTO>
 
         RuleFor(x => x.AvatarURL)
             .MaximumLength(1000)
-            .Must(x => Uri.IsWellFormedUriString(x, UriKind.Absolute))
-            .When(x => !string.IsNullOrWhiteSpace(x.AvatarURL))
-            .WithMessage("AvatarURL must be a valid URL");
+            .WithMessage("Lenght of avatarId must be less than 1000");
     }
 }
