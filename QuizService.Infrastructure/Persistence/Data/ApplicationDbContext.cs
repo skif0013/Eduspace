@@ -29,15 +29,26 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Question>(entity =>
         {
-            entity.HasKey(q => q.Id);
-            entity.Property(q => q.Text).IsRequired();
-            entity.HasMany<AnswerOption>().WithOne().OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(q => q.AnswerOptions)
+                .WithOne(a => a.Question)
+                .HasForeignKey(a => a.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Navigation(q => q.AnswerOptions)
+                .HasField("_answerOptions")
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
         });
 
         modelBuilder.Entity<AnswerOption>(entity =>
         {
             entity.HasKey(a => a.Id);
+            
             entity.Property(a => a.Text).IsRequired();
+            
+            entity.HasOne(a => a.Question)      
+                .WithMany(q => q.AnswerOptions) 
+                .HasForeignKey(a => a.QuestionId) 
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
