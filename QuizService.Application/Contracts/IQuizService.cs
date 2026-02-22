@@ -1,5 +1,6 @@
 ﻿using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
+using QuizService.Application.DTOs.QuizDTOs.SubmitDTOs;
 using QuizService.Application.DTOs.ResponseDTOs;
 
 namespace QuizService.Application.Contracts;
@@ -15,4 +16,6 @@ public interface IQuizService
     Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request);
     
     Task DeleteQuizAsync(Guid quizId);
+    
+    Task<QuizSubmitResponseDTO> SubmitQuizAsync(SubmitQuizRequestDTO request);
 }
