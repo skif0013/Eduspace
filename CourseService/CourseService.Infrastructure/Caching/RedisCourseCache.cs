@@ -62,7 +62,7 @@ public class RedisCourseCache : ICourseCache
         await _cache.RemoveAsync(key);
     }
     
-    public async Task<int> GetCatalogVersionAsync()
+    public async Task<long> GetCatalogVersionAsync()
     {
         var version = await _cache.GetStringAsync(CatalogVersionKey);
         if (version == null)
@@ -71,7 +71,7 @@ public class RedisCourseCache : ICourseCache
             return 1;
         }
 
-        return int.Parse(version);
+        return long.Parse(version);
     }
 
     public async Task IncrementCatalogVersionAsync()

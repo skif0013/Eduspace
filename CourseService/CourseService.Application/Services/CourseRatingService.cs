@@ -1,4 +1,5 @@
-﻿using CourseService.Application.DTO;
+﻿using CourseService.Application.Caching;
+using CourseService.Application.DTO;
 using CourseService.Application.Extentions;
 using CourseService.Application.Interfaces.Repositories;
 using CourseService.Application.Interfaces.Services;
@@ -11,13 +12,16 @@ public class CourseRatingService : ICourseRatingService
 {
     private readonly ICourseRatingRepository _ratingRepository;
     private readonly ICourseRepository _courseRepository;
+    private readonly ICourseCache _cache;
 
     public CourseRatingService(
         ICourseRatingRepository ratingRepository,
-        ICourseRepository courseRepository)
+        ICourseRepository courseRepository,
+        ICourseCache cache)
     {
         _ratingRepository = ratingRepository;
         _courseRepository = courseRepository;
+        _cache = cache;
     }
 
     public async Task<Result<CourseRatingResponse>> CreateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId)
@@ -44,12 +48,15 @@ public class CourseRatingService : ICourseRatingService
 
         var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
 
-        return Result<CourseRatingResponse>.Success(
-            new CourseRatingResponse
-            {
-                AverageRating = average,
-                AmountRatings = amount
-            });
+        var response = new CourseRatingResponse
+        {
+            AverageRating = average,
+            AmountRatings = amount
+        };
+
+        await _cache.RemoveAsync($"course:{course.Id}"); 
+
+        return Result<CourseRatingResponse>.Success(response);
     }
 
     public async Task<Result<CourseRatingResponse>> UpdateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId)
@@ -66,11 +73,14 @@ public class CourseRatingService : ICourseRatingService
         var ratings = await _ratingRepository.GetRatingsByCourseIdAsync(courseId);
         var (average, amount) = CourseRatingExtensions.CalculateRating(ratings);
 
-        return Result<CourseRatingResponse>.Success(
-            new CourseRatingResponse
-            {
-                AverageRating = average,
-                AmountRatings = amount
-            });
+        var response = new CourseRatingResponse
+        {
+            AverageRating = average,
+            AmountRatings = amount
+        };
+
+        await _cache.RemoveAsync($"course:{courseId}");
+
+        return Result<CourseRatingResponse>.Success(response);
     }
 }

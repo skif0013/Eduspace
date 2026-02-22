@@ -6,6 +6,6 @@ public interface ICourseCache
     Task SetAsync<T>(string key, T value, CacheEntryType type) where T : class;
     Task RemoveAsync(string key);
 
-    Task<int> GetCatalogVersionAsync();
+    Task<long> GetCatalogVersionAsync();
     Task IncrementCatalogVersionAsync();
 }
