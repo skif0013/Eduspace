@@ -12,6 +12,8 @@ public class Quiz
     
     public string? Description { get; set; }
     
+    public int PassScore { get; set; }
+    
     public bool IsActive { get; set; }
     
     public bool IsPublished { get; set; }
