@@ -2,6 +2,7 @@
 using QuizService.Application.Contracts;
 using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
+using QuizService.Application.DTOs.QuizDTOs.SubmitDTOs;
 
 namespace QuizService.WebApi.Controller;
 
@@ -45,7 +46,7 @@ public class QuizController : ControllerBase
     }
     
     
-    [HttpPut("Update")]
+    [HttpPut("Update {quizId}")]
     public async Task<IActionResult> Update([FromRoute] Guid quizId,[FromBody] QuizUpdateRequestDTO request)
     {
         await _quizService.UpdateQuizAsync(quizId, request);
@@ -53,11 +54,19 @@ public class QuizController : ControllerBase
         return NoContent();
     }
     
-    [HttpDelete("Delete")]
+    [HttpDelete("Delete{quizId}]")]
     public async Task<IActionResult> Delete([FromRoute] Guid quizId)
     {
         await _quizService.DeleteQuizAsync(quizId);
         
         return NoContent();
+    }
+    
+    [HttpPost("submit")]
+    public async Task<ActionResult<QuizSubmitResponseDTO>> SubmitQuiz([FromBody] SubmitQuizRequestDTO request)
+    {
+        var result = await _quizService.SubmitQuizAsync(request);
+        
+        return Ok(result);
     }
 }
