@@ -28,7 +28,7 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<Question?> FindByIdAsync(Guid questionId)
     {
-        return await _context.Questions.FirstOrDefaultAsync(q => q.Id == questionId);
+        return await _context.Questions.Include(q => q.AnswerOptions).FirstOrDefaultAsync(q => q.Id == questionId);
     }
         
 

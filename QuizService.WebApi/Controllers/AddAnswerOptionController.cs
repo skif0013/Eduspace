@@ -16,7 +16,7 @@ public class AddAnswerOptionController : ControllerBase
         _answerOption = answerOption;
     }
 
-    [HttpPost]
+    [HttpPost("addAnswerOption/{questionId}")]
     public async Task<IActionResult> AddAnswerOptionAsync([FromBody] AnswerOptionDTO dto,[FromRoute]  Guid questionId )
     {
         var result = await _answerOption.AddAnswerOptionAsync(dto, questionId);
@@ -24,7 +24,7 @@ public class AddAnswerOptionController : ControllerBase
         return new OkObjectResult(result);
     }
 
-    [HttpGet]
+    [HttpGet("getAnswerOptionsByQuestionId/{questionId}")]
     public async Task<IActionResult> GetAnswerOptionByIdAsync([FromRoute] Guid questionId)
     {
         var result = await _answerOption.GetAnswerOptionsByQuestionIdAsync(questionId);
@@ -32,15 +32,15 @@ public class AddAnswerOptionController : ControllerBase
         return new OkObjectResult(result);
     }
 
-    [HttpDelete("{answerOptionId}/{questionId}")]
+    [HttpDelete("deleteAnswerOption/{questionId},{answerOptionId}")]
     public async Task<IActionResult> DeleteAnswerOptionAsync([FromRoute] Guid answerOptionId, Guid questionId)
     {
-        var delete = await _answerOption.DeleteAnswerOptionAsync(answerOptionId, questionId);
+        await _answerOption.DeleteAnswerOptionAsync(answerOptionId, questionId);
         
         return NoContent();
     }
 
-    [HttpPut]
+    [HttpPut("updateAnswerOption/{questionId}")]
     public async Task<IActionResult> UpdateAnswerOptionAsync([FromBody] UpdateAnswerOptionDTO dto, Guid questionId)
     {
          await _answerOption.UpdateAnswerOptionAsync(dto, questionId);

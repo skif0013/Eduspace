@@ -41,16 +41,16 @@ public class QuestionController : ControllerBase
         return new JsonResult(getAll);
     }
 
-    [HttpDelete("DeleteQuestionFromQuiz")]
-    public async Task<IActionResult> DeleteQuestionFromQuiz(Guid questionId)
+    [HttpDelete("DeleteQuestionFromQuiz {questionId}")]
+    public async Task<IActionResult> DeleteQuestionFromQuiz([FromRoute] Guid questionId)
     {
-        var delete = _questionService.DeleteQuestionFromQuizAsync(questionId);
+        await  _questionService.DeleteQuestionFromQuizAsync(questionId);
 
         return NoContent();
     }
 
-    [HttpPut("UpdateQuestionToQuiz")]
-    public async Task<IActionResult> UpdateQuestionToQuiz(CreateQuestionRequestDTO requestDto, Guid questionId)
+    [HttpPut("UpdateQuestionToQuiz {questionId}")]
+    public async Task<IActionResult> UpdateQuestionToQuiz([FromBody] CreateQuestionRequestDTO requestDto,[FromRoute] Guid questionId)
     {
         var update = await _questionService.UpdateQuestionToQuizAsync(requestDto, questionId);
         
