@@ -32,22 +32,6 @@ public class Question
         _answerOptions.Remove(option);
     }
     
-    public void UpdateAnswerOption(Guid Id, string Text, bool IsCorrect, int Order, double Score)
-    {
-        
-        var existingOption = _answerOptions.FirstOrDefault(o => o.Id == Id);
-        
-        if (existingOption == null)
-        {
-            throw new ArgumentException($"Answer option with Id {Id} not found.");
-        }
-        
-        existingOption.Text = Text;
-        existingOption.IsCorrectAnswer = IsCorrect;
-        existingOption.Order = Order;
-        existingOption.Score = Score;
-    }
-    
     public int Order { get; set; }
     
     public int MaxScore { get; set; }

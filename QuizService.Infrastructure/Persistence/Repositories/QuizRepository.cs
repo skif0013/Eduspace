@@ -20,7 +20,7 @@ public class QuizRepository : IQuizRepository
     
     public async Task AddQuizAsync(Quiz quiz)
     {
-        _context.Quizzes.Add(quiz);
+         _context.Quizzes.Add(quiz);
     }
     
     public async Task<Quiz?> FindByIdAsync(Guid QuizId) =>
