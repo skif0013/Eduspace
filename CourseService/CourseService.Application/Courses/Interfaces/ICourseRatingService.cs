@@ -1,7 +1,7 @@
-﻿using CourseService.Application.DTO;
-using CourseService.Domain.Results;
+﻿using CourseService.Application.Courses.DTO;
+using CourseService.Domain.Abstractions;
 
-namespace CourseService.Application.Interfaces.Services;
+namespace CourseService.Application.Courses.Interfaces;
 
 public interface ICourseRatingService
 {

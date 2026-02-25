@@ -1,9 +1,9 @@
-﻿using CourseService.Application.Interfaces.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using CourseService.Domain.Results;
-using CourseService.Application.DTO;
 using CourseService.WebApi.Extentions;
 using Microsoft.AspNetCore.Authorization;
+using CourseService.Application.Courses.DTO;
+using CourseService.Application.Courses.Interfaces;
 
 namespace CourseService.WebApi.Controllers
 {

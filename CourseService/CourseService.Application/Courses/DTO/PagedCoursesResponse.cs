@@ -1,4 +1,4 @@
-﻿namespace CourseService.Application.DTO;
+﻿namespace CourseService.Application.Courses.DTO;
 
 public class PagedCoursesResponse
 {

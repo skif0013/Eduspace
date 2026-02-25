@@ -1,4 +1,4 @@
-﻿using CourseService.Domain.Results;
+﻿using CourseService.Domain.Abstractions;
 using FluentValidation;
 
 namespace CourseService.WebApi.Middlewares;

@@ -1,12 +1,12 @@
 ﻿using CourseService.Application.Caching;
-using CourseService.Application.DTO;
+using CourseService.Application.Courses.DTO;
+using CourseService.Application.Courses.Errors;
+using CourseService.Application.Courses.Interfaces;
 using CourseService.Application.Extentions;
-using CourseService.Application.Interfaces.Repositories;
-using CourseService.Application.Interfaces.Services;
+using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
-using CourseService.Domain.Results;
 
-namespace CourseService.Application.Services;
+namespace CourseService.Application.Courses.Services;
 
 public class CourseRatingService : ICourseRatingService
 {
@@ -29,13 +29,13 @@ public class CourseRatingService : ICourseRatingService
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
         {
-            return Result<CourseRatingResponse>.Failure($"Course with {courseId} not found");
+            return Result<CourseRatingResponse>.Failure(CourseErrors.CourseNotFound);
         }
 
-        var exists = await _ratingRepository.GetRatingByCourseIdAndUserIdAsync(courseId, userId);   
-        if(exists != null)
+        var exists = await _ratingRepository.GetRatingByCourseIdAndUserIdAsync(courseId, userId);
+        if (exists != null)
         {
-            return Result<CourseRatingResponse>.Failure($"User with {userId} has already rated this course.");
+            return Result<CourseRatingResponse>.Failure(CourseRatingErrors.RatingAlreadyExists);
         }
 
         var rating = new CourseRating
@@ -54,7 +54,7 @@ public class CourseRatingService : ICourseRatingService
             AmountRatings = amount
         };
 
-        await _cache.RemoveAsync($"course:{course.Id}"); 
+        await _cache.RemoveAsync($"course:{course.Id}");
 
         return Result<CourseRatingResponse>.Success(response);
     }
@@ -64,7 +64,7 @@ public class CourseRatingService : ICourseRatingService
         var rating = await _ratingRepository.GetRatingByCourseIdAndUserIdAsync(courseId, userId);
         if (rating == null)
         {
-            return Result<CourseRatingResponse>.Failure($"User with {userId} hasn`t already rated this course.");
+            return Result<CourseRatingResponse>.Failure(CourseRatingErrors.RatingNotFound);
         }
 
         rating.Rating = ratingDTO.Rating;

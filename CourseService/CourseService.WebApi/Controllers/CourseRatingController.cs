@@ -1,5 +1,5 @@
-﻿using CourseService.Application.DTO;
-using CourseService.Application.Interfaces.Services;
+﻿using CourseService.Application.Courses.DTO;
+using CourseService.Application.Courses.Interfaces;
 using CourseService.Domain.Results;
 using CourseService.WebApi.Extentions;
 using Microsoft.AspNetCore.Authorization;

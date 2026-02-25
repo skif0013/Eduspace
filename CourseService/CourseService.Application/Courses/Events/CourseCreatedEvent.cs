@@ -1,3 +1,3 @@
-﻿namespace CourseService.Application.Events;
+﻿namespace CourseService.Application.Courses.Events;
 
 public record CourseCreatedEvent(Guid CourseId, Guid AuthorId);

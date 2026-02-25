@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using CourseService.Application.DTO;
+using CourseService.Application.Courses.DTO;
 using CourseService.Domain.Entities;
 
-namespace CourseService.Application.Mappings;
+namespace CourseService.Application.Courses.Mappings;
 
 public class CourseProfile : Profile
 {
-    public CourseProfile() 
-    { 
+    public CourseProfile()
+    {
         CreateMap<CourseDTO, Course>();
         CreateMap<Course, CourseResponse>();
     }

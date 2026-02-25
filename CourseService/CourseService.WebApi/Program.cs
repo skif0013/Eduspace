@@ -1,7 +1,6 @@
 using CourseService.Application;
-using CourseService.Application.Interfaces.Repositories;
-using CourseService.Application.Interfaces.Services;
-using CourseService.Application.Services;
+using CourseService.Application.Courses.Interfaces;
+using CourseService.Application.Courses.Services;
 using CourseService.Infrastructure;
 using CourseService.Infrastructure.Data;
 using CourseService.Infrastructure.Repositories;
@@ -75,7 +74,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
 
-builder.Services.AddScoped<ICourseService, CourseService.Application.Services.CourseService>();
+builder.Services.AddScoped<ICourseService, CourseService.Application.Courses.Services.CourseService>();
 builder.Services.AddScoped<ICourseRatingService, CourseRatingService>();
 
 

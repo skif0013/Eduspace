@@ -1,6 +1,6 @@
 ﻿using CourseService.Domain.Enums;
 
-namespace CourseService.Application.DTO;
+namespace CourseService.Application.Courses.DTO;
 
 public class CourseResponse
 {
@@ -10,7 +10,7 @@ public class CourseResponse
     public decimal Price { get; set; }
     public string? AvatarURL { get; set; }
     public CourseStatus Status { get; set; }
-    public DateTime CreatedAt {  get; set; }
+    public DateTime CreatedAt { get; set; }
     public double AverageRating { get; set; }
     public int AmountRatings { get; set; }
 }

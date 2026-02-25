@@ -1,5 +1,5 @@
-﻿using CourseService.Application.DTO;
-using CourseService.Application.Interfaces.Repositories;
+﻿using CourseService.Application.Courses.DTO;
+using CourseService.Application.Courses.Interfaces;
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using CourseService.Infrastructure.Data;

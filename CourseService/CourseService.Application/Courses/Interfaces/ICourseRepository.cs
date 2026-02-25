@@ -1,7 +1,7 @@
-﻿using CourseService.Application.DTO;
+﻿using CourseService.Application.Courses.DTO;
 using CourseService.Domain.Entities;
 
-namespace CourseService.Application.Interfaces.Repositories;
+namespace CourseService.Application.Courses.Interfaces;
 
 public interface ICourseRepository
 {

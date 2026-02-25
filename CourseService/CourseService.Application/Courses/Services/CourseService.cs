@@ -1,33 +1,37 @@
 ﻿using AutoMapper;
 using CourseService.Application.Caching;
-using CourseService.Application.DTO;
-using CourseService.Application.Events;
+using CourseService.Application.Courses.DTO;
+using CourseService.Application.Courses.Errors;
+using CourseService.Application.Courses.Events;
+using CourseService.Application.Courses.Interfaces;
 using CourseService.Application.Extentions;
-using CourseService.Application.Interfaces.Repositories;
-using CourseService.Application.Interfaces.Services;
 using CourseService.Application.Messaging;
+using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
-using CourseService.Domain.Results;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace CourseService.Application.Services;
+namespace CourseService.Application.Courses.Services;
 
 public class CourseService : ICourseService
 {
     private readonly ICourseRepository _courseRepository;
     private readonly ICourseCache _cache;
+    private readonly ILogger<CourseService> _logger;
     private readonly IMapper _mapper;
     private readonly IMessagePublisher _publisher;
 
     public CourseService(
-        ICourseRepository courseRepository, 
+        ICourseRepository courseRepository,
         ICourseCache cache,
-        IMapper mapper, 
+        ILogger<CourseService> logger,
+        IMapper mapper,
         IMessagePublisher publisher)
     {
         _courseRepository = courseRepository;
         _cache = cache;
+        _logger = logger;
         _mapper = mapper;
         _publisher = publisher;
     }
@@ -37,12 +41,21 @@ public class CourseService : ICourseService
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
         {
-            return Result<string>.Failure($"Course with {courseId} not found.");
+            //_logger.LogTrace("TRACE");
+            //_logger.LogDebug("DEBUG");
+            //_logger.LogInformation("INFO");
+            //_logger.LogWarning("WARNING");
+            //_logger.LogError("ERROR");
+            _logger.LogInformation("Course with {CourseId} not found.", courseId);
+
+            return Result<string>.Failure(CourseErrors.CourseNotFound);
         }
 
         if (course.AuthorId != authorId)
         {
-            return Result<string>.Failure($"Forbidden! {authorId} is not the creator of the course");
+            _logger.LogWarning("Archive denied. Author {AuthorId} is not the owner of course {CourseId}", authorId, courseId);
+
+            return Result<string>.Failure(CourseErrors.NotCourseAuthor);
         }
 
         var wasPublished = course.Status == CourseStatus.Published;
@@ -60,6 +73,8 @@ public class CourseService : ICourseService
         var json = JsonSerializer.Serialize(@event);
         await _publisher.PublishAsync("course.archived", json);
 
+        _logger.LogInformation("Course {CourseId} was archived by author {AuthorId}", course.Id, course.AuthorId);
+
         return Result<string>.Success("Course has been archived");
     }
 
@@ -75,7 +90,7 @@ public class CourseService : ICourseService
         var @event = new CourseCreatedEvent(course.Id, course.AuthorId);
         var json = JsonSerializer.Serialize(@event);
         await _publisher.PublishAsync("course.created", json);
-        
+
         return Result<CourseResponse>.Success(response);
     }
 
@@ -129,9 +144,9 @@ public class CourseService : ICourseService
         }
 
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
-        if(course == null)
+        if (course == null)
         {
-            return Result<CourseResponse>.Failure($"Course with {courseId} doesn`t exist");
+            return Result<CourseResponse>.Failure(CourseErrors.CourseNotFound);
         }
 
         var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
@@ -147,14 +162,14 @@ public class CourseService : ICourseService
     public async Task<Result<string>> PublishCourseAsync(Guid courseId, Guid authorId)
     {
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
-        if(course == null)
+        if (course == null)
         {
-            return Result<string>.Failure($"Course with {courseId} not found.");
+            return Result<string>.Failure(CourseErrors.CourseNotFound);
         }
 
         if (course.AuthorId != authorId)
         {
-            return Result<string>.Failure($"Forbidden! {authorId} is not the creator of the course.");
+            return Result<string>.Failure(CourseErrors.NotCourseAuthor);
         }
 
         course.Status = CourseStatus.Published;
@@ -175,14 +190,14 @@ public class CourseService : ICourseService
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
         {
-            return Result<CourseResponse>.Failure($"Course with {courseId} not found.");
+            return Result<CourseResponse>.Failure(CourseErrors.CourseNotFound);
         }
 
         if (course.AuthorId != authorId)
         {
-            return Result<CourseResponse>.Failure($"{authorId} is not the creator of the course");
+            return Result<CourseResponse>.Failure(CourseErrors.NotCourseAuthor);
         }
-        
+
         course.Name = courseDTO.Name;
         course.Description = courseDTO.Description;
         course.Price = courseDTO.Price;

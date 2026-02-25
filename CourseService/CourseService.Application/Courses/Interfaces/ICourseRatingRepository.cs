@@ -1,6 +1,6 @@
 ﻿using CourseService.Domain.Entities;
 
-namespace CourseService.Application.Interfaces.Repositories;
+namespace CourseService.Application.Courses.Interfaces;
 
 public interface ICourseRatingRepository
 {

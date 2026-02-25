@@ -1,7 +1,7 @@
-﻿using CourseService.Application.DTO;
+﻿using CourseService.Application.Courses.DTO;
 using FluentValidation;
 
-namespace CourseService.Application.Validators;
+namespace CourseService.Application.Courses.Validators;
 
 public class PaginationRequestValidator : AbstractValidator<PaginationRequest>
 {
