@@ -56,4 +56,12 @@ public class QuestionController : ControllerBase
         
         return new JsonResult(update);
     }
+
+    [HttpPatch("CompletedQuestion {questionId}")]
+    public async Task<IActionResult> CompletedQuestionAsync([FromRoute] Guid questionId)
+    {
+        var completed = await _questionService.CompletedQuestionAsync(questionId);
+        
+        return new JsonResult(completed);
+    }
 }

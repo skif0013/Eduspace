@@ -100,4 +100,20 @@ public class QuestionService : IQuestionService
         
         return _questionMapper.ToResponse(find);
     }
+    
+    public async Task<QuestionResponseDTO> CompletedQuestionAsync(Guid questionId)
+    {
+        var find = await _questionRepository.FindByIdAsync(questionId);
+        
+        if (find == null)
+        {
+            throw new Exception("Question not found");
+        }
+        
+        find.IsActive = false;
+        
+        await _unitOfWork.SaveChangesAsync();
+        
+        return _questionMapper.ToResponse(find);
+    }
 }

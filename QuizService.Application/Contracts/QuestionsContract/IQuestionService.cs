@@ -14,4 +14,6 @@ public interface IQuestionService
     Task<QuestionResponseDTO> GetQuestionByIdAsync(Guid questionId);
     
     Task<IReadOnlyCollection<QuestionResponseDTO>> GetAllQuestionsAsync();
+    
+    Task<QuestionResponseDTO> CompletedQuestionAsync(Guid questionId);
 }
