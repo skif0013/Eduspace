@@ -31,7 +31,7 @@ public class CourseRatingService : ICourseRatingService
         {
             return Result<CourseRatingResponse>.Failure(CourseErrors.CourseNotFound);
         }
-
+        
         var exists = await _ratingRepository.GetRatingByCourseIdAndUserIdAsync(courseId, userId);
         if (exists != null)
         {

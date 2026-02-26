@@ -5,8 +5,8 @@ namespace CourseService.Application.Courses.Errors;
 public static class CourseErrors
 {
     public static readonly Error CourseNotFound =
-        new("Course.CourseNotFound", "Course was not found");
+        new("COURSE_NOT_FOUND", "Course was not found");
 
     public static readonly Error NotCourseAuthor =
-        new("Course.NotCourseAuthor", "You are not the author of this course.");
+        new("NOT_COURSE_AUTHOR", "You are not the author of this course.");
 }

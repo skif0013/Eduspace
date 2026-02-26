@@ -12,7 +12,7 @@ public static class DependencyInjection
 
     public static WebApplication UseApiServices(this WebApplication app)
     {
-        app.UseMiddleware<CustomExceptionMiddleware>();
+        app.UseMiddleware<GlobalExceptionMiddleware>();
 
         return app;
     }

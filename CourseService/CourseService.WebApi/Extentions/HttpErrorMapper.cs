@@ -14,14 +14,12 @@ public static class HttpErrorMapper
     };
 
     public static int Map(Error error)
-        => _map.TryGetValue(error, out var status)
-            ? status
-            : StatusCodes.Status400BadRequest;
+    {
+        if (_map.TryGetValue(error, out var statusCode))
+        {
+            return statusCode;
+        }
 
-    //public static int Map(Error error)
-    //{
-    //    var res = _map.TryGetValue(error, out var status);
-
-    //     return res ? status : StatusCodes.Status400BadRequest;
-    //}
+        return StatusCodes.Status400BadRequest;
+    }
 }

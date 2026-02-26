@@ -80,7 +80,7 @@ builder.Services.AddScoped<ICourseRatingService, CourseRatingService>();
 
 var app = builder.Build();
 
-app.UseMiddleware<CustomExceptionMiddleware>();
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
