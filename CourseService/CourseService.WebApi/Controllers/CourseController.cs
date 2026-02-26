@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using CourseService.Domain.Results;
 using CourseService.WebApi.Extentions;
 using Microsoft.AspNetCore.Authorization;
 using CourseService.Application.Courses.DTO;
@@ -31,11 +30,11 @@ namespace CourseService.WebApi.Controllers
         /// Results are ordered by creation date (newest first).
         /// </remarks>
         [HttpGet]
-        public async Task<Result<PagedCoursesResponse>> GetPagedCourses([FromQuery] PaginationRequest request)   
+        public async Task<IActionResult> GetPagedCourses([FromQuery] PaginationRequest request)   
         {
             var result = await _courseService.GetPagedCoursesAsync(request.Page, request.PageSize);
 
-            return result;
+            return result.ToActionResult(HttpContext);
         }
 
         /// <summary>
@@ -47,11 +46,11 @@ namespace CourseService.WebApi.Controllers
         /// </remarks>
         /// <param name="courseId">Course identifier.</param>
         [HttpGet("{courseId:guid}")]
-        public async Task<Result<CourseResponse>> GetCourseById(Guid courseId)
+        public async Task<IActionResult> GetCourseById(Guid courseId)
         {
             var result = await _courseService.GetCourseByIdAsync(courseId);
 
-            return result;
+            return result.ToActionResult(HttpContext);
         }
 
         /// <summary>
@@ -63,12 +62,12 @@ namespace CourseService.WebApi.Controllers
         /// </remarks>
         [Authorize]
         [HttpPost]
-        public async Task<Result<CourseResponse>> CreateCourse(CourseDTO courseDTO)
+        public async Task<IActionResult> CreateCourse(CourseDTO courseDTO)
         {
             var authorId = User.GetUserId();
             var result = await _courseService.CreateCourseAsync(courseDTO, authorId);
 
-            return result;
+            return result.ToActionResult(HttpContext);
         }
 
         /// <summary>
@@ -82,12 +81,12 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseDto">Updated course data.</param>
         [Authorize]
         [HttpPut("{courseId:guid}")]
-        public async Task<Result<CourseResponse>> UpdateCourse(CourseDTO courseDTO, Guid courseId)
+        public async Task<IActionResult> UpdateCourse(CourseDTO courseDTO, Guid courseId)
         {
             var authorId = User.GetUserId();
             var result = await _courseService.UpdateCourseAsync(courseDTO, courseId, authorId);
 
-            return result;
+            return result.ToActionResult(HttpContext);
         }
 
         /// <summary>
@@ -100,12 +99,12 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         [Authorize]
         [HttpPatch("{courseId:guid}/publish")]
-        public async Task<Result<string>> PublishCourse(Guid courseId)
+        public async Task<IActionResult> PublishCourse(Guid courseId)
         {
             var authorId = User.GetUserId();
             var result = await _courseService.PublishCourseAsync(courseId, authorId);
 
-            return result;
+            return result.ToActionResult(HttpContext);
         }
 
         /// <summary>
@@ -118,12 +117,12 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         [Authorize]
         [HttpPatch("{courseId:guid}/archive")]
-        public async Task<Result<string>> ArchiveCourse(Guid courseId)
+        public async Task<IActionResult> ArchiveCourse(Guid courseId)
         {
             var authorId = User.GetUserId();
             var result = await _courseService.ArchiveCourseAsync(courseId, authorId);
 
-            return result;
+            return result.ToActionResult(HttpContext);
         }
     }
 }

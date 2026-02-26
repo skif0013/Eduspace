@@ -1,6 +1,6 @@
 ﻿using CourseService.Application.Courses.DTO;
 using CourseService.Application.Courses.Interfaces;
-using CourseService.Domain.Results;
+using CourseService.Domain.Abstractions;
 using CourseService.WebApi.Extentions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,12 +29,12 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         [Authorize]
         [HttpPost]
-        public async Task<Result<CourseRatingResponse>> CreateRating(CourseRatingDTO ratingDTO, Guid courseId)
+        public async Task<IActionResult> CreateRating(CourseRatingDTO ratingDTO, Guid courseId)
         {
             var userId = User.GetUserId();
             var result = await _courseRatingService.CreateRatingAsync(ratingDTO, courseId, userId);
             
-            return result;
+            return result.ToActionResult(HttpContext);
         }
 
         /// <summary>
@@ -46,12 +46,12 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         [Authorize]
         [HttpPut]
-        public async Task<Result<CourseRatingResponse>> UpdateRating(CourseRatingDTO ratingDTO, Guid courseId)
+        public async Task<IActionResult> UpdateRating(CourseRatingDTO ratingDTO, Guid courseId)
         {
             var userId = User.GetUserId();
             var result = await _courseRatingService.UpdateRatingAsync(ratingDTO, courseId, userId);
             
-            return result;
+            return result.ToActionResult(HttpContext);
         }
     }
 }
