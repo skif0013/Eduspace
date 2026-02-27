@@ -38,4 +38,14 @@ public class QuestionRepository : IQuestionRepository
         
         return Task.CompletedTask;
     }
+    
+    public async Task<List<Question>> GetActiveByQuizIdAsync(Guid quizId)
+    {
+        return await _context.Questions
+            .Where(q => q.QuizId == quizId && q.IsActive)
+            .AsNoTracking()
+            .Include(q => q.AnswerOptions)
+            .OrderBy(q => q.Order)
+            .ToListAsync();
+    }
 }

@@ -11,4 +11,6 @@ public interface IQuestionRepository
     Task AddQuestion(Question question);
     
     Task RemoveAsync(Question question);
+    
+    Task<List<Question>> GetActiveByQuizIdAsync(Guid quizId);
 }
