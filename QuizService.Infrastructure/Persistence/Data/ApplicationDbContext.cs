@@ -13,6 +13,8 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<AnswerOption> AnswerOptions { get; set; }
     
+    public DbSet<QuizAttempt> QuizAttempts { get; set; }
+    
     
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
