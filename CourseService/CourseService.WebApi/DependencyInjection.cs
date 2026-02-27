@@ -1,4 +1,4 @@
-﻿using CourseService.WebApi.Middlewares;
+﻿using CourseService.WebApi.Infrastructure.ExceptionHandling;
 
 namespace CourseService.WebApi;
 

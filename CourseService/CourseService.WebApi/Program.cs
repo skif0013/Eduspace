@@ -5,7 +5,6 @@ using CourseService.Infrastructure;
 using CourseService.Infrastructure.Data;
 using CourseService.Infrastructure.Repositories;
 using CourseService.WebApi;
-using CourseService.WebApi.Middlewares;
 using DotNetEnv;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -69,7 +68,16 @@ builder.Services.AddWebApiServices(builder.Configuration);
 #endregion
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))); 
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+        context.ProblemDetails.Instance = context.HttpContext.Request.Path;
+    };
+});
 
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
@@ -80,7 +88,7 @@ builder.Services.AddScoped<ICourseRatingService, CourseRatingService>();
 
 var app = builder.Build();
 
-app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
