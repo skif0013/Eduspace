@@ -48,4 +48,11 @@ public class QuestionRepository : IQuestionRepository
             .OrderBy(q => q.Order)
             .ToListAsync();
     }
+    
+    public async Task<Question> GetWithOptionsByIdAsync(Guid questionId)
+    {
+        return await _context.Questions
+            .Include(q => q.AnswerOptions)
+            .FirstOrDefaultAsync(q => q.Id == questionId);
+    }
 }
