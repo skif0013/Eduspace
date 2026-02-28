@@ -15,6 +15,8 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<QuizAttempt> QuizAttempts { get; set; }
     
+    public DbSet<UserAnswer> UserAnswers { get; set; }
+    
     
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)

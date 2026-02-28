@@ -1,4 +1,5 @@
-﻿using QuizService.Application.Contracts.IQuizAttempt;
+﻿using QuizService.Application.Contracts;
+using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
 using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.Repositories;
@@ -13,8 +14,10 @@ public class AttemptService : IAttemptService
     private readonly IQuizRepository _quizRepository; 
     private readonly IQuestionRepository _questionRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IQuestionScoringService _questionScoringService;
+    private readonly IUserAnswerRepository _userAnswerRepository;
     
-    public AttemptService(IAttemptRepository attemptRepository, IQuizRepository quizRepository, IQuestionRepository questionRepository, IUnitOfWork unitOfWork)
+    public AttemptService(IAttemptRepository attemptRepository, IQuizRepository quizRepository, IQuestionRepository questionRepository, IUnitOfWork unitOfWork, IQuestionScoringService questionScoringService,)
     {
         _attemptRepository = attemptRepository;
         _quizRepository = quizRepository;
@@ -66,48 +69,42 @@ public class AttemptService : IAttemptService
             }).ToList()
         };
     }
-    
+
     public async Task<SubmitAnswerResponseDTO> SubmitAnswerAsync(Guid attemptId, SubmitAnswerRequestDTO request)
     {
         var attempt = await _attemptRepository.GetByIdAsync(attemptId);
+        
         if (attempt == null)
             throw new Exception("Attempt not found");
 
-        if (attempt.Status != AttemptStatus.InProgress)
-            throw new Exception("Quiz already finished");
-
-        var question = await _questionRepository.GetWithOptionsAsync(request.QuestionId);
+        var question = await _questionRepository.GetWithOptionsByIdAsync(request.QuestionId);
+        
         if (question == null)
             throw new Exception("Question not found");
 
-        double earnedScore = 0;
-        bool isCorrect = false;
+        double ernedScore = _questionScoringService.CalculateScore(question, request.SelectedOptionIds);
+        bool isCorrect = ernedScore == question.MaxScore;
 
-        var correctOptions = question.Options.Where(o => o.IsCorrect).ToList();
-
-        if (question.QuestionType == QuestionType.SingleChoice)
-        {
-            var correctId = correctOptions.First().Id;
-            isCorrect = request.SelectedOptionIds?.Contains(correctId) == true;
-            earnedScore = isCorrect ? correctOptions.First().Score : 0;
-        }
-
-        var answer = new UserAnswer
+        var userAnswer = new UserAnswer()
         {
             Id = Guid.NewGuid(),
-            AttemptId = attemptId,
-            QuestionId = question.Id,
+            QuestionId = request.QuestionId,
+            SelectedOptionId = request.SelectedOptionIds,
             IsCorrect = isCorrect,
-            Score = earnedScore
+            TextAnswer = request.TextAnswer,
+            AttemptId = attemptId
         };
+        
+        await _userAnswerRepository.AddAsync(userAnswer);
+        
+        attempt.TotalScore += ernedScore;
 
-        await _userAnswerRepository.AddAsync(answer);
         await _unitOfWork.SaveChangesAsync();
-
+        
         return new SubmitAnswerResponseDTO
         {
             IsCorrect = isCorrect,
-            EarnedScore = earnedScore
+            EarnedScore = ernedScore,
         };
     }
 }
