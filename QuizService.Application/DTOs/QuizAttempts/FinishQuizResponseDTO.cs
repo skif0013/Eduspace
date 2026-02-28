@@ -9,4 +9,8 @@ public class FinishQuizResponseDTO
     public int TotalQuestions { get; set; }
     
     public DateTime FinishedAt { get; set; }
+    
+    public double Percentage { get; set; }
+    
+    public bool IsPassed { get; set; }
 }
