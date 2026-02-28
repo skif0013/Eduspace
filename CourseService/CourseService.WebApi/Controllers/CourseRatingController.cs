@@ -1,7 +1,6 @@
 ﻿using CourseService.Application.Courses.DTO;
 using CourseService.Application.Courses.Interfaces;
 using CourseService.WebApi.Extentions;
-using CourseService.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -51,6 +50,10 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         [Authorize]
         [HttpPut]
+        [ProducesResponseType(typeof(CourseRatingResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IResult> UpdateRating(CourseRatingDTO ratingDTO, Guid courseId)
         {
             var userId = User.GetUserId();

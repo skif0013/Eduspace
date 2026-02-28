@@ -1,4 +1,4 @@
-﻿using CourseService.WebApi.Infrastructure.ExceptionHandling;
+﻿using CourseService.WebApi.ExceptionHandling;
 
 namespace CourseService.WebApi;
 
@@ -12,7 +12,7 @@ public static class DependencyInjection
 
     public static WebApplication UseApiServices(this WebApplication app)
     {
-        app.UseMiddleware<GlobalExceptionMiddleware>();
+        app.UseMiddleware<GlobalExceptionHandler>();
 
         return app;
     }

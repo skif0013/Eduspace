@@ -10,20 +10,20 @@ public class Result
     {
         if (isSuccess && error != Error.None )
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("Success result cannot have an error.");
         }
 
         if (!isSuccess && error == Error.None)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("Failure result must have an error.");
         }
 
         IsSuccess = isSuccess;
         Error = error;
     }
 
-    public static Result Succes() => new(true, Error.None);
-    public static Result Failure(Error error) => new(false, error);
+    public static Result Success() => new(true, Error.None);
+    public static Result Failure(Error error) => new(false, error ?? throw new ArgumentNullException(nameof(error)));
 }
 
 public class Result<T> : Result

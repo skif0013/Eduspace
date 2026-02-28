@@ -5,6 +5,7 @@ using CourseService.Infrastructure;
 using CourseService.Infrastructure.Data;
 using CourseService.Infrastructure.Repositories;
 using CourseService.WebApi;
+using CourseService.WebApi.ExceptionHandling;
 using DotNetEnv;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -78,6 +79,7 @@ builder.Services.AddProblemDetails(options =>
         context.ProblemDetails.Instance = context.HttpContext.Request.Path;
     };
 });
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();

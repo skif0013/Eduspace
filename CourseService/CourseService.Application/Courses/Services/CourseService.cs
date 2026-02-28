@@ -36,7 +36,7 @@ public class CourseService : ICourseService
         _publisher = publisher;
     }
 
-    public async Task<Result<string>> ArchiveCourseAsync(Guid courseId, Guid authorId)
+    public async Task<Result> ArchiveCourseAsync(Guid courseId, Guid authorId)
     {
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
@@ -48,14 +48,14 @@ public class CourseService : ICourseService
             //_logger.LogError("ERROR");
             _logger.LogInformation("Course with {CourseId} not found.", courseId);
 
-            return Result<string>.Failure(CourseErrors.CourseNotFound);
+            return Result.Failure(CourseErrors.CourseNotFound);
         }
 
         if (course.AuthorId != authorId)
         {
             _logger.LogWarning("Archive denied. Author {AuthorId} is not the owner of course {CourseId}", authorId, courseId);
 
-            return Result<string>.Failure(CourseErrors.NotCourseAuthor);
+            return Result.Failure(CourseErrors.NotCourseAuthor);
         }
 
         var wasPublished = course.Status == CourseStatus.Published;
@@ -75,7 +75,7 @@ public class CourseService : ICourseService
 
         _logger.LogInformation("Course {CourseId} was archived by author {AuthorId}", course.Id, course.AuthorId);
 
-        return Result<string>.Success("Course has been archived");
+        return Result.Success();
     }
 
     public async Task<Result<CourseResponse>> CreateCourseAsync(CourseDTO courseDTO, Guid authorId)
@@ -159,17 +159,17 @@ public class CourseService : ICourseService
         return Result<CourseResponse>.Success(response);
     }
 
-    public async Task<Result<string>> PublishCourseAsync(Guid courseId, Guid authorId)
+    public async Task<Result> PublishCourseAsync(Guid courseId, Guid authorId)
     {
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
         {
-            return Result<string>.Failure(CourseErrors.CourseNotFound);
+            return Result.Failure(CourseErrors.CourseNotFound);
         }
 
         if (course.AuthorId != authorId)
         {
-            return Result<string>.Failure(CourseErrors.NotCourseAuthor);
+            return Result.Failure(CourseErrors.NotCourseAuthor);
         }
 
         course.Status = CourseStatus.Published;
@@ -182,7 +182,7 @@ public class CourseService : ICourseService
         var json = JsonSerializer.Serialize(@event);
         await _publisher.PublishAsync("course.published", json);
 
-        return Result<string>.Success("Course has been published.");
+        return Result.Success();
     }
 
     public async Task<Result<CourseResponse>> UpdateCourseAsync(CourseDTO courseDTO, Guid courseId, Guid authorId)

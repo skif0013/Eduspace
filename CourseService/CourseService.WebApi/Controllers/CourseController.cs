@@ -3,7 +3,6 @@ using CourseService.WebApi.Extentions;
 using Microsoft.AspNetCore.Authorization;
 using CourseService.Application.Courses.DTO;
 using CourseService.Application.Courses.Interfaces;
-using CourseService.WebApi.Infrastructure;
 
 namespace CourseService.WebApi.Controllers
 {
@@ -30,6 +29,8 @@ namespace CourseService.WebApi.Controllers
         /// Used for the public course catalog.
         /// Results are ordered by creation date (newest first).
         /// </remarks>
+        [ProducesResponseType(typeof(PagedCoursesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpGet]
         public async Task<IResult> GetPagedCourses([FromQuery] PaginationRequest request)   
         {
@@ -46,6 +47,8 @@ namespace CourseService.WebApi.Controllers
         /// Course owner can access the course regardless of its status.
         /// </remarks>
         /// <param name="courseId">Course identifier.</param>
+        [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [HttpGet("{courseId:guid}")]
         public async Task<IResult> GetCourseById(Guid courseId)
         {
@@ -63,6 +66,9 @@ namespace CourseService.WebApi.Controllers
         /// </remarks>
         [Authorize]
         [HttpPost]
+        [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IResult> CreateCourse(CourseDTO courseDTO)
         {
             var authorId = User.GetUserId();
@@ -82,6 +88,11 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseDto">Updated course data.</param>
         [Authorize]
         [HttpPut("{courseId:guid}")]
+        [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IResult> UpdateCourse(CourseDTO courseDTO, Guid courseId)
         {
             var authorId = User.GetUserId();
@@ -100,6 +111,10 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         [Authorize]
         [HttpPatch("{courseId:guid}/publish")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IResult> PublishCourse(Guid courseId)
         {
             var authorId = User.GetUserId();
@@ -118,6 +133,10 @@ namespace CourseService.WebApi.Controllers
         /// <param name="courseId">Course identifier.</param>
         [Authorize]
         [HttpPatch("{courseId:guid}/archive")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IResult> ArchiveCourse(Guid courseId)
         {
             var authorId = User.GetUserId();
