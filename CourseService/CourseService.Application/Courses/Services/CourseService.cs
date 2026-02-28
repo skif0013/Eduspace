@@ -41,19 +41,17 @@ public class CourseService : ICourseService
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
         {
-            //_logger.LogTrace("TRACE");
-            //_logger.LogDebug("DEBUG");
-            //_logger.LogInformation("INFO");
-            //_logger.LogWarning("WARNING");
-            //_logger.LogError("ERROR");
-            _logger.LogInformation("Course with {CourseId} not found.", courseId);
+            _logger.LogInformation("Course {CourseId} not found", courseId);
 
             return Result.Failure(CourseErrors.CourseNotFound);
         }
 
         if (course.AuthorId != authorId)
         {
-            _logger.LogWarning("Archive denied. Author {AuthorId} is not the owner of course {CourseId}", authorId, courseId);
+            _logger.LogWarning(
+                "Archive denied. Author {AuthorId} is not the owner of course {CourseId}", 
+                authorId, 
+                courseId);
 
             return Result.Failure(CourseErrors.NotCourseAuthor);
         }
@@ -73,7 +71,10 @@ public class CourseService : ICourseService
         var json = JsonSerializer.Serialize(@event);
         await _publisher.PublishAsync("course.archived", json);
 
-        _logger.LogInformation("Course {CourseId} was archived by author {AuthorId}", course.Id, course.AuthorId);
+        _logger.LogInformation(
+            "Course {CourseId} archived by author {AuthorId}", 
+            course.Id, 
+            course.AuthorId);
 
         return Result.Success();
     }
@@ -90,6 +91,11 @@ public class CourseService : ICourseService
         var @event = new CourseCreatedEvent(course.Id, course.AuthorId);
         var json = JsonSerializer.Serialize(@event);
         await _publisher.PublishAsync("course.created", json);
+
+        _logger.LogInformation(
+            "Course {CourseId} created by Author {AuthorId}",
+            createdCourse.Id,
+            createdCourse.AuthorId);
 
         return Result<CourseResponse>.Success(response);
     }
@@ -146,6 +152,8 @@ public class CourseService : ICourseService
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
         {
+            _logger.LogWarning("Course {CourseId} not found", courseId);
+
             return Result<CourseResponse>.Failure(CourseErrors.CourseNotFound);
         }
 
@@ -164,11 +172,18 @@ public class CourseService : ICourseService
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
         {
+            _logger.LogInformation("Course {CourseId} not found", courseId);
+
             return Result.Failure(CourseErrors.CourseNotFound);
         }
 
         if (course.AuthorId != authorId)
         {
+            _logger.LogWarning(
+                "Publish denied. Author {AuthorId} is not the owner of course {CourseId}",
+                authorId,
+                courseId);
+
             return Result.Failure(CourseErrors.NotCourseAuthor);
         }
 
@@ -182,6 +197,11 @@ public class CourseService : ICourseService
         var json = JsonSerializer.Serialize(@event);
         await _publisher.PublishAsync("course.published", json);
 
+        _logger.LogInformation(
+            "Course {CourseId} published by Author {AuthorId}",
+            courseId,
+            authorId);
+
         return Result.Success();
     }
 
@@ -190,11 +210,18 @@ public class CourseService : ICourseService
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
         {
+            _logger.LogInformation("Course {CourseId} not found", courseId);
+            
             return Result<CourseResponse>.Failure(CourseErrors.CourseNotFound);
         }
 
         if (course.AuthorId != authorId)
         {
+            _logger.LogWarning(
+                "Update denied. Author {AuthorId} is not the owner of the Course {CourseId}",
+                authorId,
+                courseId);
+
             return Result<CourseResponse>.Failure(CourseErrors.NotCourseAuthor);
         }
 
@@ -211,6 +238,11 @@ public class CourseService : ICourseService
 
         await _cache.IncrementCatalogVersionAsync();
         await _cache.RemoveAsync($"course:{course.Id}");
+
+        _logger.LogInformation(
+            "Course {CureseId} updated by Author {AuthorId}",
+            response.Id,
+            authorId);
 
         return Result<CourseResponse>.Success(response);
     }

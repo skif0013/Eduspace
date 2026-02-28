@@ -1,7 +1,7 @@
 ﻿using CourseService.Application.Courses.Errors;
 using CourseService.Domain.Abstractions;
 
-namespace CourseService.WebApi.Infrastructure.Http;
+namespace CourseService.WebApi.Http;
 
 public static class HttpErrorMapper
 {
