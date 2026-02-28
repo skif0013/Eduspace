@@ -17,6 +17,8 @@ public class QuizAttempt
     public DateTime? FinishedAt { get; set; }
 
     public int Score { get; set; }
+    
+    public double TotalScore { get; set; }
 
     public AttemptStatus Status { get; set; }
 
