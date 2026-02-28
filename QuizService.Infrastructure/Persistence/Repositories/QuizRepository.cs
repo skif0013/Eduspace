@@ -24,12 +24,20 @@ public class QuizRepository : IQuizRepository
     }
     
     public async Task<Quiz?> FindByIdAsync(Guid QuizId) =>
-        await _context.Quizzes.Include(g => g.Questions).FirstOrDefaultAsync(q => q.QuizId == QuizId);
+        await _context.Quizzes.Include(g => g.Questions).FirstOrDefaultAsync(q => q.Id == QuizId);
 
 
     public Task RemoveAsync(Quiz quiz)
     {
         _context.Quizzes.Remove(quiz);
         return Task.CompletedTask;
+    }
+    
+    public async Task<Quiz?> GetWithQuestionsAndOptionsByIdAsync(Guid quizId)
+    {
+        return await _context.Quizzes
+            .Include(q => q.Questions)
+                .ThenInclude(q => q.AnswerOptions)
+            .FirstOrDefaultAsync(q => q.Id == quizId);
     }
 }
