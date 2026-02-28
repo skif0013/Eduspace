@@ -11,63 +11,48 @@ namespace QuizService.Application.Services;
 public class AttemptService : IAttemptService
 {
     private readonly IAttemptRepository _attemptRepository;
-    private readonly IQuizRepository _quizRepository; 
     private readonly IQuestionRepository _questionRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IQuestionScoringService _questionScoringService;
     private readonly IUserAnswerRepository _userAnswerRepository;
+    private readonly IQuizMapper _quizMapper;
+    private readonly IQuizRepository _quizRepository;
     
-    public AttemptService(IAttemptRepository attemptRepository, IQuizRepository quizRepository, IQuestionRepository questionRepository, IUnitOfWork unitOfWork, IQuestionScoringService questionScoringService,)
+    
+    public AttemptService(IAttemptRepository attemptRepository,IQuestionRepository questionRepository, IUnitOfWork unitOfWork, IQuestionScoringService questionScoringService,IQuizMapper quizMapper, IQuizRepository quizRepository)
     {
-        _attemptRepository = attemptRepository;
         _quizRepository = quizRepository;
+        _quizMapper = quizMapper;
+        _attemptRepository = attemptRepository;
         _questionRepository = questionRepository;
         _unitOfWork = unitOfWork;
+        _questionScoringService = questionScoringService;
     }
     
     public async Task<QuizStartResponseDTO> StartQuizAsync(Guid quizId, Guid userId)
     {
-        var hasActive = await _attemptRepository.HasActiveAttemptAsync(quizId, userId);
-        if (hasActive)
-            throw new Exception("You already have active attempt");
+        if (await _attemptRepository.HasActiveAttemptAsync(quizId, userId))
+            throw new Exception("User already has an active attempt for this quiz");
 
-        var quiz = await _quizRepository.FindByIdAsync(quizId);
+        var quiz = await  _quizRepository.GetWithQuestionsAndOptionsByIdAsync(quizId);
         if (quiz == null)
             throw new Exception("Quiz not found");
-
-        var questions = await _questionRepository.GetActiveByQuizIdAsync(quizId);
-
+        
+        
         var attempt = new QuizAttempt
         {
             Id = Guid.NewGuid(),
             QuizId = quizId,
             UserId = userId,
-            StartedAt = DateTime.UtcNow,
-            Status = AttemptStatus.InProgress
+            Status = AttemptStatus.InProgress,
+            TotalScore = 0,
+            StartedAt = DateTime.UtcNow
         };
 
         await _attemptRepository.AddAsync(attempt);
         await _unitOfWork.SaveChangesAsync();
 
-        return new QuizStartResponseDTO
-        {
-            AttemptId = attempt.Id,
-            StartedAt = attempt.StartedAt,
-            TotalQuestions = questions.Count,
-            Questions = questions.Select(q => new QuestionForAttemptDTO
-            {
-                QuestionId = q.Id,
-                Text = q.Text,
-                QuestionType = q.QuestionType,
-                Order = q.Order,
-                Options = q.AnswerOptions.Select(o => new OptionForAttemptDTO
-                {
-                    OptionId = o.Id,
-                    Text = o.Text,
-                    Order = o.Order
-                }).ToList()
-            }).ToList()
-        };
+        return _quizMapper.ToStartResponseDTO(attempt, quiz.Questions);
     }
 
     public async Task<SubmitAnswerResponseDTO> SubmitAnswerAsync(Guid attemptId, SubmitAnswerRequestDTO request)
@@ -106,5 +91,25 @@ public class AttemptService : IAttemptService
             IsCorrect = isCorrect,
             EarnedScore = ernedScore,
         };
+    }
+
+
+    public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid quizId)
+    {
+        var attempt = await _attemptRepository.GetWithAnswersAsync(quizId);
+        if (attempt == null)
+            throw new Exception("Attempt not found");
+
+        if (attempt.Status == AttemptStatus.Completed)
+        {
+            throw new Exception("Quiz is already completed");
+        }
+        
+        attempt.Status = AttemptStatus.Completed;
+        attempt.FinishedAt = DateTime.UtcNow;
+        
+        await _unitOfWork.SaveChangesAsync();
+        
+        return _quizMapper.MapToFinishQuizResponseDTO(attempt);
     }
 }

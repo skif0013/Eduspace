@@ -1,7 +1,6 @@
 ﻿using QuizService.Application.Contracts;
 using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
-using QuizService.Application.DTOs.QuizDTOs.SubmitDTOs;
 using QuizService.Application.Repositories;
 using QuizService.Domain.Models;
 
@@ -33,7 +32,7 @@ public class QuizService : IQuizService
 
         var quiz = new Quiz()
         {
-            QuizId = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             CreatorId = userId,
             Description = request.Text,
             IsPublished = true,
@@ -102,35 +101,5 @@ public class QuizService : IQuizService
 
         await _quizRepository.RemoveAsync(delete);
         await _unitOfWork.SaveChangesAsync();
-    }
-
-    public async Task<QuizSubmitResponseDTO> SubmitQuizAsync(SubmitQuizRequestDTO request)
-    {
-        var quiz = await _quizRepository.FindByIdAsync(request.QuizId);
-
-        if (quiz == null)
-        {
-            throw new Exception("Quiz not found");
-        }
-
-        double totalScore = 0;
-
-        foreach (var question in quiz.Questions)
-        {
-            var userAnswer = request.Answers.FirstOrDefault(a => a.QuestionId == question.Id);
-
-            if (userAnswer != null)
-            {
-                totalScore += _questionScoringService.CalculateScore(question, userAnswer.SelectedOptionIds);
-            }
-        }
-
-        bool isPassed = totalScore >= quiz.PassScore;
-
-        return new QuizSubmitResponseDTO
-        {
-            TotalScore = totalScore,
-            IsPassed = isPassed
-        };
     }
 }
