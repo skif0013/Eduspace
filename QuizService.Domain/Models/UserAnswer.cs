@@ -12,7 +12,7 @@ public class UserAnswer
 
     public string? TextAnswer { get; set; }
 
-    public Guid? SelectedOptionId { get; set; }
+    public List<Guid>? SelectedOptionId { get; set; }
 
     public bool IsCorrect { get; set; }
 }
