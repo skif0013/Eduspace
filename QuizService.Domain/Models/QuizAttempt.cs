@@ -19,9 +19,18 @@ public class QuizAttempt
     public int Score { get; set; }
     
     public double TotalScore { get; set; }
-
     public AttemptStatus Status { get; set; }
 
     public ICollection<UserAnswer> Answers { get; set; } = new List<UserAnswer>();
 
+    public double CalculatePercentage()
+    {
+        if(Quiz.MaxScore == 0) return 0;
+        
+        return (TotalScore / Quiz.MaxScore) * 100;
+    }
+    public bool IsPassed()
+    {
+        return CalculatePercentage()  >= Quiz.PassPercentage;
+    }
 }

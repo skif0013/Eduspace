@@ -2,18 +2,23 @@
 
 public class Quiz
 {
-    public Guid QuizId {get; set;}
+    public Guid Id { get; set; } 
     
     public Guid CreatorId { get; set; }
     
-    public string? Category { get; set; }
-    
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     
     public string? Description { get; set; }
     
-    public int PassScore { get; set; }
+    public string? Category { get; set; }
+
     
+    public double PassPercentage { get; set; } 
+
+   
+    public double MaxScore => Questions?.Sum(q => q.MaxScore) ?? 0;
+
+   
     public bool IsActive { get; set; }
     
     public bool IsPublished { get; set; }
