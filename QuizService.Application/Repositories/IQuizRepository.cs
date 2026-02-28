@@ -10,4 +10,6 @@ public interface IQuizRepository
     
     Task<Quiz?> FindByIdAsync(Guid quizId);
     Task RemoveAsync(Quiz quiz);
+    
+    Task<Quiz?> GetWithQuestionsAndOptionsByIdAsync(Guid quizId);
 }
