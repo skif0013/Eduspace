@@ -26,14 +26,22 @@ public class RedisCourseCache : ICourseCache
 
     public async Task<T?> GetAsync<T>(string key) where T : class
     {
-        var data = await _cache.GetStringAsync(key);
-        if (data == null)
+        try
+        {
+            var data = await _cache.GetStringAsync(key);
+            if (string.IsNullOrWhiteSpace(data))
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<T>(data);
+        }
+        catch (RedisConnectionException)
         {
             return null;
         }
-
-        return JsonSerializer.Deserialize<T>(data);
     }
+
 
     public async Task SetAsync<T>(string key, T value, CacheEntryType type) where T : class
     {
@@ -61,17 +69,25 @@ public class RedisCourseCache : ICourseCache
     {
         await _cache.RemoveAsync(key);
     }
-    
+
     public async Task<long> GetCatalogVersionAsync()
     {
-        var version = await _cache.GetStringAsync(CatalogVersionKey);
-        if (version == null)
+        try
         {
-            await _cache.SetStringAsync(CatalogVersionKey, "1");
+            var version = await _cache.GetStringAsync(CatalogVersionKey);
+
+            if (version == null)
+            {
+                await _cache.SetStringAsync(CatalogVersionKey, "1");
+                return 1;
+            }
+
+            return long.Parse(version);
+        }
+        catch (RedisConnectionException)
+        {
             return 1;
         }
-
-        return long.Parse(version);
     }
 
     public async Task IncrementCatalogVersionAsync()

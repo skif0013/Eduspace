@@ -1,7 +1,7 @@
 ﻿using CourseService.Domain.Abstractions;
-using CourseService.WebApi.Infrastructure.Http;
+using CourseService.WebApi.Http;
 
-namespace CourseService.WebApi.Infrastructure;
+namespace CourseService.WebApi.Extentions;
 
 public static class ResultExtensions
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CourseService.WebApi.Infrastructure.ExceptionHandling;
+namespace CourseService.WebApi.ExceptionHandling;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {

@@ -16,6 +16,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        #region Redis ( Cache and Pub/Sub)
         var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
         var redisUser = Environment.GetEnvironmentVariable("RedisUser");
         var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
@@ -25,11 +26,18 @@ public static class DependencyInjection
             EndPoints = { redisEndPoint },
             User = redisUser,
             Password = redisPassword,
-            AbortOnConnectFail = false
+            AbortOnConnectFail = false,
+            ConnectRetry = 5,
+            ConnectTimeout = 15000,
+            SyncTimeout = 10000,
+            KeepAlive = 30,
+            ReconnectRetryPolicy = new ExponentialRetry(5000)
         };
 
-        services.AddSingleton<IConnectionMultiplexer>(
-            sp => ConnectionMultiplexer.Connect(redisOptions));
+        services.AddSingleton<IConnectionMultiplexer>( sp =>
+        {
+            return ConnectionMultiplexer.Connect(redisOptions);
+        });
 
         services.AddSingleton<IDistributedCache>(sp =>
         {
@@ -46,7 +54,7 @@ public static class DependencyInjection
         services.AddSingleton<ICourseCache, RedisCourseCache>();
 
         services.Configure<RadisCacheSettings>(configuration.GetSection("RedisCacheSettings"));
-
+        #endregion
         return services;
     }
 }

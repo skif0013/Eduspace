@@ -29,6 +29,7 @@ public class CourseController : ControllerBase
     /// Used for the public course catalog.
     /// Results are ordered by creation date (newest first).
     /// </remarks>
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedCoursesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [HttpGet]
