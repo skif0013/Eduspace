@@ -25,7 +25,7 @@ public class ApplicationDbContext : DbContext
         
         modelBuilder.Entity<Quiz>(entity =>
         {
-            entity.HasKey(q => q.QuizId);
+            entity.HasKey(q => q.Id);
             entity.Property(q => q.Name).IsRequired().HasMaxLength(200);
             entity.Property(q => q.Description).HasMaxLength(1000);
             entity.HasMany(q => q.Questions).WithOne().OnDelete(DeleteBehavior.Cascade);
@@ -53,6 +53,30 @@ public class ApplicationDbContext : DbContext
                 .WithMany(q => q.AnswerOptions) 
                 .HasForeignKey(a => a.QuestionId) 
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<QuizAttempt>(entity =>
+        {
+            entity.HasKey(a => a.Id);
+            entity.HasMany(a => a.Answers)
+                .WithOne(ua => ua.Attempt)
+                .HasForeignKey(ua => ua.AttemptId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        modelBuilder.Entity<UserAnswer>(entity =>
+        {
+            entity.HasKey(ua => ua.Id);
+            entity.HasOne(ua => ua.Attempt)
+                .WithMany(a => a.Answers)
+                .HasForeignKey(ua => ua.AttemptId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(ua => ua.QuestionId);
+            
+            //for Guid list
+            entity.Property(ua => ua.SelectedOptionId)
+                .HasColumnType("uuid[]");
         });
     }
 }
