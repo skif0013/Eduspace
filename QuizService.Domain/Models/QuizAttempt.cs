@@ -21,8 +21,56 @@ public class QuizAttempt
     public double TotalScore { get; set; }
     public AttemptStatus Status { get; set; }
 
-    public ICollection<UserAnswer> Answers { get; set; } = new List<UserAnswer>();
+    private readonly List<UserAnswer> _answers = new();
+    public IReadOnlyCollection<UserAnswer> Answers => _answers.AsReadOnly();
+    
+    public QuizAttempt(){}
+    
+    
+    public QuizAttempt(Guid quizId, Guid userId)
+    {
+        Id = Guid.NewGuid();
+        QuizId = quizId;
+        UserId = userId;
+        StartedAt = DateTime.UtcNow;
+        Status = AttemptStatus.InProgress;
+    }
 
+    public void AddScore(double score)
+    {
+        if (Status != AttemptStatus.InProgress)
+        {
+            throw new InvalidOperationException("Cannot add score to a finished or cancelled attempt");
+        }
+        
+        TotalScore += score;
+    }
+    
+    
+    public void AddAnswer(Guid questionId, List<Guid> selectedOptionIds, string textAnswer, double score, bool isCorrect)
+    {
+        if (Status != AttemptStatus.InProgress)
+        {
+            throw new InvalidOperationException("Cannot add answer to a finished or cancelled attempt");
+        }
+        
+        var answer = new UserAnswer(questionId, selectedOptionIds, textAnswer, isCorrect);
+        
+        _answers.Add(answer);
+        
+        this.TotalScore += score;
+    }
+
+    public void Finish()
+    {
+        if (Status != AttemptStatus.Completed)
+        {
+            return;
+        }
+        
+        FinishedAt = DateTime.UtcNow;
+        Status = AttemptStatus.Completed;
+    }
     public double CalculatePercentage()
     {
         if(Quiz.MaxScore == 0) return 0;

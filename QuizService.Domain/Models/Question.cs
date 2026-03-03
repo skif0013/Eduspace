@@ -4,9 +4,28 @@ namespace QuizService.Domain.Models;
 
 public class Question
 {
+    
+    private Question(){}
 
     private readonly List<AnswerOption> _answerOptions = new();
-    
+
+    public Question(Guid quizId, string text, int order, int maxScore, QuestionType questionType)
+    {
+        if (string.IsNullOrWhiteSpace(Text)) 
+            throw new ArgumentException("Question text cannot be empty.");
+            
+        if (maxScore < 0)
+            throw new ArgumentException("Max score cannot be negative.");
+
+        Id = Guid.NewGuid(); 
+        QuizId = quizId;
+        Text = text;
+        Order = order;
+        MaxScore = maxScore;
+        QuestionType = questionType;
+        IsActive = true; 
+    }
+
     public Guid Id { get; set; }
     
     public Guid QuizId { get; set; }
@@ -18,14 +37,24 @@ public class Question
     
     public IReadOnlyCollection<AnswerOption> AnswerOptions => _answerOptions; 
 
-    public void AddAnswerOption(AnswerOption option)
+    public void AddAnswerOption(string text, bool isCorrect, double score, int order)
     {
-        if(option == null) throw new ArgumentNullException(nameof(option));
-        option.QuestionId = this.Id;
-        option.Question = this;
+        if(this.QuestionType == QuestionType.SingleChoice && isCorrect && _answerOptions.Any(a => a.IsCorrectAnswer))
+        {
+            throw new Exception("Single choice question cannot have more than one correct answer.");
+        }
+        
+        if(_answerOptions.Any(o => o.Order == order))
+        {
+            throw new Exception("An answer option with the same order already exists.");
+        }
+        
+        var option = new AnswerOption(text, isCorrect, score, order);
+        
         _answerOptions.Add(option);
+        
     }
-
+    
     public void RemoveAnswerOption(AnswerOption option)
     {
         if(option == null) throw new ArgumentNullException(nameof(option));

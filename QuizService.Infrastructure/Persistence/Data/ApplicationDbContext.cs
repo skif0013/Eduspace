@@ -16,65 +16,70 @@ public class ApplicationDbContext : DbContext
     public DbSet<QuizAttempt> QuizAttempts { get; set; }
     
     public DbSet<UserAnswer> UserAnswers { get; set; }
-    
-    
-    
+
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
+
         modelBuilder.Entity<Quiz>(entity =>
         {
             entity.HasKey(q => q.Id);
             entity.Property(q => q.Name).IsRequired().HasMaxLength(200);
             entity.Property(q => q.Description).HasMaxLength(1000);
-            entity.HasMany(q => q.Questions).WithOne().OnDelete(DeleteBehavior.Cascade);
+
+            // Указываем FK явно, чтобы EF не создал "теневое" поле
+            entity.HasMany(q => q.Questions)
+                .WithOne()
+                .HasForeignKey(q => q.QuizId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
+
 
         modelBuilder.Entity<Question>(entity =>
         {
+            entity.HasKey(q => q.Id);
+
+
             entity.HasMany(q => q.AnswerOptions)
-                .WithOne(a => a.Question)
+                .WithOne()
                 .HasForeignKey(a => a.QuestionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.Navigation(q => q.AnswerOptions)
-                .HasField("_answerOptions")
-                .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+            var navigation = entity.Metadata.FindNavigation(nameof(Question.AnswerOptions));
+            navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
         });
 
-        modelBuilder.Entity<AnswerOption>(entity =>
-        {
-            entity.HasKey(a => a.Id);
-            
-            entity.Property(a => a.Text).IsRequired();
-            
-            entity.HasOne(a => a.Question)      
-                .WithMany(q => q.AnswerOptions) 
-                .HasForeignKey(a => a.QuestionId) 
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
+        // QUIZ ATTEMPT
         modelBuilder.Entity<QuizAttempt>(entity =>
         {
             entity.HasKey(a => a.Id);
+
             entity.HasMany(a => a.Answers)
                 .WithOne(ua => ua.Attempt)
                 .HasForeignKey(ua => ua.AttemptId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+
+            entity.Navigation(a => a.Answers)
+                .HasField("_answers")
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+
+            entity.Property(a => a.TotalScore).IsRequired();
         });
-        
+
+
         modelBuilder.Entity<UserAnswer>(entity =>
         {
             entity.HasKey(ua => ua.Id);
-            entity.HasOne(ua => ua.Attempt)
-                .WithMany(a => a.Answers)
-                .HasForeignKey(ua => ua.AttemptId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(ua => ua.QuestionId);
-            
-            //for Guid list
+
+
             entity.Property(ua => ua.SelectedOptionId)
                 .HasColumnType("uuid[]");
         });

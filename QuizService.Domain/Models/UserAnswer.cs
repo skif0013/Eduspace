@@ -2,6 +2,17 @@
 
 public class UserAnswer
 {
+
+    public UserAnswer() {}
+    
+    public UserAnswer(Guid questionId, List<Guid> selectedOptionIds, string? textAnswer, bool selectedOptionId)
+    {
+        QuestionId = questionId;
+        SelectedOptionId = selectedOptionIds;
+        TextAnswer = textAnswer;
+        IsCorrect = selectedOptionId;
+    }
+
     public Guid Id { get; set; }
 
     public Guid AttemptId { get; set; }
