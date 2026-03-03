@@ -1,5 +1,4 @@
 ﻿using QuizService.Application.Contracts;
-using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuestionsDTOs.ResponseDTO;
 using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;

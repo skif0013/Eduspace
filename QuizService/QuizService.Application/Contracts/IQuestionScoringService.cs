@@ -1,5 +1,4 @@
-﻿using QuizService.Application.DTOs.QuizDTOs.SubmitDTOs;
-using QuizService.Domain.Models;
+﻿using QuizService.Domain.Models;
 
 namespace QuizService.Application.Contracts;
 

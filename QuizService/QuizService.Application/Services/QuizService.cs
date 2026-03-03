@@ -14,18 +14,16 @@ public class QuizService : IQuizService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IQuizMapper _mapper;
     private readonly ITokenService _tokenService;
-    private readonly IQuestionScoringService _questionScoringService;
     private readonly IAttemptRepository _attemptRepository;
 
     public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper,
-        ITokenService tokenService, IQuestionScoringService questionScoringService, IAttemptRepository attemptRepository)
+        ITokenService tokenService,IAttemptRepository attemptRepository)
     {
         _attemptRepository = attemptRepository;
         _tokenService = tokenService;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _quizRepository = quizRepository;
-        _questionScoringService = questionScoringService;
     }
     
     public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid creatorId)
@@ -56,7 +54,7 @@ public class QuizService : IQuizService
     public async Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request)
     {
         var quiz = await _quizRepository.FindByIdAsync(quizId)
-                   ?? throw new KeyNotFoundException("Квиз не найден");
+                   ?? throw new KeyNotFoundException("quiz not found");
 
         
         quiz.UpdateBasicInfo(

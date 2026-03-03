@@ -1,6 +1,4 @@
-﻿using QuizService.Domain.Models;
-
-namespace QuizService.Application.Repositories;
+﻿namespace QuizService.Application.Repositories;
 
 public interface IUnitOfWork
 {
