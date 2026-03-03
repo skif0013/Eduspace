@@ -36,11 +36,6 @@ builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IQuestionMapper, QuestionMapper>();
 builder.Services.AddScoped<IAttemptRepository, AttemptRepository>();
 builder.Services.AddScoped<IAttemptService, AttemptService>();
-builder.Services.AddScoped<IUserAnswerRepository, UserAnswerRepository>();
-
-
-
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
