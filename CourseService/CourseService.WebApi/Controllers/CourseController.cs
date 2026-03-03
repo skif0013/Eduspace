@@ -30,9 +30,9 @@ public class CourseController : ControllerBase
     /// Results are ordered by creation date (newest first).
     /// </remarks>
     [AllowAnonymous]
+    [HttpGet]
     [ProducesResponseType(typeof(PagedCoursesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    [HttpGet]
     public async Task<IResult> GetPagedCourses([FromQuery] PaginationRequest request)   
     {
         var result = await _courseService.GetPagedCoursesAsync(request.Page, request.PageSize);
@@ -48,9 +48,10 @@ public class CourseController : ControllerBase
     /// Course owner can access the course regardless of its status.
     /// </remarks>
     /// <param name="courseId">Course identifier.</param>
+    [AllowAnonymous]
+    [HttpGet("{courseId:guid}")]
     [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [HttpGet("{courseId:guid}")]
     public async Task<IResult> GetCourseById(Guid courseId)
     {
         var result = await _courseService.GetCourseByIdAsync(courseId);

@@ -11,6 +11,8 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Serilog.Events;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -87,6 +89,10 @@ builder.Services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
 builder.Services.AddScoped<ICourseService, CourseService.Application.Courses.Services.CourseService>();
 builder.Services.AddScoped<ICourseRatingService, CourseRatingService>();
 
+#region Serilog
+builder.Host.UseSerilog((context, loggerConfig) =>
+    loggerConfig.ReadFrom.Configuration(context.Configuration));
+#endregion
 
 var app = builder.Build();
 
@@ -100,6 +106,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//app.UseSerilogRequestLogging();////
 
 app.UseAuthentication();
 app.UseAuthorization();
