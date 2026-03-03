@@ -15,53 +15,54 @@ public class QuestionController : ControllerBase
         _questionService = questionService;
     }
 
-
-    [HttpGet("GetQuestionById")]
-    public async Task<IActionResult> GetQuestionById(Guid questionId)
+    
+    [HttpGet("{id:guid}")] 
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var question = await _questionService.GetQuestionByIdAsync(questionId);
+        var question = await _questionService.GetQuestionByIdAsync(id);
+        if (question == null) return NotFound(); 
         
-        return new JsonResult(question);
+        return Ok(question);
     }
 
-    [HttpPost("AddQuestionToQuiz")]
-    public async Task<IActionResult> AddQuestionToQuiz(CreateQuestionRequestDTO requestDTO)
+    
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateQuestionRequestDTO requestDTO)
     {
-        var add = await _questionService.AddQuestionToQuizAsync(requestDTO);
+        var result = await _questionService.CreateQuestionWithTitleAsync(requestDTO);
             
-        return new JsonResult(add);
+        return CreatedAtAction(nameof(GetById), new { id = result.QuestionId }, result);
     }
 
-
-    [HttpGet("GetAllQuestions")]
-    public async Task<IActionResult> GetAllQuestions()
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
     {
-        var getAll = await  _questionService.GetAllQuestionsAsync();
-        
-        return new JsonResult(getAll);
+        var questions = await _questionService.GetAllQuestionsAsync();
+        return Ok(questions);
     }
 
-    [HttpDelete("DeleteQuestionFromQuiz {questionId}")]
-    public async Task<IActionResult> DeleteQuestionFromQuiz([FromRoute] Guid questionId)
+   
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
     {
-        await  _questionService.DeleteQuestionFromQuizAsync(questionId);
-
-        return NoContent();
+        await _questionService.DeleteQuestionFromQuizAsync(id);
+        return NoContent(); // 204 — Успешно, но возвращать нечего
     }
 
-    [HttpPut("UpdateQuestionToQuiz {questionId}")]
-    public async Task<IActionResult> UpdateQuestionToQuiz([FromBody] CreateQuestionRequestDTO requestDto,[FromRoute] Guid questionId)
+    
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] CreateQuestionRequestDTO requestDto)
     {
-        var update = await _questionService.UpdateQuestionToQuizAsync(requestDto, questionId);
-        
-        return new JsonResult(update);
+        var result = await _questionService.UpdateQuestionToQuizAsync(requestDto, id);
+        return Ok(result);
     }
 
-    [HttpPatch("CompletedQuestion {questionId}")]
-    public async Task<IActionResult> CompletedQuestionAsync([FromRoute] Guid questionId)
+    
+    [HttpPatch("{id:guid}/complete")]
+    public async Task<IActionResult> Complete(Guid id)
     {
-        var completed = await _questionService.CompletedQuestionAsync(questionId);
-        
-        return new JsonResult(completed);
+        var result = await _questionService.CompletedQuestionAsync(id);
+        return Ok(result);
     }
 }

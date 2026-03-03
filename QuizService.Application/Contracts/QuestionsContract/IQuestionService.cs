@@ -5,8 +5,6 @@ namespace QuizService.Application.Contracts.QuestionsContract;
 
 public interface IQuestionService
 {
-    Task<QuestionResponseDTO> AddQuestionToQuizAsync(CreateQuestionRequestDTO requestDTO);
-    
     Task<QuestionResponseDTO> UpdateQuestionToQuizAsync(CreateQuestionRequestDTO requestDto, Guid questionId);
     
     Task<bool> DeleteQuestionFromQuizAsync(Guid questionId);
@@ -16,4 +14,6 @@ public interface IQuestionService
     Task<IReadOnlyCollection<QuestionResponseDTO>> GetAllQuestionsAsync();
     
     Task<QuestionResponseDTO> CompletedQuestionAsync(Guid questionId);
+    
+    Task<QuestionResponseDTO> CreateQuestionWithTitleAsync(CreateQuestionRequestDTO requestDTO);
 }
