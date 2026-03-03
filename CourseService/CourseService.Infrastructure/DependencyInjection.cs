@@ -1,7 +1,12 @@
 ﻿using CourseService.Application.Caching;
+using CourseService.Application.Courses.Interfaces;
 using CourseService.Application.Messaging;
 using CourseService.Infrastructure.Caching;
+using CourseService.Infrastructure.Data;
 using CourseService.Infrastructure.Messaging.Redis;
+using CourseService.Infrastructure.Repositories;
+using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
@@ -12,11 +17,35 @@ namespace CourseService.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        #region Redis ( Cache and Pub/Sub)
+        LoadEnvironment();
+
+        services.AddDatabase(configuration);
+
+        services.AddRedis(configuration);
+
+        services.AddRepositories();
+
+        return services;
+    }
+
+    private static void LoadEnvironment()
+    {
+        var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+        Env.Load(envPath);
+    }
+
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+        return services;
+    }
+
+    private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
+    {
         var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
         var redisUser = Environment.GetEnvironmentVariable("RedisUser");
         var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
@@ -34,7 +63,7 @@ public static class DependencyInjection
             ReconnectRetryPolicy = new ExponentialRetry(5000)
         };
 
-        services.AddSingleton<IConnectionMultiplexer>( sp =>
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
         {
             return ConnectionMultiplexer.Connect(redisOptions);
         });
@@ -54,7 +83,15 @@ public static class DependencyInjection
         services.AddSingleton<ICourseCache, RedisCourseCache>();
 
         services.Configure<RadisCacheSettings>(configuration.GetSection("RedisCacheSettings"));
-        #endregion
+
+        return services;
+    }
+
+    private static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
+
         return services;
     }
 }
