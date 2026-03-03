@@ -11,7 +11,7 @@ public class Question
 
     public Question(Guid quizId, string text, int order, int maxScore, QuestionType questionType)
     {
-        if (string.IsNullOrWhiteSpace(Text)) 
+        if (string.IsNullOrWhiteSpace(text)) 
             throw new ArgumentException("Question text cannot be empty.");
             
         if (maxScore < 0)
@@ -23,11 +23,13 @@ public class Question
         Order = order;
         MaxScore = maxScore;
         QuestionType = questionType;
+        CreatedOn = DateTime.UtcNow;
+        ModifiedOn = DateTime.UtcNow;
         IsActive = true; 
     }
 
     public Guid Id { get; set; }
-    
+
     public Guid QuizId { get; set; }
     public string Text { get; set; } 
     

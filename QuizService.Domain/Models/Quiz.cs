@@ -2,30 +2,80 @@
 
 public class Quiz
 {
-    public Guid Id { get; set; } 
-    
-    public Guid CreatorId { get; set; }
-    
-    public string Name { get; set; } = string.Empty;
-    
-    public string? Description { get; set; }
-    
-    public string? Category { get; set; }
+    private readonly List<Question> _questions = new();
+    public Quiz(Guid creatorId, string name, string? description, string? category, double passPercentage)
+    {
+        
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Quiz name cannot be empty.");
+            
+        if (passPercentage < 0 || passPercentage > 100)
+            throw new ArgumentException("Pass percentage must be between 0 and 100.");
+
+        Id = Guid.NewGuid();
+        
+        CreatorId = creatorId;
+        
+        Name = name;
+        
+        Description = description;
+        
+        Category = category;
+        
+        PassPercentage = passPercentage;
+        
+        IsActive = false;
+        
+        IsPublished = false;
+        
+        CreatedOn = DateTime.UtcNow;
+        
+        ModifiedOn = DateTime.UtcNow;
+    }
 
     
-    public double PassPercentage { get; set; } 
+    public Guid Id { get; private set; } 
+    public Guid CreatorId { get; private set; }
+    public string Name { get; private set; }
+    public string? Description { get; private set; }
+    public string? Category { get; private set; }
+    public double PassPercentage { get; private set; } 
+    public bool IsActive { get; private set; }
+    public bool IsPublished { get; private set; }
+    public DateTime CreatedOn { get; private set; }
+    public DateTime ModifiedOn { get; private set; }
 
-   
-    public double MaxScore => Questions?.Sum(q => q.MaxScore) ?? 0;
+    public virtual IReadOnlyCollection<Question> Questions => _questions.AsReadOnly();
+    public double MaxScore => _questions.Sum(q => q.MaxScore);
 
-   
-    public bool IsActive { get; set; }
-    
-    public bool IsPublished { get; set; }
-    
-    public DateTime CreatedOn { get; set; }
-    
-    public DateTime ModifiedOn { get; set; }
-    
-    public ICollection<Question> Questions { get; set; } = new List<Question>();
+    public void UpdateBasicInfo(string name, string? description, string? category, double passPercentage)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Quiz name cannot be empty.");
+        
+        if (passPercentage < 0 || passPercentage > 100)
+            throw new ArgumentException("Pass percentage must be between 0 and 100.");
+
+        Name = name;
+        Description = description;
+        Category = category;
+        PassPercentage = passPercentage;
+        ModifiedOn = DateTime.UtcNow;
+    }
+
+    public void Publish()
+    {
+        if (!_questions.Any())
+            throw new InvalidOperationException("Cannot publish a quiz without questions.");
+        
+        IsPublished = true;
+        IsActive = true;
+        ModifiedOn = DateTime.UtcNow;
+    }
+
+    public void Archive()
+    {
+        IsActive = false;
+        ModifiedOn = DateTime.UtcNow;
+    }
 }

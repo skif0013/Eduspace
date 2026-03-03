@@ -35,17 +35,6 @@ public class QuizAttempt
         StartedAt = DateTime.UtcNow;
         Status = AttemptStatus.InProgress;
     }
-
-    public void AddScore(double score)
-    {
-        if (Status != AttemptStatus.InProgress)
-        {
-            throw new InvalidOperationException("Cannot add score to a finished or cancelled attempt");
-        }
-        
-        TotalScore += score;
-    }
-    
     
     public void AddAnswer(Guid questionId, List<Guid> selectedOptionIds, string textAnswer, double score, bool isCorrect)
     {
@@ -63,7 +52,7 @@ public class QuizAttempt
 
     public void Finish()
     {
-        if (Status != AttemptStatus.Completed)
+        if (Status == AttemptStatus.Completed)
         {
             return;
         }
@@ -73,8 +62,11 @@ public class QuizAttempt
     }
     public double CalculatePercentage()
     {
-        if(Quiz.MaxScore == 0) return 0;
-        
+        if (Quiz == null) 
+            throw new InvalidOperationException("Quiz data is not loaded. Ensure Include(a => a.Quiz) is used.");
+
+        if (Quiz.MaxScore == 0) return 0;
+    
         return (TotalScore / Quiz.MaxScore) * 100;
     }
     public bool IsPassed()
