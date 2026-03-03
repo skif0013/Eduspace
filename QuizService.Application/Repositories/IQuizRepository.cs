@@ -9,6 +9,7 @@ public interface IQuizRepository
     Task AddQuizAsync(Quiz quiz);
     
     Task<Quiz?> FindByIdAsync(Guid quizId);
+    
     Task RemoveAsync(Quiz quiz);
     
     Task<Quiz?> GetWithQuestionsAndOptionsByIdAsync(Guid quizId);

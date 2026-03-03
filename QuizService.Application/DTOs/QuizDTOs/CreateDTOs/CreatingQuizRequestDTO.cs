@@ -4,13 +4,11 @@ namespace QuizService.Application.DTOs;
 
 public class CreatingQuizRequestDTO
 {
-    public string QuizName { get; set; }
+    public string Name { get; set; }
     
-    public string Description { get; set; }
+    public string? Description { get; set; }
     
-    public string Text { get; set; }
+    public string? Category { get; set; }
     
-    public QuestionType questionType { get; set; }
-    
-    public string Category { get; set; }
+    public double PassPercentage { get; set; }
 }

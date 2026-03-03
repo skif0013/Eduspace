@@ -1,5 +1,7 @@
 ﻿using QuizService.Application.Contracts;
+using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.DTOs;
+using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
 using QuizService.Application.Repositories;
 using QuizService.Domain.Models;
@@ -13,93 +15,96 @@ public class QuizService : IQuizService
     private readonly IQuizMapper _mapper;
     private readonly ITokenService _tokenService;
     private readonly IQuestionScoringService _questionScoringService;
+    private readonly IAttemptRepository _attemptRepository;
 
     public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper,
-        ITokenService tokenService, IQuestionScoringService questionScoringService)
+        ITokenService tokenService, IQuestionScoringService questionScoringService, IAttemptRepository attemptRepository)
     {
+        _attemptRepository = attemptRepository;
         _tokenService = tokenService;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _quizRepository = quizRepository;
         _questionScoringService = questionScoringService;
     }
-
-    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request)
+    
+    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid creatorId)
     {
+        var quiz = new Quiz(
+            creatorId,
+            request.Name, 
+            request.Description, 
+            request.Category, 
+            request.PassPercentage
+        );
 
-        //temporarily
-        Guid userId = Guid.NewGuid();
-
-        var quiz = new Quiz()
-        {
-            Id = Guid.NewGuid(),
-            CreatorId = userId,
-            Description = request.Text,
-            IsPublished = true,
-            IsActive = true,
-            ModifiedOn = DateTime.UtcNow,
-            Name = request.QuizName,
-            CreatedOn = DateTime.UtcNow,
-            Category = request.Category
-        };
-
+       
         await _quizRepository.AddQuizAsync(quiz);
+        
         await _unitOfWork.SaveChangesAsync();
 
+        
         return _mapper.MapToResponseDTO(quiz);
     }
-
-
-    public async Task<QuizResponseDTO> GetQuizByIdAsync(Guid userId, Guid quizId)
+    
+    public async Task<IEnumerable<QuizResponseDTO>> GetAllQuizzesAsync()
     {
-        var find = await _quizRepository.FindByIdAsync(quizId);
-
-        if (find == null)
-        {
-            throw new Exception("Quiz not found");
-        }
-
-        return _mapper.MapToResponseDTO(find);
-    }
-
-
-    //for develop 
-    public async Task<IReadOnlyCollection<QuizResponseDTO>> GetAllQuizzesAsync()
-    {
-        var getAll = await _quizRepository.GetAllQuizzesAsync();
-
-        return getAll.Select(q => _mapper.MapToResponseDTO(q)).ToList();
+        var quizzes = await _quizRepository.GetAllQuizzesAsync();
+        return quizzes.Select(q => _mapper.MapToResponseDTO(q));
     }
 
     public async Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request)
     {
-        var update = await _quizRepository.FindByIdAsync(quizId);
+        var quiz = await _quizRepository.FindByIdAsync(quizId)
+                   ?? throw new KeyNotFoundException("Квиз не найден");
 
+        
+        quiz.UpdateBasicInfo(
+            request.Name, 
+            request.Description, 
+            request.Category, 
+            request.PassPercentage
+        );
 
-        if (update == null)
-        {
-            throw new Exception("Quiz not found");
-        }
-
-        update.Name = request.Title;
-        update.Description = request.Description;
-        update.IsActive = request.IsActive;
-        update.IsPublished = request.IsPublished;
-        update.ModifiedOn = DateTime.Now;
         await _unitOfWork.SaveChangesAsync();
     }
 
-
     public async Task DeleteQuizAsync(Guid quizId)
     {
-        var delete = await _quizRepository.FindByIdAsync(quizId);
-
-        if (delete == null)
-        {
-            throw new Exception("Quiz not found");
-        }
-
-        await _quizRepository.RemoveAsync(delete);
+        var quiz = await _quizRepository.FindByIdAsync(quizId)
+                   ?? throw new KeyNotFoundException("quiz not found");
+            
+        _quizRepository.RemoveAsync(quiz); 
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<QuizResponseDTO> PublishQuizAsync(Guid quizId)
+    {
+        var quiz = await _quizRepository.GetWithQuestionsAndOptionsByIdAsync(quizId)
+                   ?? throw new KeyNotFoundException("quiz not found");
+        
+        quiz.Publish();
+
+        await _unitOfWork.SaveChangesAsync();
+
+        return _mapper.MapToResponseDTO(quiz);
+    }
+    
+    public async Task GetQuizByIdAsync(Guid quizId)
+    {
+        await _quizRepository.FindByIdAsync(quizId);
+    }
+    
+    
+    public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId)
+    {
+        var attempt = await _attemptRepository.GetByIdAsync(attemptId)
+                      ?? throw new Exception("Attempt not found");
+
+        attempt.Finish();
+        
+        await _unitOfWork.SaveChangesAsync();
+        
+        return _mapper.MapToFinishQuizResponseDTO(attempt);
     }
 }
