@@ -13,7 +13,6 @@ public class AttemptService : IAttemptService
     private readonly IQuestionRepository _questionRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IQuestionScoringService _questionScoringService;
-    private readonly IUserAnswerRepository _userAnswerRepository;
     private readonly IQuizMapper _quizMapper;
     private readonly IQuizRepository _quizRepository;
     
@@ -75,19 +74,5 @@ public class AttemptService : IAttemptService
             EarnedScore = score
         };
         
-    }
-
-
-    public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId)
-    {
-        var attempt = await _attemptRepository.GetWithAnswersAsync(attemptId)
-            ?? throw new Exception("Attempt not found");
-
-        attempt.Finish();
-        
-        
-        await _unitOfWork.SaveChangesAsync();
-        
-        return _quizMapper.MapToFinishQuizResponseDTO(attempt);
     }
 }

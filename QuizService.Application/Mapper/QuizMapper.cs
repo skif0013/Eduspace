@@ -1,5 +1,6 @@
 ﻿using QuizService.Application.Contracts;
 using QuizService.Application.DTOs;
+using QuizService.Application.DTOs.QuestionsDTOs.ResponseDTO;
 using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
 using QuizService.Domain.Models;
@@ -8,40 +9,48 @@ namespace QuizService.Application.Services;
 
 public class QuizMapper : IQuizMapper
 {
-    public Quiz MapToDomain(CreatingQuizRequestDTO dto, Guid userId)
-    {
-        return new Quiz
-        {
-            Id = Guid.NewGuid(),
-            CreatorId = userId,
-            Name = dto.QuizName,
-            Description = dto.Description,
-            Category = dto.Category,
-            IsActive = true,
-            IsPublished = false,
-            CreatedOn = DateTime.UtcNow,
-            ModifiedOn = DateTime.UtcNow
-        };
-    }
-
-    public void MapToDomain(QuizUpdateRequestDTO request, Quiz quiz)
-    {
-        quiz.Name = request.Title;
-        quiz.Description = request.Description;
-        quiz.Category = request.Category;
-        quiz.IsActive = request.IsActive;
-        quiz.IsPublished = request.IsPublished;
-        quiz.ModifiedOn = DateTime.UtcNow;
-    }
-    
     public QuizResponseDTO MapToResponseDTO(Quiz quiz)
     {
         return new QuizResponseDTO
         {
-            QuizId = quiz.Id,
+            Id = quiz.Id,
+            
             Name = quiz.Name,
+            
             Description = quiz.Description,
+            
             Category = quiz.Category,
+            
+            PassPercentage = quiz.PassPercentage,
+            
+            MaxScore = quiz.MaxScore,
+            
+            QuestionsCount = quiz.Questions?.Count ?? 0,
+        
+            IsPublished = quiz.IsPublished,
+            
+            IsActive = quiz.IsActive,
+            
+            CreatedOn = quiz.CreatedOn,
+            
+            ModifiedOn = quiz.ModifiedOn,
+            
+            Questions = quiz.Questions?
+                .Select(q => MapQuestionToResponseDTO(q)) 
+                .ToList()
+        };
+    }
+
+    public QuestionResponseDTO MapQuestionToResponseDTO(Question question)
+    {
+        return new QuestionResponseDTO
+        {
+            QuestionId = question.Id,
+            Text = question.Text,
+            Order = question.Order,
+            MaxScore = question.MaxScore,
+            QuestionType = question.QuestionType,
+            IsActive = question.IsActive
         };
     }
 
