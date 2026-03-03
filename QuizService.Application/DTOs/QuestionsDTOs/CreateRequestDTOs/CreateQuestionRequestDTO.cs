@@ -12,4 +12,6 @@ public class CreateQuestionRequestDTO
     public int MaxScore { get; set; }
     
     public QuestionType QuestionType { get; set; }
+
+    public List<CreateAnswerOptionInsideQuestionDTO>? Options { get; set; } = new();
 }

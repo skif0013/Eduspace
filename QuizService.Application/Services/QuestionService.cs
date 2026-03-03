@@ -22,27 +22,26 @@ public class QuestionService : IQuestionService
         _questionRepository = questionRepository;
     }
 
-    public async Task<QuestionResponseDTO> AddQuestionToQuizAsync(CreateQuestionRequestDTO requestDTO)
+
+    public async Task<QuestionResponseDTO> CreateQuestionWithTitleAsync(CreateQuestionRequestDTO dto)
     {
-        var question = new Question
+        var question = new Question(dto.QuizId, dto.Text, dto.Order, dto.MaxScore, dto.QuestionType);
+
+
+        if (dto.Options != null && dto.Options.Any())
         {
-            Id = Guid.NewGuid(),
-            Text = requestDTO.Text,
-            Order = requestDTO.Order,
-            MaxScore = requestDTO.MaxScore,
-            QuestionType = requestDTO.QuestionType,
-            IsActive = true,
-            QuizId = requestDTO.QuizId
-        };
-        
+            foreach (var opt in dto.Options)
+            {
+                question.AddAnswerOption(opt.Text, opt.IsCorrect, opt.Score, opt.Order);
+            }
+        }
         
         await _questionRepository.AddQuestion(question);
         await _unitOfWork.SaveChangesAsync();
         
         return _questionMapper.ToResponse(question);
     }
-
-
+    
     public Task<QuestionResponseDTO> GetQuestionByIdAsync(Guid id)
     {
         var find = _questionRepository.FindByIdAsync(id);

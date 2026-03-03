@@ -3,7 +3,6 @@ using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
 using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.Repositories;
-using QuizService.Domain.Enum;
 using QuizService.Domain.Models;
 
 namespace QuizService.Application.Services;
@@ -34,20 +33,11 @@ public class AttemptService : IAttemptService
         if (await _attemptRepository.HasActiveAttemptAsync(quizId, userId))
             throw new Exception("User already has an active attempt for this quiz");
 
-        var quiz = await  _quizRepository.GetWithQuestionsAndOptionsByIdAsync(quizId);
-        if (quiz == null)
-            throw new Exception("Quiz not found");
+        var quiz = await _quizRepository.GetWithQuestionsAndOptionsByIdAsync(quizId);
+        if (quiz == null) throw new Exception("Quiz not found");
         
         
-        var attempt = new QuizAttempt
-        {
-            Id = Guid.NewGuid(),
-            QuizId = quizId,
-            UserId = userId,
-            Status = AttemptStatus.InProgress,
-            TotalScore = 0,
-            StartedAt = DateTime.UtcNow
-        };
+        var attempt = new QuizAttempt(quizId, userId);
 
         await _attemptRepository.AddAsync(attempt);
         await _unitOfWork.SaveChangesAsync();
@@ -63,50 +53,38 @@ public class AttemptService : IAttemptService
             throw new Exception("Attempt not found");
 
         var question = await _questionRepository.GetWithOptionsByIdAsync(request.QuestionId);
-        
         if (question == null)
             throw new Exception("Question not found");
-
-        double ernedScore = _questionScoringService.CalculateScore(question, request.SelectedOptionIds);
-        bool isCorrect = ernedScore == question.MaxScore;
-
-        var userAnswer = new UserAnswer()
-        {
-            Id = Guid.NewGuid(),
-            QuestionId = request.QuestionId,
-            SelectedOptionId = request.SelectedOptionIds,
-            IsCorrect = isCorrect,
-            TextAnswer = request.TextAnswer,
-            AttemptId = attemptId
-        };
         
-        await _userAnswerRepository.AddAsync(userAnswer);
+        var score = _questionScoringService.CalculateScore(question, request.SelectedOptionIds);
+        bool isCorrect = (score >= question.MaxScore);
         
-        attempt.TotalScore += ernedScore;
-
+        attempt.AddAnswer(
+            question.Id, 
+            request.SelectedOptionIds, 
+            request.TextAnswer, 
+            score, 
+            isCorrect
+        );
+        
         await _unitOfWork.SaveChangesAsync();
         
         return new SubmitAnswerResponseDTO
         {
             IsCorrect = isCorrect,
-            EarnedScore = ernedScore,
+            EarnedScore = score
         };
+        
     }
 
 
-    public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid quizId)
+    public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId)
     {
-        var attempt = await _attemptRepository.GetWithAnswersAsync(quizId);
-        if (attempt == null)
-            throw new Exception("Attempt not found");
+        var attempt = await _attemptRepository.GetWithAnswersAsync(attemptId)
+            ?? throw new Exception("Attempt not found");
 
-        if (attempt.Status == AttemptStatus.Completed)
-        {
-            throw new Exception("Quiz is already completed");
-        }
+        attempt.Finish();
         
-        attempt.Status = AttemptStatus.Completed;
-        attempt.FinishedAt = DateTime.UtcNow;
         
         await _unitOfWork.SaveChangesAsync();
         

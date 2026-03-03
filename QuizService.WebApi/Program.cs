@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using QuizService.Infrastructure.Data;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.AnswerOptionContracts;
+using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
 using QuizService.Infrastructure.Repositories;
 using QuizService.Infrastructure.Persistence.UnitOfWork;
@@ -30,11 +31,15 @@ builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IQuizMapper, QuizMapper>();
 builder.Services.AddScoped<ITokenService,TokenService>();
-builder.Services.AddScoped<IAnswerOption, AnswerOptionService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IQuestionScoringService, QuestionScoringService>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IQuestionMapper, QuestionMapper>();
+builder.Services.AddScoped<IAttemptRepository, AttemptRepository>();
+builder.Services.AddScoped<IAttemptService, AttemptService>();
+builder.Services.AddScoped<IUserAnswerRepository, UserAnswerRepository>();
+
+
 
 
 
