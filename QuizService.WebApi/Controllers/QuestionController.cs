@@ -47,7 +47,7 @@ public class QuestionController : ControllerBase
     public async Task<IActionResult> Delete(Guid id)
     {
         await _questionService.DeleteQuestionFromQuizAsync(id);
-        return NoContent(); // 204 — Успешно, но возвращать нечего
+        return NoContent(); 
     }
 
     

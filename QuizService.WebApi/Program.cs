@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using QuizService.Infrastructure.Data;
 using QuizService.Application.Contracts;
-using QuizService.Application.Contracts.AnswerOptionContracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
 using QuizService.Infrastructure.Repositories;
