@@ -29,12 +29,19 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(q => q.Id);
             entity.Property(q => q.Name).IsRequired().HasMaxLength(200);
             entity.Property(q => q.Description).HasMaxLength(1000);
+            entity.Property(q => q.Category).HasMaxLength(100);
+            
+            entity.Navigation(q => q.Questions)
+                .HasField("_questions")
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-            // Указываем FK явно, чтобы EF не создал "теневое" поле
+            
             entity.HasMany(q => q.Questions)
                 .WithOne()
                 .HasForeignKey(q => q.QuizId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.Ignore(q => q.MaxScore);
         });
 
 
@@ -52,8 +59,7 @@ public class ApplicationDbContext : DbContext
             var navigation = entity.Metadata.FindNavigation(nameof(Question.AnswerOptions));
             navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
         });
-
-        // QUIZ ATTEMPT
+        
         modelBuilder.Entity<QuizAttempt>(entity =>
         {
             entity.HasKey(a => a.Id);

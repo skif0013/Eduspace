@@ -20,9 +20,12 @@ public class AttemptRepository : IAttemptRepository
         await _context.QuizAttempts.AddAsync(attempt);
     }
 
-    public Task<QuizAttempt?> GetByIdAsync(Guid attemptId)
+    public async Task<QuizAttempt?> GetByIdAsync(Guid attemptId)
     {
-        return _context.QuizAttempts
+        return await _context.QuizAttempts
+            .Include(a => a.Answers)      
+            .Include(a => a.Quiz)         
+            .ThenInclude(q => q.Questions) 
             .FirstOrDefaultAsync(a => a.Id == attemptId);
     }
 
