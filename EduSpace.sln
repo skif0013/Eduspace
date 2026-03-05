@@ -1,71 +1,70 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuthService", "AuthService", "{54C27F26-71CB-9721-02CF-9E5332C2F895}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.API", "AuthService\AuthService.API\AuthService.API.csproj", "{F9F6448E-22FB-4AB2-9ABA-FA0D8C352F68}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.API", "src\AuthService\AuthService.API\AuthService.API.csproj", "{F9F6448E-22FB-4AB2-9ABA-FA0D8C352F68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Application", "AuthService\AuthService.Application\AuthService.Application.csproj", "{FCD43382-2597-4B67-A95B-74B24ABD6678}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Application", "src\AuthService\AuthService.Application\AuthService.Application.csproj", "{FCD43382-2597-4B67-A95B-74B24ABD6678}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Domain", "AuthService\AuthService.Domain\AuthService.Domain.csproj", "{78686F0F-243C-4CC6-9513-4CE42A299778}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Domain", "src\AuthService\AuthService.Domain\AuthService.Domain.csproj", "{78686F0F-243C-4CC6-9513-4CE42A299778}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Infrastructure", "AuthService\AuthService.Infrastructure\AuthService.Infrastructure.csproj", "{E2505265-90C9-41E0-B59F-4EF5C00718F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Infrastructure", "src\AuthService\AuthService.Infrastructure\AuthService.Infrastructure.csproj", "{E2505265-90C9-41E0-B59F-4EF5C00718F9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ContentService", "ContentService", "{F683A2BF-B18A-76C4-8DFE-125E2E151B1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.Application", "ContentService\ContentService.Application\ContentService.Application.csproj", "{8BBEAF32-185C-47CD-A035-94D9E0C244C3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.Application", "src\ContentService\ContentService.Application\ContentService.Application.csproj", "{8BBEAF32-185C-47CD-A035-94D9E0C244C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.Domain", "ContentService\ContentService.Domain\ContentService.Domain.csproj", "{7DB43E1D-6CC0-489F-915C-694B08A3D617}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.Domain", "src\ContentService\ContentService.Domain\ContentService.Domain.csproj", "{7DB43E1D-6CC0-489F-915C-694B08A3D617}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.Infrastructure", "ContentService\ContentService.Infrastructure\ContentService.Infrastructure.csproj", "{CF0B5E25-A46B-4FEA-8454-35A254E0EADE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.Infrastructure", "src\ContentService\ContentService.Infrastructure\ContentService.Infrastructure.csproj", "{CF0B5E25-A46B-4FEA-8454-35A254E0EADE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.WebApi", "ContentService\ContentService.WebApi\ContentService.WebApi.csproj", "{EC3C2C0D-87F7-481A-92FF-F0893C663280}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService.WebApi", "src\ContentService\ContentService.WebApi\ContentService.WebApi.csproj", "{EC3C2C0D-87F7-481A-92FF-F0893C663280}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CourseService", "CourseService", "{BB26DCB3-C984-C138-110B-93319A42B7DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseService.Application", "CourseService\CourseService.Application\CourseService.Application.csproj", "{C0469210-7EA3-45B8-BAAE-5743CA48B6B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseService.Application", "src\CourseService\CourseService.Application\CourseService.Application.csproj", "{C0469210-7EA3-45B8-BAAE-5743CA48B6B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseService.Domain", "CourseService\CourseService.Domain\CourseService.Domain.csproj", "{62A4D2D6-1886-41A6-BF63-9F396CC60ADC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseService.Domain", "src\CourseService\CourseService.Domain\CourseService.Domain.csproj", "{62A4D2D6-1886-41A6-BF63-9F396CC60ADC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseService.Infrastructure", "CourseService\CourseService.Infrastructure\CourseService.Infrastructure.csproj", "{ABC4A68B-237D-4426-90C8-CD2C4D2D4257}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseService.Infrastructure", "src\CourseService\CourseService.Infrastructure\CourseService.Infrastructure.csproj", "{ABC4A68B-237D-4426-90C8-CD2C4D2D4257}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseService.WebApi", "CourseService\CourseService.WebApi\CourseService.WebApi.csproj", "{2C622B19-EA76-4E24-A964-7DFB2B97DADA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseService.WebApi", "src\CourseService\CourseService.WebApi\CourseService.WebApi.csproj", "{2C622B19-EA76-4E24-A964-7DFB2B97DADA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NotificationService", "NotificationService", "{0BAE62A9-2200-0262-2CB5-8EE825167370}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Application", "NotificationService\NotificationService.Application\NotificationService.Application.csproj", "{1CC2A45B-D192-45E8-8DC3-4350327A0196}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Application", "src\NotificationService\NotificationService.Application\NotificationService.Application.csproj", "{1CC2A45B-D192-45E8-8DC3-4350327A0196}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Domain", "NotificationService\NotificationService.Domain\NotificationService.Domain.csproj", "{91B36D0C-9523-4055-9E97-B21E748A04DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Domain", "src\NotificationService\NotificationService.Domain\NotificationService.Domain.csproj", "{91B36D0C-9523-4055-9E97-B21E748A04DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Infrastructure", "NotificationService\NotificationService.Infrastructure\NotificationService.Infrastructure.csproj", "{7D24C539-10F6-4439-81EC-09EC81FFF15D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Infrastructure", "src\NotificationService\NotificationService.Infrastructure\NotificationService.Infrastructure.csproj", "{7D24C539-10F6-4439-81EC-09EC81FFF15D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.WebApi", "NotificationService\NotificationService.WebApi\NotificationService.WebApi.csproj", "{D3BC844E-5E59-410C-AB3E-B77D83148065}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.WebApi", "src\NotificationService\NotificationService.WebApi\NotificationService.WebApi.csproj", "{D3BC844E-5E59-410C-AB3E-B77D83148065}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OcelotGeatwey", "OcelotGeatwey", "{0DC46BCA-E012-2640-625E-836CBB628842}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{0DC46BCA-E012-2640-625E-836CBB628842}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcelotGeatwey", "OcelotGeatwey\OcelotGeatwey\OcelotGeatwey.csproj", "{9AB3435D-1FB9-4C36-B465-BCA6E554CFF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcelotGeatwey", "src\Gateway\OcelotGeatwey.csproj", "{9AB3435D-1FB9-4C36-B465-BCA6E554CFF2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QuizService", "QuizService", "{067C75A1-E974-9F51-AC57-C784B5F5A818}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizService.Application", "QuizService\QuizService.Application\QuizService.Application.csproj", "{BD406F65-EA1C-4A58-AED6-B94AF77AE746}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizService.Application", "src\QuizService\QuizService.Application\QuizService.Application.csproj", "{BD406F65-EA1C-4A58-AED6-B94AF77AE746}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizService.Domain", "QuizService\QuizService.Domain\QuizService.Domain.csproj", "{69E97057-9C85-42CA-9D1F-8FEE544E4DC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizService.Domain", "src\QuizService\QuizService.Domain\QuizService.Domain.csproj", "{69E97057-9C85-42CA-9D1F-8FEE544E4DC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizService.Infrastructure", "QuizService\QuizService.Infrastructure\QuizService.Infrastructure.csproj", "{8C07A93A-A76F-4E22-8E9C-56B65594AA80}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizService.Infrastructure", "src\QuizService\QuizService.Infrastructure\QuizService.Infrastructure.csproj", "{8C07A93A-A76F-4E22-8E9C-56B65594AA80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizService.WebApi", "QuizService\QuizService.WebApi\QuizService.WebApi.csproj", "{DCCEB4EC-9A4B-48C4-8DDA-9296D8439B42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizService.WebApi", "src\QuizService\QuizService.WebApi\QuizService.WebApi.csproj", "{DCCEB4EC-9A4B-48C4-8DDA-9296D8439B42}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserService", "UserService", "{C0127DB6-3CA8-EE98-7726-A4993E48C5D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Application", "UserService\UserService.Application\UserService.Application.csproj", "{D370FA0D-6CCA-4708-8788-118C1A12D6EA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Application", "src\UserService\UserService.Application\UserService.Application.csproj", "{D370FA0D-6CCA-4708-8788-118C1A12D6EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Domain", "UserService\UserService.Domain\UserService.Domain.csproj", "{3AB11ED8-7092-4544-BA8E-EAAB23E2BD74}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Domain", "src\UserService\UserService.Domain\UserService.Domain.csproj", "{3AB11ED8-7092-4544-BA8E-EAAB23E2BD74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Infrastructure", "UserService\UserService.Infrastructure\UserService.Infrastructure.csproj", "{63344235-B948-4416-B7DE-AF6865C4D978}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Infrastructure", "src\UserService\UserService.Infrastructure\UserService.Infrastructure.csproj", "{63344235-B948-4416-B7DE-AF6865C4D978}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.WebApi", "UserService\UserService.WebApi\UserService.WebApi.csproj", "{52417BC4-F62A-4211-884B-1642D25CAAB6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.WebApi", "src\UserService\UserService.WebApi\UserService.WebApi.csproj", "{52417BC4-F62A-4211-884B-1642D25CAAB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
