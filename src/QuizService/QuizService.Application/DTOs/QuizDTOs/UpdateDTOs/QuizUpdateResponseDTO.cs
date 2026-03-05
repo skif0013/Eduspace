@@ -1,0 +1,14 @@
+﻿namespace QuizService.Application.DTOs;
+
+public class QuizUpdateResponseDTO
+{
+    public string Title { get; set; }
+    
+    public string Description { get; set; }
+    
+    public string Category { get; set; }
+    
+    public int TimeLimit { get; set; }
+    
+    public int MaxScore { get; set; }
+}

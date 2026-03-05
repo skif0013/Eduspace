@@ -1,0 +1,34 @@
+﻿# yaml
+services:
+  auth.server:
+    image: ${DOCKER_REGISTRY-}authservice
+    build:
+      context: .
+      dockerfile: AuthService.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=authservice;Username=postgres;Password=postgres
+    ports:
+      - "5010:5010"
+      - "5011:5011"
+    depends_on:
+        - postgres
+    env_file:
+      - .env
+    restart: always
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: authservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  postgres_data:
+    driver: local
