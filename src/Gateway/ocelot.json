@@ -1,9 +1,5 @@
 {
   "Routes": [
-
-    // ─── AuthService (/auth/...) → auth-service:8080 ─────────────────────────
-
-    // POST /auth/users/register
     {
       "DownstreamPathTemplate": "/api/users/register",
       "DownstreamScheme": "http",
@@ -12,7 +8,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "" }
     },
-    // POST /auth/users/login
     {
       "DownstreamPathTemplate": "/api/users/login",
       "DownstreamScheme": "http",
@@ -21,7 +16,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "" }
     },
-    // POST /auth/users/ForgotPassword
     {
       "DownstreamPathTemplate": "/api/users/ForgotPassword",
       "DownstreamScheme": "http",
@@ -30,7 +24,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "" }
     },
-    // POST /auth/users/ResetPassword
     {
       "DownstreamPathTemplate": "/api/users/ResetPassword",
       "DownstreamScheme": "http",
@@ -39,7 +32,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "" }
     },
-    // POST /auth/users/ConfirmEmail
     {
       "DownstreamPathTemplate": "/api/users/ConfirmEmail",
       "DownstreamScheme": "http",
@@ -48,7 +40,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "" }
     },
-    // POST /auth/tokens/RevokeRefreshToken
     {
       "DownstreamPathTemplate": "/api/tokens/RevokeRefreshToken",
       "DownstreamScheme": "http",
@@ -57,7 +48,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /auth/tokens/NewAccessToken
     {
       "DownstreamPathTemplate": "/api/tokens/NewAccessToken",
       "DownstreamScheme": "http",
@@ -66,10 +56,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "" }
     },
-
-    // ─── UserService (/user/...) → user-service:8080 ─────────────────────────
-
-    // GET /user/{userId}
     {
       "DownstreamPathTemplate": "/api/user/{userId}",
       "DownstreamScheme": "http",
@@ -78,7 +64,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /user/create
     {
       "DownstreamPathTemplate": "/api/user/create",
       "DownstreamScheme": "http",
@@ -87,7 +72,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "" }
     },
-    // PUT /user/update
     {
       "DownstreamPathTemplate": "/api/user/update",
       "DownstreamScheme": "http",
@@ -96,10 +80,6 @@
       "UpstreamHttpMethod": [ "Put" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-
-    // ─── CourseService (/courses/...) → course-service:8080 ──────────────────
-
-    // GET /courses
     {
       "DownstreamPathTemplate": "/api/courses",
       "DownstreamScheme": "http",
@@ -108,7 +88,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /courses
     {
       "DownstreamPathTemplate": "/api/courses",
       "DownstreamScheme": "http",
@@ -117,7 +96,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // GET /courses/{courseId}
     {
       "DownstreamPathTemplate": "/api/courses/{courseId}",
       "DownstreamScheme": "http",
@@ -126,7 +104,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // PUT /courses/{courseId}
     {
       "DownstreamPathTemplate": "/api/courses/{courseId}",
       "DownstreamScheme": "http",
@@ -135,7 +112,6 @@
       "UpstreamHttpMethod": [ "Put" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // PATCH /courses/{courseId}/publish
     {
       "DownstreamPathTemplate": "/api/courses/{courseId}/publish",
       "DownstreamScheme": "http",
@@ -144,7 +120,6 @@
       "UpstreamHttpMethod": [ "Patch" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // PATCH /courses/{courseId}/archive
     {
       "DownstreamPathTemplate": "/api/courses/{courseId}/archive",
       "DownstreamScheme": "http",
@@ -153,7 +128,6 @@
       "UpstreamHttpMethod": [ "Patch" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /courses/{courseId}/ratings
     {
       "DownstreamPathTemplate": "/api/courses/{courseId}/ratings",
       "DownstreamScheme": "http",
@@ -162,7 +136,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // PUT /courses/{courseId}/ratings
     {
       "DownstreamPathTemplate": "/api/courses/{courseId}/ratings",
       "DownstreamScheme": "http",
@@ -171,10 +144,6 @@
       "UpstreamHttpMethod": [ "Put" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-
-    // ─── ContentService (/content/...) → content-service:80 ─────────────────
-
-    // POST /content/files/upload
     {
       "DownstreamPathTemplate": "/api/files/upload",
       "DownstreamScheme": "http",
@@ -183,7 +152,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // GET /content/files/{fileId}/link
     {
       "DownstreamPathTemplate": "/api/files/{fileId}/link",
       "DownstreamScheme": "http",
@@ -192,7 +160,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // DELETE /content/files/{fileId}
     {
       "DownstreamPathTemplate": "/api/files/{fileId}",
       "DownstreamScheme": "http",
@@ -201,7 +168,6 @@
       "UpstreamHttpMethod": [ "Delete" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // GET /content/group/get-all-groups
     {
       "DownstreamPathTemplate": "/api/group/get-all-groups",
       "DownstreamScheme": "http",
@@ -210,7 +176,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // GET /content/group/{groupId}
     {
       "DownstreamPathTemplate": "/api/group/{groupId}",
       "DownstreamScheme": "http",
@@ -219,7 +184,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /content/group/CreateGroup
     {
       "DownstreamPathTemplate": "/api/group/CreateGroup",
       "DownstreamScheme": "http",
@@ -228,7 +192,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // PUT /content/group/update/{groupId}
     {
       "DownstreamPathTemplate": "/api/group/update/{groupId}",
       "DownstreamScheme": "http",
@@ -237,7 +200,6 @@
       "UpstreamHttpMethod": [ "Put" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // DELETE /content/group/{groupId}
     {
       "DownstreamPathTemplate": "/api/group/{groupId}",
       "DownstreamScheme": "http",
@@ -246,7 +208,6 @@
       "UpstreamHttpMethod": [ "Delete" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /content/group/{groupId}/members
     {
       "DownstreamPathTemplate": "/api/group/{groupId}/members",
       "DownstreamScheme": "http",
@@ -255,7 +216,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // DELETE /content/group/{groupId}/members/{memberUserId}
     {
       "DownstreamPathTemplate": "/api/group/{groupId}/members/{memberUserId}",
       "DownstreamScheme": "http",
@@ -264,7 +224,6 @@
       "UpstreamHttpMethod": [ "Delete" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // GET /content/group/{groupId}/members/{memberUserId}
     {
       "DownstreamPathTemplate": "/api/group/{groupId}/members/{memberUserId}",
       "DownstreamScheme": "http",
@@ -273,10 +232,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-
-    // ─── QuizService (/quiz/...) → quiz-service:8080 ─────────────────────────
-
-    // POST /quiz/quiz
     {
       "DownstreamPathTemplate": "/api/quiz",
       "DownstreamScheme": "http",
@@ -285,7 +240,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // GET /quiz/quiz
     {
       "DownstreamPathTemplate": "/api/quiz",
       "DownstreamScheme": "http",
@@ -294,7 +248,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // GET /quiz/quiz/{id}
     {
       "DownstreamPathTemplate": "/api/quiz/{id}",
       "DownstreamScheme": "http",
@@ -303,7 +256,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // PUT /quiz/quiz/{id}
     {
       "DownstreamPathTemplate": "/api/quiz/{id}",
       "DownstreamScheme": "http",
@@ -312,7 +264,6 @@
       "UpstreamHttpMethod": [ "Put" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // DELETE /quiz/quiz/{id}
     {
       "DownstreamPathTemplate": "/api/quiz/{id}",
       "DownstreamScheme": "http",
@@ -321,7 +272,6 @@
       "UpstreamHttpMethod": [ "Delete" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /quiz/quiz/{id}/start
     {
       "DownstreamPathTemplate": "/api/quiz/{id}/start",
       "DownstreamScheme": "http",
@@ -330,7 +280,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /quiz/quiz/attempts/{attemptId}/submit
     {
       "DownstreamPathTemplate": "/api/quiz/attempts/{attemptId}/submit",
       "DownstreamScheme": "http",
@@ -339,7 +288,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // PATCH /quiz/quiz/{id}/publish
     {
       "DownstreamPathTemplate": "/api/quiz/{id}/publish",
       "DownstreamScheme": "http",
@@ -348,7 +296,6 @@
       "UpstreamHttpMethod": [ "Patch" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /quiz/quiz/{id}/finish
     {
       "DownstreamPathTemplate": "/api/quiz/{id}/finish",
       "DownstreamScheme": "http",
@@ -357,7 +304,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // GET /quiz/question/{id}
     {
       "DownstreamPathTemplate": "/api/question/{id}",
       "DownstreamScheme": "http",
@@ -366,7 +312,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // POST /quiz/question
     {
       "DownstreamPathTemplate": "/api/question",
       "DownstreamScheme": "http",
@@ -375,7 +320,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // GET /quiz/question
     {
       "DownstreamPathTemplate": "/api/question",
       "DownstreamScheme": "http",
@@ -384,7 +328,6 @@
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // DELETE /quiz/question/{id}
     {
       "DownstreamPathTemplate": "/api/question/{id}",
       "DownstreamScheme": "http",
@@ -393,7 +336,6 @@
       "UpstreamHttpMethod": [ "Delete" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // PUT /quiz/question/{id}
     {
       "DownstreamPathTemplate": "/api/question/{id}",
       "DownstreamScheme": "http",
@@ -402,7 +344,6 @@
       "UpstreamHttpMethod": [ "Put" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-    // PATCH /quiz/question/{id}/complete
     {
       "DownstreamPathTemplate": "/api/question/{id}/complete",
       "DownstreamScheme": "http",
@@ -411,10 +352,6 @@
       "UpstreamHttpMethod": [ "Patch" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
     },
-
-    // ─── NotificationService (/notification/...) → notification-service:8080 ─
-
-    // POST /notification/email/send
     {
       "DownstreamPathTemplate": "/api/email/send",
       "DownstreamScheme": "http",
@@ -423,7 +360,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "" }
     },
-    // POST /notification/email/send-verify
     {
       "DownstreamPathTemplate": "/api/email/send-verify",
       "DownstreamScheme": "http",
@@ -432,7 +368,6 @@
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "" }
     }
-
   ],
 
   "GlobalConfiguration": {
