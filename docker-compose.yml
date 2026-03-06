@@ -2,7 +2,6 @@
 
 services:
 
-  # ─── API Gateway ────────────────────────────────────────────────────────────
   ocelot-gateway:
     build:
       context: .
@@ -10,6 +9,10 @@ services:
       target: final-gateway
     ports:
       - "5000:8080"
+    volumes:
+      - ./src/Gateway/ocelot.json:/app/ocelot.json:ro
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - auth-service
       - user-service
@@ -21,7 +24,6 @@ services:
     networks:
       - eduspace-net
 
-  # ─── Auth Service ────────────────────────────────────────────────────────────
   auth-service:
     build:
       context: .
@@ -52,7 +54,6 @@ services:
     networks:
       - eduspace-net
 
-  # ─── User Service ────────────────────────────────────────────────────────────
   user-service:
     build:
       context: .
@@ -81,7 +82,6 @@ services:
     networks:
       - eduspace-net
 
-  # ─── Course Service ──────────────────────────────────────────────────────────
   course-service:
     build:
       context: .
@@ -112,7 +112,6 @@ services:
     networks:
       - eduspace-net
 
-  # ─── Content Service ─────────────────────────────────────────────────────────
   content-service:
     build:
       context: .
@@ -141,7 +140,6 @@ services:
     networks:
       - eduspace-net
 
-  # ─── Quiz Service ─────────────────────────────────────────────────────────────
   quiz-service:
     build:
       context: .
@@ -170,7 +168,6 @@ services:
     networks:
       - eduspace-net
 
-  # ─── Notification Service ────────────────────────────────────────────────────
   notification-service:
     build:
       context: .
@@ -184,7 +181,6 @@ services:
     networks:
       - eduspace-net
 
-  # ─── Shared Infrastructure ───────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     ports:
