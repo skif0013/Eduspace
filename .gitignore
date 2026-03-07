@@ -1,56 +1,135 @@
-# Environment / secrets
-**/.env
 
-# User-specific files
-*.rsuser
-*.suo
+bin/
+obj/
+out/
+
 *.user
+*.suo
 *.userosscache
 *.sln.docstates
-*.csproj.user
-
-# Visual Studio / Rider / IDE
+*.userprefs
 .vs/
-**/.vs/
-
 .idea/
-**/.idea/
+*.DotSettings.user
 
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# Build results
 [Dd]ebug/
-[Dd]ebugPublic/
 [Rr]elease/
-[Rr]eleases/
 x64/
 x86/
-arm/
-arm64/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
 [Bb]in/
 [Oo]bj/
+[Ll]og/
+[Ll]ogs/
 
-# Logs and temp files
-*.log
-logs/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
 *.tmp
-*.temp
+*.tmp_proj
+*_wpftmp.csproj
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+*.ncrunchproject
+*.ncrunchsolution
+*.ncrunchsolution
+.ncrunch*
+
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.publishsettings
+orleans.codegen.cs
+
+Generated\ Files/
+
 *.cache
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
 
-# Test results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
+*.psess
+*.vsp
+*.vspx
+*.sap
 
-# Code coverage
-coverage*.xml
-coverage*.json
-coverage*.info
+*.e2e
 
-# NuGet
+$tf/
+
+*.gpState
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings
+JustCode/
+
+_TeamCity*
+
+.axoCover/*
+!.axoCover/settings.json
+
+coverage.xml
+*.coveragexml
+*.coverage
+
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+*.mm.*
+AutoTest.Net/
+
+.sass-cache/
+
+[Ee]xpress/
+
+DocProject/buildhelp/
+DocProject/Help/*.HxT
+DocProject/Help/*.HxC
+DocProject/Help/*.hhc
+DocProject/Help/*.hhk
+DocProject/Help/*.hhp
+DocProject/Help/Html2
+DocProject/Help/html
+
+publish/
+*.[Pp]ublish.xml
+*.azurePubxml
+*.pubxml
+*.publishproj
+
+PublishScripts/
+
 *.nupkg
 *.snupkg
 **/[Pp]ackages/*
@@ -58,25 +137,97 @@ coverage*.info
 *.nuget.props
 *.nuget.targets
 
-# .NET artifacts
-project.lock.json
-project.fragment.lock.json
-artifacts/
-BenchmarkDotNet.Artifacts/
+csx/
+*.build.csdef
 
-# Docker
-docker-compose.override.yml
+ecf/
+rcf/
 
-# Node.js (if used)
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
+*.appxbundle
+*.appxupload
+
+*.[Cc]ache
+ClientBin/
+~$*
+*~
+*.dbmdl
+*.dbproj.schemaview
+*.pfx
+*.publishsettings
+node_modules/
+bower_components/
+
+*.d.ts
+
+healthmonitor.config
+
+*.map
+
+ScaffoldingReadMe.txt
+
+StyleCopReport.xml
+
+*.[Rr]esharper.user
+
+FakesAssemblies/
+
+__pycache__/
+*.pyc
+
+paket-files/
+.fake/
+
+.paket/paket.exe
+
+.fake
+
+ServiceFabricBackup/
+*.bak
+
+.ntvs_analysis.dat
 node_modules/
 
-# OS generated files
-# Windows
+dist/
+npm-debug.log
+bower_components/
+
+.yarn-integrity
+.yarnrc
+yarn-error.log
+
 Thumbs.db
+ehthumbs.db
 Desktop.ini
+$RECYCLE.BIN/
 
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
+*.lnk
 
+.env
+.env.*
+!.env.example
+
+**/appsettings.Production.json
+**/appsettings.Staging.json
+
+*.pfx
+*.p12
+*.key
+*.pem
+*.cer
+*.crt
+
+**/Migrations/*.cs
+
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+lcov.info
+
+docker-compose.override.yml

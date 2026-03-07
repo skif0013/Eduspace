@@ -1,0 +1,379 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/users/register",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "auth-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/auth/users/register",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/users/login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "auth-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/auth/users/login",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/users/ForgotPassword",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "auth-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/auth/users/ForgotPassword",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/users/ResetPassword",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "auth-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/auth/users/ResetPassword",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/users/ConfirmEmail",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "auth-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/auth/users/ConfirmEmail",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/tokens/RevokeRefreshToken",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "auth-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/auth/tokens/RevokeRefreshToken",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/tokens/NewAccessToken",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "auth-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/auth/tokens/NewAccessToken",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/user/{userId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "user-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/user/{userId}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/user/create",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "user-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/user/create",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/user/update",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "user-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/user/update",
+      "UpstreamHttpMethod": [ "Put" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/courses",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "course-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/courses",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/courses",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "course-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/courses",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/courses/{courseId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "course-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/courses/{courseId}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/courses/{courseId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "course-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/courses/{courseId}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/courses/{courseId}/publish",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "course-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/courses/{courseId}/publish",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/courses/{courseId}/archive",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "course-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/courses/{courseId}/archive",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/courses/{courseId}/ratings",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "course-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/courses/{courseId}/ratings",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/courses/{courseId}/ratings",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "course-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/courses/{courseId}/ratings",
+      "UpstreamHttpMethod": [ "Put" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/files/upload",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/files/upload",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/files/{fileId}/link",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/files/{fileId}/link",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/files/{fileId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/files/{fileId}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/group/get-all-groups",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/group/get-all-groups",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/group/{groupId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/group/{groupId}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/group/CreateGroup",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/group/CreateGroup",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/group/update/{groupId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/group/update/{groupId}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/group/{groupId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/group/{groupId}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/group/{groupId}/members",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/group/{groupId}/members",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/group/{groupId}/members/{memberUserId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/group/{groupId}/members/{memberUserId}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/group/{groupId}/members/{memberUserId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "UpstreamPathTemplate": "/content/group/{groupId}/members/{memberUserId}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/quiz",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/quiz",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/quiz",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/quiz",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/quiz/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/quiz/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/quiz/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/quiz/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/quiz/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/quiz/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/quiz/{id}/start",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/quiz/{id}/start",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/quiz/attempts/{attemptId}/submit",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/quiz/attempts/{attemptId}/submit",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/quiz/{id}/publish",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/quiz/{id}/publish",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/quiz/{id}/finish",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/quiz/{id}/finish",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/question/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/question/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/question",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/question",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/question",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/question",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/question/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/question/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/question/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/question/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/question/{id}/complete",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "quiz-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/quiz/question/{id}/complete",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/email/send",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "notification-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/notification/email/send",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/email/send-verify",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "notification-service", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/notification/email/send-verify",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "" }
+    }
+  ],
+
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5000",
+    "ServiceDiscoveryProvider": {
+      "Type": "AppConfiguration"
+    }
+  }
+}

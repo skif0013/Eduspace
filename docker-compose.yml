@@ -1,0 +1,204 @@
+﻿version: '3.8'
+
+services:
+
+  ocelot-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final-gateway
+    ports:
+      - "5000:8080"
+    volumes:
+      - ./src/Gateway/ocelot.json:/app/ocelot.json:ro
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - auth-service
+      - user-service
+      - content-service
+      - course-service
+      - quiz-service
+      - notification-service
+    restart: always
+    networks:
+      - eduspace-net
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final-auth
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Port=5432;Database=authservice;Username=postgres;Password=postgres
+      - Redis__ConnectionString=redis:6379
+    depends_on:
+      - auth-db
+      - redis
+    restart: always
+    networks:
+      - eduspace-net
+
+  auth-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: authservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - eduspace-net
+
+  user-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final-user
+    ports:
+      - "5003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=user-db;Port=5432;Database=UserDB;Username=postgres;Password=postgres
+    depends_on:
+      - user-db
+    restart: always
+    networks:
+      - eduspace-net
+
+  user-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: UserDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - eduspace-net
+
+  course-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final-course
+    ports:
+      - "5004:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=course-db;Port=5432;Database=CourseDB;Username=postgres;Password=postgres
+      - Redis__ConnectionString=redis:6379
+    depends_on:
+      - course-db
+      - redis
+    restart: always
+    networks:
+      - eduspace-net
+
+  course-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: CourseDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - course-db-data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - eduspace-net
+
+  content-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final-content
+    ports:
+      - "5005:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=content-db;Port=5432;Database=ContentDB;Username=postgres;Password=postgres
+    depends_on:
+      - content-db
+    restart: always
+    networks:
+      - eduspace-net
+
+  content-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ContentDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - content-db-data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - eduspace-net
+
+  quiz-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final-quiz
+    ports:
+      - "5006:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=quiz-db;Port=5432;Database=quizdb;Username=postgres;Password=123
+    depends_on:
+      - quiz-db
+    restart: always
+    networks:
+      - eduspace-net
+
+  quiz-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: quizdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123"
+    volumes:
+      - quiz-db-data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - eduspace-net
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final-notification
+    ports:
+      - "5007:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    restart: always
+    networks:
+      - eduspace-net
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: always
+    networks:
+      - eduspace-net
+
+networks:
+  eduspace-net:
+    driver: bridge
+
+volumes:
+  auth-db-data:
+  user-db-data:
+  course-db-data:
+  content-db-data:
+  quiz-db-data:
+  redis-data:
