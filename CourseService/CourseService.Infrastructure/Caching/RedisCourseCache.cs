@@ -8,19 +8,22 @@ namespace CourseService.Infrastructure.Caching;
 
 public class RedisCourseCache : ICourseCache
 {
-    private const string CatalogVersionKey = "catalog:version";
+    private const long InitialCatalogVersion = 1;
 
     private readonly IDistributedCache _cache;
     private readonly IConnectionMultiplexer _multiplexer;
+    private readonly IRedisKeyBuilder _keyBuilder;
     private readonly RadisCacheSettings _settings;
 
     public RedisCourseCache(
         IDistributedCache cache,
         IConnectionMultiplexer multiplexer,
-        IOptions<RadisCacheSettings> options)
+        IOptions<RadisCacheSettings> options,
+        IRedisKeyBuilder keyBuilder)
     {
         _cache = cache;
         _multiplexer = multiplexer;
+        _keyBuilder = keyBuilder;
         _settings = options.Value;
     }
 
@@ -41,7 +44,6 @@ public class RedisCourseCache : ICourseCache
             return null;
         }
     }
-
 
     public async Task SetAsync<T>(string key, T value, CacheEntryType type) where T : class
     {
@@ -74,25 +76,27 @@ public class RedisCourseCache : ICourseCache
     {
         try
         {
-            var version = await _cache.GetStringAsync(CatalogVersionKey);
+            var version = await _cache.GetStringAsync(_keyBuilder.GetCatalogVersion());
 
             if (version == null)
             {
-                await _cache.SetStringAsync(CatalogVersionKey, "1");
-                return 1;
+                await _cache.SetStringAsync(_keyBuilder.GetCatalogVersion(), InitialCatalogVersion.ToString());
+                
+                return InitialCatalogVersion;
             }
 
             return long.Parse(version);
         }
         catch (RedisConnectionException)
         {
-            return 1;
+            return InitialCatalogVersion;
         }
     }
 
     public async Task IncrementCatalogVersionAsync()
     {
         var db = _multiplexer.GetDatabase();
-        await db.StringIncrementAsync(CatalogVersionKey);
+        var cacheKey = _keyBuilder.GetCatalogVersion();
+        await db.StringIncrementAsync(cacheKey);
     }
 }

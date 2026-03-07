@@ -68,7 +68,7 @@ public class CourseController : ControllerBase
     /// </remarks>
     [Authorize]
     [HttpPost]
-    [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IResult> CreateCourse(CourseDTO courseDTO)
@@ -76,7 +76,7 @@ public class CourseController : ControllerBase
         var authorId = User.GetUserId();
         var result = await _courseService.CreateCourseAsync(courseDTO, authorId);
 
-        return result.ToHttpResult();
+        return result.ToCreatedResult($"/api/courses/{result.Value?.Id}");
     }
 
     /// <summary>

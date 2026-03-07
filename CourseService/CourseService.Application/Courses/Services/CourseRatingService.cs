@@ -15,17 +15,20 @@ public class CourseRatingService : ICourseRatingService
     private readonly ICourseRepository _courseRepository;
     private readonly ICourseCache _cache;
     private readonly ILogger<CourseRatingService> _logger;
+    private readonly IRedisKeyBuilder _keyBuilder;
 
     public CourseRatingService(
         ICourseRatingRepository ratingRepository,
         ICourseRepository courseRepository,
         ICourseCache cache,
-        ILogger<CourseRatingService> logger)
+        ILogger<CourseRatingService> logger,
+        IRedisKeyBuilder keyBuilder)
     {
         _ratingRepository = ratingRepository;
         _courseRepository = courseRepository;
         _cache = cache;
         _logger = logger;
+        _keyBuilder = keyBuilder;
     }
 
     public async Task<Result<CourseRatingResponse>> CreateRatingAsync(CourseRatingDTO ratingDTO, Guid courseId, Guid userId)
@@ -60,7 +63,8 @@ public class CourseRatingService : ICourseRatingService
             AmountRatings = amount
         };
 
-        await _cache.RemoveAsync($"course:{course.Id}");
+        var cackeKey = _keyBuilder.GetCourseKey(courseId);
+        await _cache.RemoveAsync(cackeKey);
 
         _logger.LogInformation(
             "Course {CourseId} rated by User {UserId}",
@@ -90,7 +94,8 @@ public class CourseRatingService : ICourseRatingService
             AmountRatings = amount
         };
 
-        await _cache.RemoveAsync($"course:{courseId}");
+        var cackeKey = _keyBuilder.GetCourseKey(courseId);
+        await _cache.RemoveAsync(cackeKey);
 
         _logger.LogInformation(
             "Rating for Course {CourseId} updated by User {UserId}",

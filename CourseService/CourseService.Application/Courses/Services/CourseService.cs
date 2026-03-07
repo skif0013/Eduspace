@@ -21,19 +21,22 @@ public class CourseService : ICourseService
     private readonly ILogger<CourseService> _logger;
     private readonly IMapper _mapper;
     private readonly IMessagePublisher _publisher;
+    private readonly IRedisKeyBuilder _keyBuilder;
 
     public CourseService(
         ICourseRepository courseRepository,
         ICourseCache cache,
         ILogger<CourseService> logger,
         IMapper mapper,
-        IMessagePublisher publisher)
+        IMessagePublisher publisher,
+        IRedisKeyBuilder keyBuilder)
     {
         _courseRepository = courseRepository;
         _cache = cache;
         _logger = logger;
         _mapper = mapper;
         _publisher = publisher;
+        _keyBuilder = keyBuilder;
     }
 
     public async Task<Result> ArchiveCourseAsync(Guid courseId, Guid authorId)
@@ -64,7 +67,8 @@ public class CourseService : ICourseService
         if (wasPublished)
         {
             await _cache.IncrementCatalogVersionAsync();
-            await _cache.RemoveAsync($"course:{course.Id}");
+            var cackeKey = _keyBuilder.GetCourseKey(courseId);
+            await _cache.RemoveAsync(cackeKey);
         }
 
         var @event = new CourseArchivedEvent(course.Id, course.AuthorId);
@@ -104,7 +108,7 @@ public class CourseService : ICourseService
     {
         var version = await _cache.GetCatalogVersionAsync();
 
-        var cacheKey = $"courses:v{version}:page:{page}:size:{pageSize}";
+        var cacheKey = _keyBuilder.GetCoursesPageKey(version, page, pageSize);
 
         var cachedData = await _cache.GetAsync<PagedCoursesResponse>(cacheKey);
         if (cachedData != null)
@@ -142,7 +146,7 @@ public class CourseService : ICourseService
 
     public async Task<Result<CourseResponse>> GetCourseByIdAsync(Guid courseId)
     {
-        var cacheKey = $"course:{courseId}";
+        var cacheKey = _keyBuilder.GetCourseKey(courseId);
         var cacheData = await _cache.GetAsync<CourseResponse>(cacheKey);
         if (cacheData != null)
         {
@@ -191,7 +195,8 @@ public class CourseService : ICourseService
         await _courseRepository.UpdateCourseAsync(course);
 
         await _cache.IncrementCatalogVersionAsync();
-        await _cache.RemoveAsync($"course:{course.Id}");
+        var key = _keyBuilder.GetCourseKey(courseId);
+        await _cache.RemoveAsync(key);
 
         var @event = new CoursePublishedEvent(course.Id, course.AuthorId);
         var json = JsonSerializer.Serialize(@event);
@@ -237,7 +242,8 @@ public class CourseService : ICourseService
         response.AmountRatings = amount;
 
         await _cache.IncrementCatalogVersionAsync();
-        await _cache.RemoveAsync($"course:{course.Id}");
+        var cackeKey = _keyBuilder.GetCourseKey(courseId);
+        await _cache.RemoveAsync(cackeKey);
 
         _logger.LogInformation(
             "Course {CureseId} updated by Author {AuthorId}",

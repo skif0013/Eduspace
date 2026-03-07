@@ -82,6 +82,8 @@ public static class DependencyInjection
         services.AddSingleton<IMessagePublisher, RedisMessagePublisher>();
         services.AddSingleton<ICourseCache, RedisCourseCache>();
 
+        services.AddSingleton<IRedisKeyBuilder, RedisKeyBuilder>();
+
         services.Configure<RadisCacheSettings>(configuration.GetSection("RedisCacheSettings"));
 
         return services;

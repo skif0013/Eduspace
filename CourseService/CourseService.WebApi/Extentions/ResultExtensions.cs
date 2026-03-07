@@ -34,4 +34,19 @@ public static class ResultExtensions
             detail: result.Error.Description,
             statusCode: statusCode);
     }
+
+    public static IResult ToCreatedResult<T>(this Result<T> result, string location)
+    {
+        if (result.IsSuccess)
+        {
+            return Results.Created(location, result.Value);
+        }
+
+        var statusCode = HttpErrorMapper.Map(result.Error);
+
+        return Results.Problem(
+            title: result.Error.Code,
+            detail: result.Error.Description,
+            statusCode: statusCode);
+    }
 }
