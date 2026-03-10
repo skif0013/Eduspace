@@ -1,4 +1,4 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -68,13 +68,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.WebApi", "src\U
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EmailService", "EmailService", "{70A08999-9CF1-44EE-B74A-624E0C8E2ADA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmaillService.Api", "EmaillService.Api\EmaillService.Api.csproj", "{B3E8C188-E3DB-45CB-98B2-7EE7FF2361B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmaillService.Api", "src\EmailService\EmaillService.Api\EmaillService.Api.csproj", "{B3E8C188-E3DB-45CB-98B2-7EE7FF2361B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService.Application", "EmailService.Application\EmailService.Application.csproj", "{CB0553BE-F589-46B4-BBBB-E6B7D6CBB8CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService.Application", "src\EmailService\EmailService.Application\EmailService.Application.csproj", "{CB0553BE-F589-46B4-BBBB-E6B7D6CBB8CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService.Infrastructure", "EmailService.Infrastructure\EmailService.Infrastructure.csproj", "{6873FB6A-64E5-4959-B5F3-F9473C6078DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService.Infrastructure", "src\EmailService\EmailService.Infrastructure\EmailService.Infrastructure.csproj", "{6873FB6A-64E5-4959-B5F3-F9473C6078DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService.Domain", "EmailService.Domain\EmailService.Domain.csproj", "{0E27812F-487B-4E38-8D39-B3106F28A69A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService.Domain", "src\EmailService\EmailService.Domain\EmailService.Domain.csproj", "{0E27812F-487B-4E38-8D39-B3106F28A69A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
