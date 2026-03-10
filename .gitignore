@@ -232,3 +232,6 @@ lcov.info
 
 docker-compose.override.yml
 
+*.log
+replay_pid*.log
+.idea/
