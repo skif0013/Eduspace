@@ -2,11 +2,11 @@
   "Routes": [
     {
       "DownstreamPathTemplate": "/api/{everything}",
-      "ServiceName": "content",
+      "ServiceName": "file",
       "UpstreamPathTemplate": "/content/{everything}",
       "UpstreamPathTemplate": "/group/{everything}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
-      "SwaggerKey": "content"
+      "SwaggerKey": "file"
     }
   ]
 }

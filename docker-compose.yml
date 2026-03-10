@@ -16,7 +16,7 @@ services:
     depends_on:
       - auth-service
       - user-service
-      - content-service
+      - file-service
       - course-service
       - quiz-service
       - notification-service
@@ -112,30 +112,30 @@ services:
     networks:
       - eduspace-net
 
-  content-service:
+  file-service:
     build:
       context: .
       dockerfile: Dockerfile
-      target: final-content
+      target: final-file
     ports:
       - "5005:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=content-db;Port=5432;Database=ContentDB;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=file-db;Port=5432;Database=FileDB;Username=postgres;Password=postgres
     depends_on:
-      - content-db
+      - file-db
     restart: always
     networks:
       - eduspace-net
 
-  content-db:
+  file-db:
     image: postgres:16
     environment:
-      POSTGRES_DB: ContentDB
+      POSTGRES_DB: FileDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - content-db-data:/var/lib/postgresql/data
+      - file-db-data:/var/lib/postgresql/data
     restart: always
     networks:
       - eduspace-net
@@ -199,12 +199,6 @@ volumes:
   auth-db-data:
   user-db-data:
   course-db-data:
-  content-db-data:
+  file-db-data:
   quiz-db-data:
   redis-data:
-  eamilservice.api:
-    image: eamilservice.api
-    build:
-      context: .
-      dockerfile: EamilService.Api/Dockerfile
-

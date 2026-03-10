@@ -88,24 +88,24 @@ FROM base8 AS final-quiz
 COPY --from=build-quiz /app/publish .
 ENTRYPOINT ["dotnet", "QuizService.WebApi.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-content
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-file
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/ContentService/ContentService.WebApi/ContentService.WebApi.csproj", "src/ContentService/ContentService.WebApi/"]
-COPY ["src/ContentService/ContentService.Application/ContentService.Application.csproj", "src/ContentService/ContentService.Application/"]
-COPY ["src/ContentService/ContentService.Domain/ContentService.Domain.csproj", "src/ContentService/ContentService.Domain/"]
-COPY ["src/ContentService/ContentService.Infrastructure/ContentService.Infrastructure.csproj", "src/ContentService/ContentService.Infrastructure/"]
-RUN dotnet restore "src/ContentService/ContentService.WebApi/ContentService.WebApi.csproj"
-COPY src/ContentService/ src/ContentService/
-WORKDIR /src/src/ContentService/ContentService.WebApi
-RUN dotnet publish "ContentService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+COPY ["src/FileService/FileService.WebApi/FileService.WebApi.csproj", "src/FileService/FileService.WebApi/"]
+COPY ["src/FileService/FileService.Application/FileService.Application.csproj", "src/FileService/FileService.Application/"]
+COPY ["src/FileService/FileService.Domain/FileService.Domain.csproj", "src/FileService/FileService.Domain/"]
+COPY ["src/FileService/FileService.Infrastructure/FileService.Infrastructure.csproj", "src/FileService/FileService.Infrastructure/"]
+RUN dotnet restore "src/FileService/FileService.WebApi/FileService.WebApi.csproj"
+COPY src/FileService/ src/FileService/
+WORKDIR /src/src/FileService/FileService.WebApi
+RUN dotnet publish "FileService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final-content
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final-file
 WORKDIR /app
 EXPOSE 80
 ENV ASPNETCORE_URLS=http://+:80
-COPY --from=build-content /app/publish .
-ENTRYPOINT ["dotnet", "ContentService.WebApi.dll"]
+COPY --from=build-file /app/publish .
+ENTRYPOINT ["dotnet", "FileService.WebApi.dll"]
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-gateway
 ARG BUILD_CONFIGURATION=Release
