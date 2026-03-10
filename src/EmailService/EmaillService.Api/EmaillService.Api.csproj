@@ -12,6 +12,11 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\EmailService.Application\EmailService.Application.csproj" />
+      <ProjectReference Include="..\EmailService.Infrastructure\EmailService.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
