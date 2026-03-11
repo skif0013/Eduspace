@@ -202,3 +202,9 @@ volumes:
   content-db-data:
   quiz-db-data:
   redis-data:
+  eamilservice.api:
+    image: eamilservice.api
+    build:
+      context: .
+      dockerfile: EamilService.Api/Dockerfile
+
