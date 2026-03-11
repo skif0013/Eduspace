@@ -1,8 +1,6 @@
 using System.Text;
 using Azure.Storage.Blobs;
-using FileService.Application.Contracts;
 using FileService.Application.Contracts.Repositories;
-using FileService.Application.DTOs.GroupDTOs;
 using FileService.Application.Service;
 using FileService.Infrastructure.Data;
 using FileService.Infrastructure.Repositories;

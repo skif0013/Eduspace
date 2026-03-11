@@ -27,9 +27,9 @@ public class FileRepository : IFileRepository
             .ToListAsync();
     }
     
-    public async Task DeleteAsync(UserFileMetadata userFile)
-    {
-       userFile.IsDeleted = true;
+    public async Task<UserFileMetadata> DeleteAsync(UserFileMetadata userFile)
+    { 
+        
     }
     
     public async Task<UserFileMetadata?> GetFileByIdAsync(Guid fileId, Guid userId)
