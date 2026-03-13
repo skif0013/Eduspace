@@ -47,20 +47,12 @@ public class UserFileMetadata
         IsDeleted = true;
         DeletedAt = DateTime.UtcNow;
     }
-
-    public void UpdateMetadata(string newTitle)
-    {
-        if (string.IsNullOrWhiteSpace(newTitle)) 
-            throw new Exception("Title cannot be empty");
-            
-        Title = newTitle;
-    }
     
-    public void ReplaceContent(string newBlobPath, long newSize)
+    public void ReplaceContent(string newBlobPath, long newSize, string  newContentType)
     {
         if (string.IsNullOrWhiteSpace(newBlobPath)) 
             throw new Exception("New blob path is required");
-
+        ContentType =  newContentType;
         BlobPath = newBlobPath;
         SizeInBytes = newSize;
     }
