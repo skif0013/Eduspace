@@ -1,6 +1,4 @@
-﻿using CourseService.Domain.Enums;
-
-namespace CourseService.Application.Courses.DTO;
+﻿namespace CourseService.Application.Courses.DTO;
 
 public class LessonResponse
 {
@@ -8,6 +6,6 @@ public class LessonResponse
     public int LessonNumber { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-    public string? VideoURL { get; set; }
+    public string? VideoUrl { get; set; }
     public DateTime CreatedAt { get; set; }
 }

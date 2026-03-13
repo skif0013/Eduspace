@@ -161,6 +161,12 @@ public class CourseService : ICourseService
             return Result<CourseResponse>.Failure(CourseErrors.CourseNotFound);
         }
 
+        if (!course.IsFree)
+        {
+            // TODO Implement Payment
+            return Result<CourseResponse>.Failure(CourseErrors.PaidCourse);
+        }
+
         var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
         var response = _mapper.Map<CourseResponse>(course);
         response.AverageRating = average;

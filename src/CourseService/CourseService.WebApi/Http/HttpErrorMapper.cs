@@ -10,6 +10,7 @@ public static class HttpErrorMapper
         { CourseErrors.CourseNotFound, StatusCodes.Status404NotFound },
         { CourseErrors.NotCourseAuthor, StatusCodes.Status403Forbidden },
         { CourseErrors.CourseArchived, StatusCodes.Status409Conflict },
+        { CourseErrors.PaidCourse, StatusCodes.Status409Conflict },
 
         { CourseRatingErrors.RatingAlreadyExists, StatusCodes.Status409Conflict },
         { CourseRatingErrors.RatingNotFound, StatusCodes.Status404NotFound }
