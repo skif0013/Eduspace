@@ -6,6 +6,6 @@ public interface ILessonRepository
 {
     Task<Lesson> CreateLessonAsync(Lesson lesson);
     Task<Lesson> GetLessonByIdAsync(Guid lessonId);
-    Task<Lesson> GetLessonsAsync();
+    Task<List<Lesson>> GetLessonsAsync(Guid courseId);
     Task UpdateLessonAsync(Lesson lesson);
 }
