@@ -9,7 +9,7 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
-    
+
     public DbSet<UserFileMetadata> UserFileMetadatas { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -19,10 +19,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<UserFileMetadata>(entity =>
         {
             entity.HasKey(f => f.Id);
-
-            entity.Property(f => f.FileName).IsRequired();
             entity.Property(f => f.BlobPath).IsRequired();
             entity.Property(f => f.UserId).IsRequired();
+            entity.Property(f => f.Title).IsRequired().HasMaxLength(255);
         });
     }
 }
