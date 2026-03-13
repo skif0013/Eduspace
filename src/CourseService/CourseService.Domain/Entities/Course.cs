@@ -13,4 +13,5 @@ public class Course : Entity
     public CourseStatus Status { get; set; }
 
     public ICollection<CourseRating> CourseRatings { get; set; } = new List<CourseRating>();
+    public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
 }
