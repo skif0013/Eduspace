@@ -13,4 +13,6 @@ public class CourseResponse
     public DateTime CreatedAt { get; set; }
     public double AverageRating { get; set; }
     public int AmountRatings { get; set; }
+
+    public List<LessonResponse> Lessons { get; set; } = new();
 }

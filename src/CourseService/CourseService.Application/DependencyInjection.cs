@@ -11,6 +11,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddAutoMapper(typeof(CourseProfile).Assembly);
+        services.AddAutoMapper(typeof(LessonProfile).Assembly);
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
@@ -23,6 +24,7 @@ public static class DependencyInjection
     {
         services.AddScoped<ICourseService, Courses.Services.CourseService>();
         services.AddScoped<ICourseRatingService, CourseRatingService>();
+        services.AddScoped<ILessonService, LessonService>();
 
         return services;
     }

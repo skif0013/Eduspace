@@ -230,6 +230,11 @@ public class CourseService : ICourseService
             return Result<CourseResponse>.Failure(CourseErrors.NotCourseAuthor);
         }
 
+        if (course.Status == CourseStatus.Archived)
+        {
+            return Result<CourseResponse>.Failure(CourseErrors.CourseArchived);
+        }
+
         course.Name = courseDTO.Name;
         course.Description = courseDTO.Description;
         course.Price = courseDTO.Price;

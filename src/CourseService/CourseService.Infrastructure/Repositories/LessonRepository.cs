@@ -22,6 +22,12 @@ public class LessonRepository : ILessonRepository
         return lesson;
     }
 
+    public async Task DeleteLessonAsync(Lesson lesson)
+    {
+        _dbContext.Lessons.Remove(lesson);
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async Task<Lesson?> GetLessonByIdAsync(Guid lessonId)
     {
         var query = await _dbContext.Lessons
@@ -35,6 +41,7 @@ public class LessonRepository : ILessonRepository
         var items = await _dbContext.Lessons
             .AsNoTracking()
             .Where(x => x.CourseId == courseId)
+            .OrderBy(x => x.LessonNumber)
             .ToListAsync();
 
         return items;

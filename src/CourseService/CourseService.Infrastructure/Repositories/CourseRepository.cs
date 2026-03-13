@@ -45,13 +45,21 @@ namespace CourseService.Infrastructure.Repositories
             };
         }
 
-        public async Task<Course> GetCourseByIdAsync(Guid courseId)
+        public async Task<Course?> GetCourseByIdAsync(Guid courseId)
         {
-            var query = await _dbContext.Courses
+            var course = await _dbContext.Courses
                 .Include(c => c.CourseRatings)
-                .FirstOrDefaultAsync(x=>x.Id == courseId);
+                .Include(l => l.Lessons)
+                .FirstOrDefaultAsync(x => x.Id == courseId);
 
-            return query;
+            if (course == null) 
+                return null;
+
+            course.Lessons = course.Lessons
+                .OrderBy(l => l.LessonNumber)
+                .ToList();
+
+            return course;
         }
 
         public async Task UpdateCourseAsync(Course course)

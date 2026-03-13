@@ -1,6 +1,7 @@
 ﻿using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 
 namespace CourseService.Infrastructure.Data;
 
@@ -32,6 +33,10 @@ public class ApplicationDbContext : DbContext
 
         builder.Entity<CourseRating>()
             .HasIndex(x => new { x.CourseId, x.UserId })
+            .IsUnique();
+
+        builder.Entity<Lesson>()
+            .HasIndex(x => new { x.CourseId, x.LessonNumber })
             .IsUnique();
     }
 

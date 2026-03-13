@@ -93,6 +93,7 @@ public static class DependencyInjection
     {
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
+        services.AddScoped<ILessonRepository, LessonRepository>();
 
         return services;
     }

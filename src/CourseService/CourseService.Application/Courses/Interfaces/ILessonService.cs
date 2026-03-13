@@ -5,9 +5,8 @@ namespace CourseService.Application.Courses.Interfaces;
 
 public interface ILessonService
 {
-    Task<Result> ArchiveLessonAsync(Guid lessonId, Guid courseId, Guid authorId);
-    Task<Result<CourseResponse>> CreateLessonAsync(LessonDTO lessonDTO, Guid courseId, Guid authorId);
-    Task<Result<CourseResponse>> GetLessonByIdAsync(Guid lessonId);
-    Task<Result> PublishLessonAsync(Guid lessonId, Guid courseId, Guid authorId);
-    Task<Result<CourseResponse>> UpdateLessonAsync(LessonDTO lessonDTO, Guid lessonId, Guid courseId, Guid authorId);
+    Task<Result<LessonResponse>> CreateLessonAsync(LessonDTO lessonDTO, Guid courseId, Guid authorId);
+    Task<Result> DeleteLessonAsync(Guid lessonId, Guid courseId, Guid authorId);
+    Task<Result<LessonResponse>> GetLessonByIdAsync(Guid lessonId);
+    Task<Result<LessonResponse>> UpdateLessonAsync(LessonDTO lessonDTO, Guid lessonId, Guid courseId, Guid authorId);
 }
