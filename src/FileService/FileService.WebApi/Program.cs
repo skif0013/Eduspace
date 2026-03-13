@@ -1,6 +1,7 @@
 using System.Text;
 using Azure.Storage.Blobs;
 using FileService.Application.Contracts.Repositories;
+using FileService.Application.Mapper;
 using FileService.Application.Service;
 using FileService.Infrastructure.Data;
 using FileService.Infrastructure.Repositories;
@@ -79,7 +80,7 @@ builder.Services.AddSingleton(x =>
     new BlobServiceClient(builder.Configuration["AzureStorage:ConnectionString"])
 );
 
-
+// закинуть данные азура 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrEmpty(connectionString))
 {
@@ -91,7 +92,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddAuthorization();
 
-
+builder.Services.AddAutoMapper(typeof(FileMappingProfile).Assembly);
 builder.Services.AddScoped<BlobStorageService>();
 builder.Services.AddScoped<IFileRepository, FileRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
