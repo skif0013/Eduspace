@@ -14,27 +14,28 @@ public class FileRepository : IFileRepository
         _dbContext = dbContext;
     }
 
+    public  async Task AddAsync(UserFileMetadata file, CancellationToken ct = default)
+    {
+        var add = await _dbContext.UserFileMetadatas.AddAsync(file);
+    }
 
-    public async Task AddAsync(UserFileMetadata userFile)
+    public Task<List<UserFileMetadata>> GetFilesByUserIdAsync(Guid userId, CancellationToken ct = default)
     {
-       await _dbContext.UserFileMetadatas.AddAsync(userFile);
+        return _dbContext.UserFileMetadatas.Where(x => x.UserId == userId).ToListAsync(ct);
     }
-    
-    public async Task<List<UserFileMetadata>> GetFilesByUserIdAsync(Guid userId)
+
+    public  async Task<UserFileMetadata?> GetFileByIdAsync(Guid fileId, Guid userId, CancellationToken ct = default)
     {
-        return await _dbContext.UserFileMetadatas
-            .Where(f => f.UserId == userId && !f.IsDeleted)
-            .ToListAsync();
+        return await _dbContext.UserFileMetadatas.FirstOrDefaultAsync(f => f.UserId == userId && f.Id == fileId, ct);
     }
-    
-    public async Task<UserFileMetadata> DeleteAsync(UserFileMetadata userFile)
-    { 
-        
-    }
-    
-    public async Task<UserFileMetadata?> GetFileByIdAsync(Guid fileId, Guid userId)
+
+    public void Update(UserFileMetadata file)
     {
-        return await _dbContext.UserFileMetadatas
-            .FirstOrDefaultAsync(f => f.Id == fileId && f.UserId == userId);
+        _dbContext.UserFileMetadatas.Update(file);
+    }
+
+    public void Remove(UserFileMetadata file)
+    {
+        _dbContext.UserFileMetadatas.Remove(file);
     }
 }
