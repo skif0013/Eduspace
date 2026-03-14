@@ -1,18 +1,20 @@
 ﻿using CourseService.Application.Messaging;
+using StackExchange.Redis;
 
 namespace CourseService.Infrastructure.Messaging.Redis;
 
 public class RedisMessagePublisher : IMessagePublisher
 {
-    private readonly RedisMessageBroker _broker;
+    private readonly IConnectionMultiplexer _multiplexer;
 
-    public RedisMessagePublisher(RedisMessageBroker broker)
+    public RedisMessagePublisher(IConnectionMultiplexer multiplexer)
     {
-        _broker = broker;
+        _multiplexer = multiplexer;
     }
 
-    public Task<bool> PublishAsync(string channel, string message)
+    public async Task PublishAsync(string channel, string message)
     {
-        return _broker.Publish(channel, message);
+        var subscriber = _multiplexer.GetSubscriber();
+        await subscriber.PublishAsync(channel, message);
     }
 }
