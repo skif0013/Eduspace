@@ -164,7 +164,7 @@ public class CourseService : ICourseService
         if (!course.IsFree)
         {
             // TODO Implement Payment
-            return Result<CourseResponse>.Failure(CourseErrors.PaidCourse);
+            return Result<CourseResponse>.Failure(CourseErrors.CourseRequiresPayment);
         }
 
         var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);

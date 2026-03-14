@@ -13,6 +13,6 @@ public static class CourseErrors
     public static readonly Error CourseArchived =
         new("COURSE_ARCHIVED", "Course is archived and cannot be modified");
 
-    public static readonly Error PaidCourse =
-        new("PAID_COURSE", "This is not a free course");
+    public static readonly Error CourseRequiresPayment =
+        new("COURSE_PAID", "Course requires purchase");
 }

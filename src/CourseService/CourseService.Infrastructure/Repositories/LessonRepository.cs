@@ -9,9 +9,9 @@ public class LessonRepository : ILessonRepository
 {
     private readonly ApplicationDbContext _dbContext;
 
-    public LessonRepository(ApplicationDbContext dBcontext)
+    public LessonRepository(ApplicationDbContext dbContext)
     {
-        _dbContext = dBcontext;
+        _dbContext = dbContext;
     }
 
     public async Task<Lesson> CreateLessonAsync(Lesson lesson)

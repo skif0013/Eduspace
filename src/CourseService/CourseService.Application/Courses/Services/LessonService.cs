@@ -54,7 +54,7 @@ public class LessonService : ILessonService
 
         var response = _mapper.Map<LessonResponse>(createdLesson);
 
-        var @event = new LessonCreatedEvent(lesson.Id, lesson.CourseId, authorId);
+        var @event = new LessonCreatedEvent(createdLesson.Id, createdLesson.CourseId, authorId);
         var json = JsonSerializer.Serialize(@event);
         await _publisher.PublishAsync("lesson.created", json);
 
@@ -66,23 +66,23 @@ public class LessonService : ILessonService
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
         if (course == null)
         {
-            return Result<LessonResponse>.Failure(CourseErrors.CourseNotFound);
+            return Result.Failure(CourseErrors.CourseNotFound);
         }
 
         if (course.AuthorId != authorId)
         {
-            return Result<LessonResponse>.Failure(CourseErrors.NotCourseAuthor);
+            return Result.Failure(CourseErrors.NotCourseAuthor);
         }
 
         if (course.Status == CourseStatus.Archived)
         {
-            return Result<LessonResponse>.Failure(CourseErrors.CourseArchived);
+            return Result.Failure(CourseErrors.CourseArchived);
         }
 
         var lesson = await _lessonRepository.GetLessonByIdAsync(lessonId);
         if (lesson == null || lesson.CourseId != courseId)
         {
-            return Result<LessonResponse>.Failure(LessonErrors.LessonNotFound);
+            return Result.Failure(LessonErrors.LessonNotFound);
         }
 
         await _lessonRepository.DeleteLessonAsync(lesson);
@@ -134,8 +134,8 @@ public class LessonService : ILessonService
 
         await _lessonRepository.UpdateLessonAsync(lesson);
 
-        var resopnse = _mapper.Map<LessonResponse>(lesson);
+        var response = _mapper.Map<LessonResponse>(lesson);
 
-        return Result<LessonResponse>.Success(resopnse);
+        return Result<LessonResponse>.Success(response);
     }
 }

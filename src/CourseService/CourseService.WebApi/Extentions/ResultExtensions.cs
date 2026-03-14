@@ -1,50 +1,51 @@
 ﻿using CourseService.Domain.Abstractions;
 using CourseService.WebApi.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CourseService.WebApi.Extentions;
 
 public static class ResultExtensions
 {
-    public static IResult ToHttpResult(this Result result)
+    public static IActionResult ToActionResult(this Result result, ControllerBase controller)
     {
         if (result.IsSuccess)
         {
-            return Results.NoContent();
+            return controller.NoContent();
         }
 
         var statusCode = HttpErrorMapper.Map(result.Error);
 
-        return Results.Problem(
+        return controller.Problem(
             title: result.Error.Code,
             detail: result.Error.Description,
             statusCode: statusCode);
     }
 
-    public static IResult ToHttpResult<T>(this Result<T> result)
+    public static IActionResult ToActionResult<T>(this Result<T> result, ControllerBase controller)
     {
         if (result.IsSuccess)
         {
-            return Results.Ok(result.Value);
+            return controller.Ok(result.Value);
         }
 
         var statusCode = HttpErrorMapper.Map(result.Error);
 
-        return Results.Problem(
+        return controller.Problem(
             title: result.Error.Code,
             detail: result.Error.Description,
             statusCode: statusCode);
     }
 
-    public static IResult ToCreatedResult<T>(this Result<T> result, string location)
+    public static IActionResult ToCreatedActionResult<T>(this Result<T> result, ControllerBase controller, string location)
     {
         if (result.IsSuccess)
         {
-            return Results.Created(location, result.Value);
+            return controller.Created(location, result.Value);
         }
 
         var statusCode = HttpErrorMapper.Map(result.Error);
 
-        return Results.Problem(
+        return controller.Problem(
             title: result.Error.Code,
             detail: result.Error.Description,
             statusCode: statusCode);

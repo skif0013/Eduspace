@@ -33,11 +33,11 @@ public class CourseController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(PagedCoursesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IResult> GetPagedCourses([FromQuery] PaginationRequest request)   
+    public async Task<IActionResult> GetPagedCourses([FromQuery] PaginationRequest request)   
     {
         var result = await _courseService.GetPagedCoursesAsync(request.Page, request.PageSize);
 
-        return result.ToHttpResult();
+        return result.ToActionResult(this);
     }
 
     /// <summary>
@@ -51,12 +51,13 @@ public class CourseController : ControllerBase
     [AllowAnonymous]
     [HttpGet("{courseId:guid}")]
     [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IResult> GetCourseById(Guid courseId)
+    public async Task<IActionResult> GetCourseById(Guid courseId)
     {
         var result = await _courseService.GetCourseByIdAsync(courseId);
 
-        return result.ToHttpResult();
+        return result.ToActionResult(this);
     }
 
     /// <summary>
@@ -66,17 +67,16 @@ public class CourseController : ControllerBase
     /// Course is created with status <b>Draft</b>.
     /// Available only to the course author.
     /// </remarks>
-    [Authorize]
     [HttpPost]
     [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IResult> CreateCourse(CourseDTO courseDTO)
+    public async Task<IActionResult> CreateCourse([FromBody] CourseDTO courseDTO)
     {
         var authorId = User.GetUserId();
         var result = await _courseService.CreateCourseAsync(courseDTO, authorId);
 
-        return result.ToCreatedResult($"/api/courses/{result.Value?.Id}");
+        return result.ToCreatedActionResult(this, $"/api/courses/{result.Value?.Id}");
     }
 
     /// <summary>
@@ -88,19 +88,18 @@ public class CourseController : ControllerBase
     /// </remarks>
     /// <param name="courseId">Course identifier.</param>
     /// <param name="courseDto">Updated course data.</param>
-    [Authorize]
     [HttpPut("{courseId:guid}")]
     [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IResult> UpdateCourse(CourseDTO courseDTO, Guid courseId)
+    public async Task<IActionResult> UpdateCourse([FromBody] CourseDTO courseDTO, Guid courseId)
     {
         var authorId = User.GetUserId();
         var result = await _courseService.UpdateCourseAsync(courseDTO, courseId, authorId);
 
-        return result.ToHttpResult();
+        return result.ToActionResult(this);
     }
 
     /// <summary>
@@ -111,18 +110,17 @@ public class CourseController : ControllerBase
     /// After publishing, the course becomes visible in the public catalog.
     /// </remarks>
     /// <param name="courseId">Course identifier.</param>
-    [Authorize]
     [HttpPatch("{courseId:guid}/publish")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IResult> PublishCourse(Guid courseId)
+    public async Task<IActionResult> PublishCourse(Guid courseId)
     {
         var authorId = User.GetUserId();
         var result = await _courseService.PublishCourseAsync(courseId, authorId);
 
-        return result.ToHttpResult();
+        return result.ToActionResult(this);
     }
 
     /// <summary>
@@ -133,17 +131,16 @@ public class CourseController : ControllerBase
     /// The course becomes invisible.
     /// </remarks>
     /// <param name="courseId">Course identifier.</param>
-    [Authorize]
     [HttpPatch("{courseId:guid}/archive")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IResult> ArchiveCourse(Guid courseId)
+    public async Task<IActionResult> ArchiveCourse(Guid courseId)
     {
         var authorId = User.GetUserId();
         var result = await _courseService.ArchiveCourseAsync(courseId, authorId);
 
-        return result.ToHttpResult();
+        return result.ToActionResult(this);
     }
 }

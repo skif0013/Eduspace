@@ -8,12 +8,15 @@ public static class HttpErrorMapper
     private static readonly Dictionary<Error, int> _map = new()
     {
         { CourseErrors.CourseNotFound, StatusCodes.Status404NotFound },
-        { CourseErrors.NotCourseAuthor, StatusCodes.Status403Forbidden },
         { CourseErrors.CourseArchived, StatusCodes.Status409Conflict },
-        { CourseErrors.PaidCourse, StatusCodes.Status409Conflict },
+        { CourseErrors.NotCourseAuthor, StatusCodes.Status403Forbidden },
+        { CourseErrors.CourseRequiresPayment, StatusCodes.Status403Forbidden },
 
         { CourseRatingErrors.RatingAlreadyExists, StatusCodes.Status409Conflict },
-        { CourseRatingErrors.RatingNotFound, StatusCodes.Status404NotFound }
+        { CourseRatingErrors.RatingNotFound, StatusCodes.Status404NotFound },
+
+        { LessonErrors.LessonNotFound, StatusCodes.Status404NotFound },
+        { LessonErrors.NotLessonAuthor, StatusCodes.Status403Forbidden }
     };
 
     public static int Map(Error error)

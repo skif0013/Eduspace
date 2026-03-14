@@ -26,19 +26,18 @@ public class CourseRatingController : ControllerBase
     /// Each user can have only one rating per course.
     /// </remarks>
     /// <param name="courseId">Course identifier.</param>
-    [Authorize]
     [HttpPost]
     [ProducesResponseType(typeof(CourseRatingResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IResult> CreateRating(CourseRatingDTO ratingDTO, Guid courseId)
+    public async Task<IActionResult> CreateRating([FromBody] CourseRatingDTO ratingDTO, Guid courseId)
     {
         var userId = User.GetUserId();
         var result = await _courseRatingService.CreateRatingAsync(ratingDTO, courseId, userId);
 
-        return result.ToHttpResult();
+        return result.ToActionResult(this);
     }
 
     /// <summary>
@@ -48,17 +47,16 @@ public class CourseRatingController : ControllerBase
     /// Available only to the user who created the rating.
     /// </remarks>
     /// <param name="courseId">Course identifier.</param>
-    [Authorize]
     [HttpPut]
     [ProducesResponseType(typeof(CourseRatingResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IResult> UpdateRating(CourseRatingDTO ratingDTO, Guid courseId)
+    public async Task<IActionResult> UpdateRating([FromBody] CourseRatingDTO ratingDTO, Guid courseId)
     {
         var userId = User.GetUserId();
         var result = await _courseRatingService.UpdateRatingAsync(ratingDTO, courseId, userId);
 
-        return result.ToHttpResult();
+        return result.ToActionResult(this);
     }
 }
