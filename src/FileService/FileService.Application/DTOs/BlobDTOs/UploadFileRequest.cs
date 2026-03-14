@@ -4,6 +4,5 @@ namespace FileService.Application.DTOs.BlobDTOs;
 
 public record UploadFileRequest(
     IFormFile File, 
-    string Title, 
-    string Description
+    string Title
 );
