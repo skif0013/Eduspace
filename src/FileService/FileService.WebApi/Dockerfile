@@ -11,7 +11,7 @@ WORKDIR /src
 COPY FileService.WebApi/FileService.WebApi.csproj FileService.WebApi/
 COPY FileService.Application/FileService.Application.csproj FileService.Application/
 COPY FileService.Domain/FileService.Domain.csproj FileService.Domain/
-COPY FileService.Infrastructure/FileService.Infrastructure.csproj FileService.Infrastructure/
+COPY ["FileService.Infrastructure/FileService.Infrastructure.csproj", "FileService.Infrastructure/"]
 
 RUN dotnet restore FileService.WebApi/FileService.WebApi.csproj
 
