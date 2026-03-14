@@ -22,7 +22,7 @@ public class FileService : IFileService
     
     public async Task<FileResponse> UploadAsync(UploadFileRequest request,Guid userId, CancellationToken ct = default)
     {
-        using var stream = request.File.OpenReadStream();
+        await using var stream = request.File.OpenReadStream();
         
         var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(request.File.FileName)}";
         
