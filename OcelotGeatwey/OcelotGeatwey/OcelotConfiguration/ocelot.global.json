@@ -1,7 +1,0 @@
-{
-  "GlobalConfiguration": {
-    "ServiceDiscoveryProvider": {
-      "Type": "AppConfiguration"
-    }
-  }
-}
