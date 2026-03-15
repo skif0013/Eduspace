@@ -5,4 +5,7 @@ public record FileResponse(
     string Title,
     string Url,
     string SizeInBytes,
-    DateTime CreatedAt );
+    DateTime CreatedAt)
+{
+    public FileResponse() : this(Guid.Empty, string.Empty, string.Empty, string.Empty, DateTime.MinValue) { }
+}

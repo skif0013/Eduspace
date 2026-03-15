@@ -29,7 +29,7 @@ public class FileService : IFileService
         var uploadResult = await _blobService.UploadAsync(stream, uniqueFileName, request.File.ContentType, ct);
         
         var fileMetadata = new UserFileMetadata(
-            userId, 
+            userId,
             uploadResult.BlobPatch, 
             request.File.Length, 
             request.File.ContentType, 
