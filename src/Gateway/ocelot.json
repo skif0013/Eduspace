@@ -147,7 +147,7 @@
     {
       "DownstreamPathTemplate": "/api/files/upload",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/files/upload",
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -155,7 +155,7 @@
     {
       "DownstreamPathTemplate": "/api/files/{fileId}/link",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/files/{fileId}/link",
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -163,7 +163,7 @@
     {
       "DownstreamPathTemplate": "/api/files/{fileId}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/files/{fileId}",
       "UpstreamHttpMethod": [ "Delete" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -171,7 +171,7 @@
     {
       "DownstreamPathTemplate": "/api/group/get-all-groups",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/group/get-all-groups",
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -179,7 +179,7 @@
     {
       "DownstreamPathTemplate": "/api/group/{groupId}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/group/{groupId}",
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -187,7 +187,7 @@
     {
       "DownstreamPathTemplate": "/api/group/CreateGroup",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/group/CreateGroup",
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -195,7 +195,7 @@
     {
       "DownstreamPathTemplate": "/api/group/update/{groupId}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/group/update/{groupId}",
       "UpstreamHttpMethod": [ "Put" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -203,7 +203,7 @@
     {
       "DownstreamPathTemplate": "/api/group/{groupId}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/group/{groupId}",
       "UpstreamHttpMethod": [ "Delete" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -211,7 +211,7 @@
     {
       "DownstreamPathTemplate": "/api/group/{groupId}/members",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/group/{groupId}/members",
       "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -219,7 +219,7 @@
     {
       "DownstreamPathTemplate": "/api/group/{groupId}/members/{memberUserId}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/group/{groupId}/members/{memberUserId}",
       "UpstreamHttpMethod": [ "Delete" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
@@ -227,7 +227,7 @@
     {
       "DownstreamPathTemplate": "/api/group/{groupId}/members/{memberUserId}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "content-service", "Port": 80 } ],
+      "DownstreamHostAndPorts": [ { "Host": "file-service", "Port": 80 } ],
       "UpstreamPathTemplate": "/content/group/{groupId}/members/{memberUserId}",
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }

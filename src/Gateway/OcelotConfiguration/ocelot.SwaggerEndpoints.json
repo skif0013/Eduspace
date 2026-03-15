@@ -27,13 +27,13 @@
       ]
     },
     {
-      "Key": "content",
+      "Key": "file",
       "Config": [
         {
-          "Name": "Content Web API",
+          "Name": "File Web API",
           "Version": "v1",
           "Service": {
-            "Name": "content",
+            "Name": "file",
             "Path": "/swagger/v1/swagger.json"
           }
         }
