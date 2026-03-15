@@ -202,3 +202,15 @@ volumes:
   file-db-data:
   quiz-db-data:
   redis-data:
+  fileservice.webapi:
+    image: fileservice.webapi
+    build:
+      context: .
+      dockerfile: src/FileService/FileService.WebApi/Dockerfile
+
+  fileservice.webapi:
+    image: fileservice.webapi
+    build:
+      context: .
+      dockerfile: src/FileService/FileService.WebApi/Dockerfile
+
