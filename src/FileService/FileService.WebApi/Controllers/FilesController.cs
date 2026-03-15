@@ -14,8 +14,8 @@ namespace FileService.WebApi.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly IFileService _fileService;
-   
     
+    private readonly Guid _testUserId = Guid.Parse("7a31636c-134b-4654-946d-315147321683");
     
     public FilesController(IFileService fileService)
     {
@@ -26,9 +26,7 @@ public class FilesController : ControllerBase
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<FileResponse>> UploadFile([FromForm] UploadFileRequest request, CancellationToken ct)
     {
-        Guid fakeUserId = Guid.Parse("00000000-0000-0000-0000-000000000000");
-        
-        var result = await _fileService.UploadAsync(request,fakeUserId,ct);
+        var result = await _fileService.UploadAsync(request,_testUserId,ct);
         
         return Ok(result);
     }
@@ -36,10 +34,7 @@ public class FilesController : ControllerBase
     [HttpDelete("{fileId}")]
     public async Task<IActionResult> DeleteFile(Guid fileId)
     {
-        
-        Guid fakeUserId = Guid.Parse("00000000-0000-0000-0000-000000000000");
-        
-        await _fileService.DeleteAsync(fileId,fakeUserId);
+        await _fileService.DeleteAsync(fileId,_testUserId);
         
         return NoContent();
     }
@@ -51,12 +46,10 @@ public class FilesController : ControllerBase
         [FromRoute] Guid fileId, 
         CancellationToken ct)
     {
-        Guid fakeUserId = Guid.Parse("00000000-0000-0000-0000-000000000000");
         
-        
-        var response = await _fileService.UpdateContentAsync(request, fileId, fakeUserId, ct);
+        var response = await _fileService.UpdateContentAsync(request, fileId, _testUserId, ct);
     
-        // 3. Возвращаем именно то, что пришло из сервиса
+        
         return Ok(response);
     }
 }
