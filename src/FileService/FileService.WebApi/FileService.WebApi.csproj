@@ -4,7 +4,6 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>46fc1950-5685-418c-93bc-9a35027d56e9</UserSecretsId>
         <RootNamespace>FileService.WebApi</RootNamespace>
     </PropertyGroup>
 
