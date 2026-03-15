@@ -6,14 +6,12 @@ services:
       dockerfile: CourseService.WebApi/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionString__DefaultConnection: Host=postgres;Port=5432;Database=CourseDB;Username=postgres;Password=postgres
-      Redis__ConnectionString: redis:6379
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=CourseDB;Username=postgres;Password=postgres
     ports:
       - "5016:5016"
       - "5017:5017"
     depends_on:
       - postgres
-      - redis
     env_file:
       - .env
     restart: always
@@ -30,12 +28,18 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: always
   
-  redis:
-    image: redis:7
+  seq:
+    image: datalust/seq:latest
+    volumes:
+      - seq_data:/data
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORD=YourStrongPassword123!
     ports:
-      - "6379:6379"
-    restart: always
+      - 5341:80
 
 volumes:
   postgres_data:
     driver: local
+  seq_data:
+    driver: local  

@@ -1,4 +1,5 @@
-﻿using CourseService.Application.Interfaces.Repositories;
+﻿using CourseService.Application.Courses.DTO;
+using CourseService.Application.Courses.Interfaces;
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using CourseService.Infrastructure.Data;
@@ -23,23 +24,42 @@ namespace CourseService.Infrastructure.Repositories
             return course;
         }
 
-        public async Task<List<Course>> GetAllCoursesAsync()
+        public async Task<PagedResult<Course>> GetPagedCoursesAsync(int page, int pageSize)
         {
-            var query =  await _dbContext.Courses
-                .Where(s => s.Status == CourseStatus.Published)
+            var query = _dbContext.Courses
+                .Where(s => s.Status == CourseStatus.Published);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
                 .Include(x => x.CourseRatings)
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return query;
+            return new PagedResult<Course>
+            {
+                Items = items,
+                TotalCount = totalCount
+            };
         }
 
-        public async Task<Course> GetCourseByIdAsync(Guid courseId)
+        public async Task<Course?> GetCourseByIdAsync(Guid courseId)
         {
-            var query = await _dbContext.Courses
+            var course = await _dbContext.Courses
                 .Include(c => c.CourseRatings)
-                .FirstOrDefaultAsync(x=>x.Id == courseId);
+                .Include(l => l.Lessons)
+                .FirstOrDefaultAsync(x => x.Id == courseId);
 
-            return query;
+            if (course == null) 
+                return null;
+
+            course.Lessons = course.Lessons
+                .OrderBy(l => l.LessonNumber)
+                .ToList();
+
+            return course;
         }
 
         public async Task UpdateCourseAsync(Course course)

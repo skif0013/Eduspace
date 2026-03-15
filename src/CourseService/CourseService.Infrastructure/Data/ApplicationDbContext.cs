@@ -1,6 +1,7 @@
 ﻿using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 
 namespace CourseService.Infrastructure.Data;
 
@@ -12,6 +13,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Course> Courses { get; set; }
     public DbSet<CourseRating> CourseRatings { get; set; }
+    public DbSet<Lesson> Lessons { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -23,8 +25,18 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(x => x.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Entity<Course>()
+            .HasMany(x => x.Lessons)
+            .WithOne(x => x.Course)
+            .HasForeignKey(x => x.CourseId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.Entity<CourseRating>()
             .HasIndex(x => new { x.CourseId, x.UserId })
+            .IsUnique();
+
+        builder.Entity<Lesson>()
+            .HasIndex(x => new { x.CourseId, x.LessonNumber })
             .IsUnique();
     }
 

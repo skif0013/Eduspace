@@ -2,5 +2,5 @@
 
 public interface IMessagePublisher
 {
-    Task<bool> PublishAsync(string channel, string message);
+    Task PublishAsync(string channel, string message);
 }
