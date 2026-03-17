@@ -32,7 +32,6 @@ public class QuizService : IQuizService
             creatorId,
             request.Name, 
             request.Description, 
-            request.Category, 
             request.PassPercentage
         );
 

@@ -8,7 +8,5 @@ public class CreatingQuizRequestDTO
     
     public string? Description { get; set; }
     
-    public string? Category { get; set; }
-    
     public double PassPercentage { get; set; }
 }

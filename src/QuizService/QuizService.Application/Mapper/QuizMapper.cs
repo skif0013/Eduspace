@@ -18,8 +18,6 @@ public class QuizMapper : IQuizMapper
             
             Description = quiz.Description,
             
-            Category = quiz.Category,
-            
             PassPercentage = quiz.PassPercentage,
             
             MaxScore = quiz.MaxScore,

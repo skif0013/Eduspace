@@ -29,7 +29,6 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(q => q.Id);
             entity.Property(q => q.Name).IsRequired().HasMaxLength(200);
             entity.Property(q => q.Description).HasMaxLength(1000);
-            entity.Property(q => q.Category).HasMaxLength(100);
             
             entity.Navigation(q => q.Questions)
                 .HasField("_questions")

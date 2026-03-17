@@ -3,7 +3,7 @@
 public class Quiz
 {
     private readonly List<Question> _questions = new();
-    public Quiz(Guid creatorId, string name, string? description, string? category, double passPercentage)
+    public Quiz(Guid creatorId, string name, string? description,double passPercentage)
     {
         
         if (string.IsNullOrWhiteSpace(name))
@@ -19,8 +19,6 @@ public class Quiz
         Name = name;
         
         Description = description;
-        
-        Category = category;
         
         PassPercentage = passPercentage;
         
@@ -38,7 +36,6 @@ public class Quiz
     public Guid CreatorId { get; private set; }
     public string Name { get; private set; }
     public string? Description { get; private set; }
-    public string? Category { get; private set; }
     public double PassPercentage { get; private set; } 
     public bool IsActive { get; private set; }
     public bool IsPublished { get; private set; }
@@ -58,7 +55,6 @@ public class Quiz
 
         Name = name;
         Description = description;
-        Category = category;
         PassPercentage = passPercentage;
         ModifiedOn = DateTime.UtcNow;
     }
