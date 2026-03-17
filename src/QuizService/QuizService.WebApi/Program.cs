@@ -102,7 +102,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz Service API v1");
-    c.RoutePrefix = ""; 
+    c.RoutePrefix = "swagger"; 
 });
 
 app.UseHttpsRedirection();

@@ -98,9 +98,10 @@ COPY ["src/FileService/FileService.Infrastructure/FileService.Infrastructure.csp
 RUN dotnet restore "src/FileService/FileService.WebApi/FileService.WebApi.csproj"
 COPY src/FileService/ src/FileService/
 WORKDIR /src/src/FileService/FileService.WebApi
+RUN dotnet build "FileService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 RUN dotnet publish "FileService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final-file
+FROM base8 AS final-file
 WORKDIR /app
 EXPOSE 80
 ENV ASPNETCORE_URLS=http://+:80

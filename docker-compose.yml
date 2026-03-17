@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
       target: final-gateway
     ports:
-      - "5000:8080"
+      - "5020:8080"
     volumes:
       - ./src/Gateway/ocelot.json:/app/ocelot.json:ro
     environment:
@@ -202,15 +202,3 @@ volumes:
   file-db-data:
   quiz-db-data:
   redis-data:
-  fileservice.webapi:
-    image: fileservice.webapi
-    build:
-      context: .
-      dockerfile: src/FileService/FileService.WebApi/Dockerfile
-
-  fileservice.webapi:
-    image: fileservice.webapi
-    build:
-      context: .
-      dockerfile: src/FileService/FileService.WebApi/Dockerfile
-

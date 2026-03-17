@@ -2,8 +2,8 @@
   file.server:
     image: ${DOCKER_REGISTRY-}fileservice
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../../..
+      dockerfile: src/FileService/FileService.WebApi/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=fileservice;Username=postgres;Password=123

@@ -5,7 +5,7 @@
       context: .
       dockerfile: QuizService.WebApi/Dockerfile
     ports:
-      - "8080:8080"
+      - "5006:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=quizdb;Username=postgres;Password=123
