@@ -44,6 +44,8 @@ services:
 
   auth-db:
     image: postgres:16
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: authservice
       POSTGRES_USER: postgres
@@ -72,6 +74,8 @@ services:
 
   user-db:
     image: postgres:16
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_DB: UserDB
       POSTGRES_USER: postgres
@@ -102,6 +106,8 @@ services:
 
   course-db:
     image: postgres:16
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_DB: CourseDB
       POSTGRES_USER: postgres
@@ -130,6 +136,8 @@ services:
 
   file-db:
     image: postgres:16
+    ports:
+      - "5435:5432"
     environment:
       POSTGRES_DB: FileDB
       POSTGRES_USER: postgres
@@ -158,6 +166,8 @@ services:
 
   quiz-db:
     image: postgres:16
+    ports:
+      - "5436:5432"
     environment:
       POSTGRES_DB: quizdb
       POSTGRES_USER: postgres
