@@ -10,4 +10,6 @@ public interface IFileService
     
     Task<bool> DeleteAsync(Guid fileId,Guid userId, CancellationToken ct = default);
     
+    Task<FileResponse> GetFileLinkAsync(Guid fileId, Guid userId, CancellationToken ct = default);
+    
 }

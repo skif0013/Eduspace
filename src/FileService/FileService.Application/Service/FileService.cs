@@ -98,4 +98,21 @@ public class FileService : IFileService
 
         return true;
     }
+
+    public async Task<FileResponse> GetFileLinkAsync(Guid fileId, Guid userId, CancellationToken ct = default)
+    {
+        var fileMetadata = await _fileRepository.GetFileByIdAsync(fileId, userId, ct);
+
+        if (fileMetadata == null)
+        {
+            throw new KeyNotFoundException($"File with ID {fileId} not found for user {userId}");
+        }
+        
+        string sharedUrl = _blobService.GetReadOnlyLink(fileMetadata.BlobPath, TimeSpan.FromHours(1));
+        
+        return _mapper.Map<FileResponse>(fileMetadata) with 
+        { 
+            Url = sharedUrl 
+        };
+    }
 }

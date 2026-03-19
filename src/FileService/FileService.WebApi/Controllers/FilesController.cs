@@ -52,4 +52,13 @@ public class FilesController : ControllerBase
         
         return Ok(response);
     }
+
+    [HttpGet("{fileId:guid}/link")]
+    public async Task<ActionResult<FileResponse>> GetFileLink([FromRoute] Guid fileId, CancellationToken ct)
+    {
+        var response = await _fileService.GetFileLinkAsync(fileId, _testUserId, ct);
+
+        return Ok(response);
+    }
+
 }
