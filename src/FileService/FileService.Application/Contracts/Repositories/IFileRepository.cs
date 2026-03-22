@@ -1,4 +1,5 @@
-﻿using FileService.Domain.Models;
+﻿using FileService.Application.DTOs;
+using FileService.Domain.Models;
 
 namespace FileService.Application.Contracts.Repositories;
 
@@ -13,5 +14,4 @@ public interface IFileRepository
     void Update(UserFileMetadata file);
     
     void Remove(UserFileMetadata file);
-    
 }
