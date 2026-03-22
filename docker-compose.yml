@@ -30,7 +30,7 @@ services:
       dockerfile: Dockerfile
       target: final-auth
     ports:
-      - "5001:8080"
+      - "5010:8080"
     env_file:
       - .env
     environment:
