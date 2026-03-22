@@ -58,7 +58,7 @@ public class BlobStorageService : IBlobService
            ExpiresOn = DateTimeOffset.UtcNow.Add(expiry)
        };
        
-       sasBuilder.SetPermissions(BlobAccountSasPermissions.Read);
+       sasBuilder.SetPermissions(BlobSasPermissions.Read);
        
        return blobClient.GenerateSasUri(sasBuilder).ToString();
    }
