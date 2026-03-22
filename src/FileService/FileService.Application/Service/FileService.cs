@@ -115,4 +115,18 @@ public class FileService : IFileService
             Url = sharedUrl 
         };
     }
+
+    public async  Task<IEnumerable<FileResponse>> GetAllFilsAsync(Guid userId, CancellationToken ct = default)
+    {
+        var fileMataData = await _fileRepository.GetFilesByUserIdAsync(userId, ct);
+
+        var result = fileMataData.Select(file => new FileResponse()
+        {
+            Title = file.Title,
+            Url = _blobService.GetReadOnlyLink(file.BlobPath, TimeSpan.FromHours(1)),
+        });
+        
+        return result;
+    }
+    
 }
