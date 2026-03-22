@@ -31,6 +31,8 @@ services:
       target: final-auth
     ports:
       - "5001:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=auth-db;Port=5432;Database=authservice;Username=postgres;Password=postgres
@@ -63,6 +65,8 @@ services:
       target: final-user
     ports:
       - "5003:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=user-db;Port=5432;Database=UserDB;Username=postgres;Password=postgres
@@ -93,6 +97,8 @@ services:
       target: final-course
     ports:
       - "5004:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=course-db;Port=5432;Database=CourseDB;Username=postgres;Password=postgres
@@ -125,6 +131,8 @@ services:
       target: final-file
     ports:
       - "5005:80"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=file-db;Port=5432;Database=FileDB;Username=postgres;Password=postgres
@@ -155,6 +163,8 @@ services:
       target: final-quiz
     ports:
       - "5006:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=quiz-db;Port=5432;Database=quizdb;Username=postgres;Password=123
@@ -185,6 +195,8 @@ services:
       target: final-notification
     ports:
       - "5007:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     restart: always

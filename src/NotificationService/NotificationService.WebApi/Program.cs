@@ -36,9 +36,13 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddSingleton<IMessageHandler, ConfimEmailHandler>();
 builder.Services.AddHostedService<RedisSubscriberService>();
 
-var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
-var redisUser = Environment.GetEnvironmentVariable("RedisUser");
-var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
+var redisEndPoint = builder.Configuration.GetValue<string>("RedisEndPoint");
+var redisUser = builder.Configuration.GetValue<string>("RedisUser");
+var redisPassword = builder.Configuration.GetValue<string>("RedisPassword");
+
+Console.WriteLine($"Redis EndPoint: {redisEndPoint}");
+Console.WriteLine($"Redis User: {redisUser}");
+Console.WriteLine($"Redis Password: {redisPassword}");
 
 builder.Services.AddSingleton<RedisMessageBroker>(sb =>
 {
