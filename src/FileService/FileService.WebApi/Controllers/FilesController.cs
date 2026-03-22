@@ -1,12 +1,8 @@
-﻿using System.Security.Claims;
-using AutoMapper;
-using FileService.Application.Contracts.Repositories;
+﻿using FileService.Application.Contracts.Repositories;
 using FileService.Application.DTOs.BlobDTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FileService.WebApi.Controllers;
-
-
 
 //[Authorize]
 [ApiController]
@@ -46,9 +42,7 @@ public class FilesController : ControllerBase
         [FromRoute] Guid fileId, 
         CancellationToken ct)
     {
-        
         var response = await _fileService.UpdateContentAsync(request, fileId, _testUserId, ct);
-    
         
         return Ok(response);
     }
@@ -61,4 +55,11 @@ public class FilesController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("GetAllFiles")]
+    public async Task<ActionResult<IEnumerable<FileResponse>>> GetAllFilesAsync(CancellationToken ct)
+    {
+        var response = await _fileService.GetAllFilsAsync(_testUserId, ct);
+        
+        return Ok(response);
+    }
 }
