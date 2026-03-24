@@ -13,4 +13,6 @@ public interface IFileService
     Task<FileResponse> GetFileLinkAsync(Guid fileId, Guid userId, CancellationToken ct = default);
     
     Task<IEnumerable<FileResponse>> GetAllFilsAsync(Guid userId, CancellationToken ct = default);
+    
+    Task DownloadAsync(Guid fileId, Guid userId, CancellationToken ct = default);
 }
