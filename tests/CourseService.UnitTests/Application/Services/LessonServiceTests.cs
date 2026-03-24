@@ -7,6 +7,7 @@ using CourseService.Application.Courses.Services;
 using CourseService.Application.Messaging;
 using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
+using CourseService.Domain.Enums;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -25,7 +26,6 @@ public class LessonServiceTests
     private readonly Mock<IRedisKeyBuilder> _keyBuilderMock = new();
 
     private readonly LessonService _lessonService;
-    //private readonly CourseService _courseService;
 
     public LessonServiceTests()
     {
@@ -39,20 +39,8 @@ public class LessonServiceTests
             _publisherMock.Object,
             _keyBuilderMock.Object
         );
-
-//        _courseService = new CourseService(
-//            _courseRepositoryMock.Object,
-//            _cacheMock.Object,
-//            _lessonRepositoryMock.Object,
-//            _loggerMock.Object,
-//            _mapperMock.Object,
-//            _publisherMock.Object,
-//            _keyBuilderMock.Object
-//);
-
     }
 
-    // Lesson validation
     [Fact]
     public async Task GetLessonByIdAsync_ShouldReturnFailure_WhenLessonNotFound()
     {
@@ -74,15 +62,14 @@ public class LessonServiceTests
         _mapperMock.Verify(x => x.Map<LessonResponse>(It.IsAny<Lesson>()), Times.Never);
     }
 
-    // Happy path
     [Fact]
     public async Task GetLessonByIdAsync_ShouldReturnSuccess_WhenLessonExists()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
 
-        var lesson = new Lesson 
-        {  
+        var lesson = new Lesson
+        {
             Id = lessonId,
             LessonNumber = 1,
             Name = "Test Lesson",
@@ -91,8 +78,8 @@ public class LessonServiceTests
             CreatedAt = DateTime.UtcNow,
         };
 
-        var expectedResponse = new LessonResponse 
-        { 
+        var expectedResponse = new LessonResponse
+        {
             Id = lesson.Id,
             LessonNumber = lesson.LessonNumber,
             Name = lesson.Name,
@@ -121,7 +108,6 @@ public class LessonServiceTests
         _mapperMock.Verify(x => x.Map<LessonResponse>(lesson), Times.Once);
     }
 
-    // Course validations
     [Fact]
     public async Task DeleteLessonAsync_ShouldReturnFailure_WhenCourseNotFound()
     {
@@ -131,7 +117,7 @@ public class LessonServiceTests
         var authorId = Guid.NewGuid();
 
         _courseRepositoryMock
-            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .Setup(x => x.GetCourseByIdAsync(courseId!))
             .ReturnsAsync((Course?)null);
 
         // Act
@@ -147,35 +133,206 @@ public class LessonServiceTests
         _lessonRepositoryMock.Verify(x => x.DeleteLessonAsync(It.IsAny<Lesson>()), Times.Never);
         _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
     }
-    //[Fact]
-    //public async Task DeleteLessonAsync_ShouldReturnSuccess_WhenLessonDeleted()
-    //{
-    //    // Arrange
-    //    var lessonId = Guid.NewGuid();
-    //    var courseId = Guid.NewGuid();
-    //    var authorId = Guid.NewGuid();
-    //    var cacheKey = $"{_prefix}:course:{courseId}";
 
-    //    var lesson = new Lesson
-    //    {
-    //        Id = lessonId,
-    //        LessonNumber = 1,
-    //        Name = "Test Lesson",
-    //        Description = "Test Description",
-    //        VideoUrl = "test-url",
-    //        CreatedAt = DateTime.UtcNow,
-    //    };
+    [Fact]
+    public async Task DeleteLessonAsync_ShouldReturnFailure_WhenNotCourseAuthor()
+    {
+        // Arrange
+        var lessonId = Guid.NewGuid();
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
 
-    //    _lessonRepositoryMock
-    //        .Setup(x => x.DeleteLessonAsync(lesson));
+        var course = new Course
+        {
+            Id = lessonId,
+            AuthorId = Guid.NewGuid(),
+            Status = CourseStatus.Published
+        };
 
-    //    _keyBuilderMock
-    //        .Setup(x => x.GetCourseKey(courseId))
-    //        .ReturnsAsync(cacheKey);
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
 
-    //    // Act 
-    //    var result = await _lessonService.DeleteLessonAsync(lesson);
-    //}
+        // Act
+        var result = await _lessonService.DeleteLessonAsync(lessonId, courseId, authorId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CourseErrors.NotCourseAuthor);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once);
+
+        _lessonRepositoryMock.Verify(x => x.GetLessonByIdAsync(It.IsAny<Guid>()), Times.Never);
+        _lessonRepositoryMock.Verify(x => x.DeleteLessonAsync(It.IsAny<Lesson>()), Times.Never);
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteLessonAsync_ShouldReturnFailure_WhenCourseArchived()
+    {
+        // Arrange
+        var lessonId = Guid.NewGuid();
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = authorId,
+            Status = CourseStatus.Archived
+        };
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        // Act
+        var result = await _lessonService.DeleteLessonAsync(lessonId, courseId, authorId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CourseErrors.CourseArchived);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once);
+
+        _lessonRepositoryMock.Verify(x => x.GetLessonByIdAsync(It.IsAny<Guid>()), Times.Never);
+        _lessonRepositoryMock.Verify(x => x.DeleteLessonAsync(It.IsAny<Lesson>()), Times.Never);
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteLessonAsync_ShouldReturnFailure_WhenLessonNotFound()
+    {
+        // Arrange
+        var lessonId = Guid.NewGuid();
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = authorId,
+            Status = CourseStatus.Published
+        };
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        _lessonRepositoryMock
+            .Setup(x => x.GetLessonByIdAsync(lessonId))
+            .ReturnsAsync((Lesson?)null);
+
+        // Act
+        var result = await _lessonService.DeleteLessonAsync(lessonId, courseId, authorId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(LessonErrors.LessonNotFound);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once);
+        _lessonRepositoryMock.Verify(x => x.GetLessonByIdAsync(lessonId), Times.Once);
+
+        _lessonRepositoryMock.Verify(x => x.DeleteLessonAsync(It.IsAny<Lesson>()), Times.Never);
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteLessonAsync_ShouldReturnFailure_WhenLessonDoesNotBelongToCourse()
+    {
+        // Arrange
+        var lessonId = Guid.NewGuid();
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = authorId,
+            Status = CourseStatus.Published
+        };
+
+        var lesson = new Lesson
+        {
+            Id = lessonId,
+            CourseId = Guid.NewGuid(),
+        };
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        _lessonRepositoryMock
+            .Setup(x => x.GetLessonByIdAsync(lessonId))
+            .ReturnsAsync(lesson);
+
+        // Act
+        var result = await _lessonService.DeleteLessonAsync(lessonId, courseId, authorId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(LessonErrors.LessonNotFound);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once);
+        _lessonRepositoryMock.Verify(x => x.GetLessonByIdAsync(lessonId), Times.Once);
+
+        _lessonRepositoryMock.Verify(x => x.DeleteLessonAsync(It.IsAny<Lesson>()), Times.Never);
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteLessonAsync_ShouldReturnSuccess_WhenLessonDeleted()
+    {
+        // Arrange
+        var lessonId = Guid.NewGuid();
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var cacheKey = "test-key";
+
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = authorId,
+            Status = CourseStatus.Published
+        };
+
+        var lesson = new Lesson
+        {
+            Id = lessonId,
+            CourseId = courseId,
+            LessonNumber = 1,
+            Name = "Test Lesson",
+            Description = "Test Description",
+            VideoUrl = "test-url",
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        _lessonRepositoryMock
+            .Setup(x => x.GetLessonByIdAsync(lessonId))
+            .ReturnsAsync(lesson);
+
+        _keyBuilderMock
+            .Setup(x => x.GetCourseKey(courseId))
+            .Returns(cacheKey);
+
+        // Act 
+        var result = await _lessonService.DeleteLessonAsync(lessonId, courseId, authorId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Error.Should().Be(Error.None);
+
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+        _lessonRepositoryMock.Verify(x => x.GetLessonByIdAsync(lessonId), Times.Once());
+        _lessonRepositoryMock.Verify(x => x.DeleteLessonAsync(lesson), Times.Once());
+        _cacheMock.Verify(x => x.RemoveAsync(cacheKey), Times.Once());
+    }
 
     ////[Theory]
     ////[InlineData(1, 2, 4)]
