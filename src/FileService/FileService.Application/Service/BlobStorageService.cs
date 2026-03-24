@@ -62,4 +62,11 @@ public class BlobStorageService : IBlobService
        
        return blobClient.GenerateSasUri(sasBuilder).ToString();
    }
+
+   public async Task DownloadAsync(string blobPath, Stream destination, CancellationToken ct = default)
+   {
+       var blobClient = _containerClient.GetBlobClient(blobPath);
+       
+       await blobClient.DownloadToAsync(destination, ct);
+   }
 }
