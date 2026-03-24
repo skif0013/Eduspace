@@ -27,7 +27,7 @@ public class FilesController : ControllerBase
         return Ok(result);
     }
     
-    [HttpDelete("{fileId}")]
+    [HttpDelete("{fileId}/delete")]
     public async Task<IActionResult> DeleteFile(Guid fileId)
     {
         await _fileService.DeleteAsync(fileId,_testUserId);
@@ -61,5 +61,14 @@ public class FilesController : ControllerBase
         var response = await _fileService.GetAllFilsAsync(_testUserId, ct);
         
         return Ok(response);
+    }
+    
+    
+    [HttpGet("{fileId:guid}/Download")]
+    public async Task<IActionResult> DownloadFile([FromRoute]Guid fileId, CancellationToken ct)
+    {
+        await _fileService.DownloadAsync(fileId, _testUserId, ct);
+        
+        return Ok();
     }
 }
