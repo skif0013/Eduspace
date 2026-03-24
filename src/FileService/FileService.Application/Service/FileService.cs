@@ -93,7 +93,7 @@ public class FileService : IFileService
         
         fileMetadata.Delete();
         
-        _fileRepository.Update(fileMetadata);
+        _fileRepository.Remove(fileMetadata);
         await _uow.SaveChangesAsync();
 
         return true;
@@ -120,13 +120,26 @@ public class FileService : IFileService
     {
         var fileMataData = await _fileRepository.GetFilesByUserIdAsync(userId, ct);
 
-        var result = fileMataData.Select(file => new FileResponse()
-        {
-            Title = file.Title,
-            Url = _blobService.GetReadOnlyLink(file.BlobPath, TimeSpan.FromHours(1)),
-        });
+        var dtos = _mapper.Map<IEnumerable<FileResponse>>(fileMataData);
         
-        return result;
+        var response = dtos.Select(dto => dto with{ Url = _blobService.GetReadOnlyLink(dto.Id.ToString(), TimeSpan.FromHours(1))}).ToList();
+        
+        return response;
     }
+
+    public async Task DownloadAsync(Guid fileId, Guid userId,CancellationToken ct = default)
+    {
+        var fileMetadata = await _fileRepository.GetFileByIdAsync(fileId, userId, ct);
     
+        Stream destination  = new MemoryStream();
+        
+        destination.Position = 0;
+        
+        if (fileMetadata == null)
+        {
+            throw new KeyNotFoundException($"File with ID {fileId} not found for user {userId}");
+        }
+        
+        await _blobService.DownloadAsync(fileMetadata.BlobPath, destination, ct );
+    }
 }
