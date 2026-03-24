@@ -105,7 +105,7 @@ public class FileService : IFileService
 
         if (fileMetadata == null)
         {
-            throw new KeyNotFoundException($"File with ID {fileId} not found for user {userId}");
+            throw new KeyNotFoundException($"File with ID {fileId} not found or access denied");
         }
         
         string sharedUrl = _blobService.GetReadOnlyLink(fileMetadata.BlobPath, TimeSpan.FromHours(1));
@@ -127,19 +127,31 @@ public class FileService : IFileService
         return response;
     }
 
-    public async Task DownloadAsync(Guid fileId, Guid userId,CancellationToken ct = default)
+    public async Task<Stream> DownloadAsync(Guid fileId, Guid userId,CancellationToken ct = default)
     {
         var fileMetadata = await _fileRepository.GetFileByIdAsync(fileId, userId, ct);
-    
-        Stream destination  = new MemoryStream();
-        
-        destination.Position = 0;
-        
+
         if (fileMetadata == null)
         {
-            throw new KeyNotFoundException($"File with ID {fileId} not found for user {userId}");
+            throw new KeyNotFoundException($"File with ID {fileId} or  access denied");
         }
-        
-        await _blobService.DownloadAsync(fileMetadata.BlobPath, destination, ct );
+
+        var destination = new MemoryStream();
+
+        try
+        {
+            await _blobService.DownloadAsync(fileMetadata.BlobPath, destination, ct);
+
+            destination.Position = 0;
+
+            return destination;
+        }
+        catch
+        {
+
+            await destination.DisposeAsync();
+
+            throw;
+        }
     }
 }
