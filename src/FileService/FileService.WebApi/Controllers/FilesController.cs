@@ -64,11 +64,11 @@ public class FilesController : ControllerBase
     }
     
     
-    [HttpGet("{fileId:guid}/Download")]
+    [HttpGet("Download/{fileId:guid}")]
     public async Task<IActionResult> DownloadFile([FromRoute]Guid fileId, CancellationToken ct)
     {
-        await _fileService.DownloadAsync(fileId, _testUserId, ct);
+        Stream fileStream = await _fileService.DownloadAsync(fileId, _testUserId, ct);
         
-        return Ok();
+        return File(fileStream, "application/octet-stream", "file_from_azure.dat");
     }
 }
