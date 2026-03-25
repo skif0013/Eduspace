@@ -92,7 +92,7 @@ public class CourseService : ICourseService
 
         var response = _mapper.Map<CourseResponse>(createdCourse);
 
-        var @event = new CourseCreatedEvent(course.Id, course.AuthorId);
+        var @event = new CourseCreatedEvent(createdCourse.Id, createdCourse.AuthorId);
         var json = JsonSerializer.Serialize(@event);
         await _publisher.PublishAsync("course.created", json);
 
