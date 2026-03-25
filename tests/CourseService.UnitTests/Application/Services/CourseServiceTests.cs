@@ -14,5 +14,16 @@ namespace CourseService.UnitTests.Application.Services
 
         //    a.Should().BeEquivalentTo(b);
         //}
+
+        //[Theory]
+        //[InlineData(1, 2, 4)]
+        //[Fact]
+        //public async Task GetLessonByIdAsync_ShouldReturnFaild()
+        //{
+        //    //result.Should().BeOfType<LessonResponse>();
+        //    //result.Should().ContainEquivalentOf(expected);
+        //    //result.Should().Contain(x => x.IsFree == true);
+        //}
+
     }
 }
