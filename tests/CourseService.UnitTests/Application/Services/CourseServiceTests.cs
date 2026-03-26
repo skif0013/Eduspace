@@ -9,6 +9,7 @@ using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using FluentAssertions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Moq;
@@ -250,6 +251,137 @@ public class CourseServiceTests
     }
 
     [Fact]
+    public async Task GetPagedCoursesAsync_ShouldReturnCachedData_AndNotCallDependencies()
+    {
+        // Arrange
+        var page = 1;
+        var pageSize = 4;
+
+        var cacheVersion = 1;
+        var cacheKey = "test-key";
+        var cachedData = new PagedCoursesResponse
+        {
+            Courses = new List<CourseResponse>(),
+            TotalCount = 1,
+            Page = page,
+            PageSize = pageSize,
+            TotalPages = 1
+        };
+
+        _cacheMock
+            .Setup(x => x.GetCatalogVersionAsync())
+            .ReturnsAsync(cacheVersion);
+
+        _keyBuilderMock
+            .Setup(x => x.GetCoursesPageKey(cacheVersion, page, pageSize))
+            .Returns(cacheKey);
+
+        _cacheMock
+            .Setup(x => x.GetAsync<PagedCoursesResponse>(cacheKey))
+            .ReturnsAsync(cachedData);
+
+        // Act
+        var result = await _courseService.GetPagedCoursesAsync(page, pageSize);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEquivalentTo(cachedData);
+
+        _cacheMock.Verify(x => x.GetCatalogVersionAsync(), Times.Once());
+        _keyBuilderMock.Verify(x => x.GetCoursesPageKey(cacheVersion, page, pageSize), Times.Once());
+        _cacheMock.Verify(x => x.GetAsync<PagedCoursesResponse>(cacheKey), Times.Once());
+
+        _courseRepositoryMock.Verify(x => x.GetPagedCoursesAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never());
+        _cacheMock.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<PagedCoursesResponse>(), It.IsAny<CacheEntryType>()), Times.Never());
+        _mapperMock.Verify(x => x.Map<CourseResponse>(It.IsAny<Course>()), Times.Never());
+    }
+
+    [Fact]
+    public async Task GetPagedCoursesAsync_ShouldReturnSuccess_AndData()
+    {
+        // Arrange
+        var page = 1;
+        var pageSize = 4;
+
+        var cacheVersion = 1;
+        var cacheKey = "test-key";
+
+        var course = new Course
+        {
+            CourseRatings = new List<CourseRating>
+            {
+                new CourseRating { Rating = 5 },
+                new CourseRating { Rating = 1 },
+            }
+        };
+
+        var pagedCourses = new PagedResult<Course>
+        {
+            Items = new List<Course> { course },
+            TotalCount = 1
+        };
+
+        var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
+
+        var mappedCourse = new CourseResponse();
+
+        _cacheMock
+            .Setup(x => x.GetCatalogVersionAsync())
+            .ReturnsAsync(cacheVersion);
+
+        _keyBuilderMock
+            .Setup(x => x.GetCoursesPageKey(cacheVersion, page, pageSize))
+            .Returns(cacheKey);
+
+        _cacheMock
+            .Setup(x => x.GetAsync<PagedCoursesResponse>(cacheKey))
+            .ReturnsAsync((PagedCoursesResponse)null);
+
+        _courseRepositoryMock
+            .Setup(x => x.GetPagedCoursesAsync(page, pageSize))
+            .ReturnsAsync(pagedCourses);
+
+        _mapperMock
+            .Setup(x => x.Map<CourseResponse>(course))
+            .Returns(mappedCourse);
+
+        //_cacheMock.Setup(x => x.SetAsync(cacheKey, response, CacheEntryType.Catalog));
+
+        // Act
+        var result = await _courseService.GetPagedCoursesAsync(page, pageSize);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+
+        result.Value.Should().NotBeNull();
+        result.Value.Page.Should().Be(page);
+        result.Value.PageSize.Should().Be(pageSize);
+        result.Value.TotalCount.Should().Be(1);
+        result.Value.TotalPages.Should().Be(1);
+
+        result.Value.Courses.Should().HaveCount(1);
+        result.Value.Courses.First().AverageRating.Should().Be(average);
+        result.Value.Courses.First().AmountRatings.Should().Be(amount);
+
+        _cacheMock.Verify(x => x.GetCatalogVersionAsync(), Times.Once());
+        _keyBuilderMock.Verify(x => x.GetCoursesPageKey(cacheVersion, page, pageSize), Times.Once());
+        _cacheMock.Verify(x => x.GetAsync<PagedCoursesResponse>(cacheKey), Times.Once());
+        
+        _courseRepositoryMock.Verify(x => x.GetPagedCoursesAsync(page, pageSize), Times.Once());
+        _mapperMock.Verify(x => x.Map<CourseResponse>(course), Times.Once());
+
+        _cacheMock.Verify(x => x.SetAsync(
+            cacheKey,
+            It.Is<PagedCoursesResponse>(r =>
+                r.Page == page &&
+                r.PageSize == pageSize &&
+                r.TotalCount == pagedCourses.TotalCount &&
+                r.Courses.Count == 1),
+            CacheEntryType.Catalog),
+            Times.Once);
+    }
+
+    [Fact]
     public async Task GetCourseByIdAsync_ShouldReturnFailure_WhenCourseNotFound()
     {
         // Arrange
@@ -405,8 +537,8 @@ public class CourseServiceTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeEquivalentTo(courseResponse);
 
+        result.Value.Should().BeEquivalentTo(courseResponse);
         result.Value.AverageRating.Should().Be(5);
         result.Value.AmountRatings.Should().Be(1);
 
