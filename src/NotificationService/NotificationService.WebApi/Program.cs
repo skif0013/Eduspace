@@ -10,12 +10,6 @@ using NotificationService.Infrastructure.SmtpClientFactory;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5005);
-    options.ListenAnyIP(5006);
-});
-
 var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
 Env.Load(envPath);
 
