@@ -3,6 +3,7 @@ using CourseService.Application.Caching;
 using CourseService.Application.Courses.DTO;
 using CourseService.Application.Courses.Errors;
 using CourseService.Application.Courses.Interfaces;
+using CourseService.Application.Extentions;
 using CourseService.Application.Messaging;
 using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
@@ -11,6 +12,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Moq;
+using System.Xml.Linq;
 using Xunit;
 
 namespace CourseService.UnitTests.Application.Services;
@@ -245,6 +247,174 @@ public class CourseServiceTests
                 json.Contains(course.Id.ToString()) &&
                 json.Contains(authorId.ToString()))
             ), Times.Once());
+    }
+
+    [Fact]
+    public async Task GetCourseByIdAsync_ShouldReturnFailure_WhenCourseNotFound()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var cacheKey = "test-key";
+
+        _keyBuilderMock
+            .Setup(x => x.GetCourseKey(courseId))
+            .Returns(cacheKey);
+
+        _cacheMock
+            .Setup(x => x.GetAsync<CourseResponse>(cacheKey))
+            .ReturnsAsync((CourseResponse?)null);
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync((Course?)null);
+
+        // Act
+        var result = await _courseService.GetCourseByIdAsync(courseId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CourseErrors.CourseNotFound);
+
+        _cacheMock.Verify(x => x.GetAsync<CourseResponse>(cacheKey), Times.Once());
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+
+        _mapperMock.Verify(x => x.Map<CourseResponse>(It.IsAny<Course>()), Times.Never());
+        _cacheMock.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<CourseResponse>(), It.IsAny<CacheEntryType>()), Times.Never());
+    }
+
+    [Fact]
+    public async Task GetCourseByIdAsync_ShouldReturnFailure_WhenCourseRequiresPayment()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var cacheKey = "test-key";
+
+        var course = new Course
+        {
+            Id = courseId,
+            IsFree = false
+        };
+
+        _keyBuilderMock
+            .Setup(x => x.GetCourseKey(courseId))
+            .Returns(cacheKey);
+
+        _cacheMock
+            .Setup(x => x.GetAsync<CourseResponse>(cacheKey))
+            .ReturnsAsync((CourseResponse?)null);
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        // Act
+        var result = await _courseService.GetCourseByIdAsync(courseId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CourseErrors.CourseRequiresPayment);
+
+        _cacheMock.Verify(x => x.GetAsync<CourseResponse>(cacheKey), Times.Once());
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+
+        _mapperMock.Verify(x => x.Map<CourseResponse>(It.IsAny<Course>()), Times.Never());
+        _cacheMock.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<CourseResponse>(), It.IsAny<CacheEntryType>()), Times.Never());
+    }
+
+    [Fact]
+    public async Task GetCourseByIdAsync_ShouldReturnSuccess_WhenDataCached()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var cacheKey = "test-key";
+
+        var courseResponse = new CourseResponse
+        {
+            Id = courseId,
+        };
+
+        _keyBuilderMock
+            .Setup(x => x.GetCourseKey(courseId))
+            .Returns(cacheKey);
+
+        _cacheMock
+            .Setup(x => x.GetAsync<CourseResponse>(cacheKey))
+            .ReturnsAsync(courseResponse);
+
+        // Act 
+        var result = await _courseService.GetCourseByIdAsync(courseId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeSameAs(courseResponse);
+
+        _keyBuilderMock.Verify(x => x.GetCourseKey(courseId), Times.Once());
+        _cacheMock.Verify(x => x.GetAsync<CourseResponse>(cacheKey), Times.Once());
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(It.IsAny<Guid>()), Times.Never());
+        _mapperMock.Verify(x => x.Map<CourseResponse>(It.IsAny<Course>()), Times.Never());
+        _cacheMock.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<CourseResponse>(), It.IsAny<CacheEntryType>()), Times.Never());
+    }
+
+    [Fact]
+    public async Task GetCourseByIdAsync_ShouldReturnSuccess_WhenValidData()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var cacheKey = "test-key";
+
+        var course = new Course
+        {
+            Id = courseId,
+            IsFree = true,
+            CourseRatings = new List<CourseRating>
+            {
+                new CourseRating { Rating = 5 }
+            }
+        };
+
+        var courseResponse = new CourseResponse
+        {
+            Id = courseId,
+            AmountRatings = 1,
+            AverageRating = 5
+        };
+
+        _keyBuilderMock
+            .Setup(x => x.GetCourseKey(courseId))
+            .Returns(cacheKey);
+
+        _cacheMock
+            .Setup(x => x.GetAsync<CourseResponse>(cacheKey))
+            .ReturnsAsync((CourseResponse?)null);
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        _mapperMock
+            .Setup(x => x.Map<CourseResponse>(course))
+            .Returns(courseResponse);
+
+        _cacheMock
+            .Setup(x => x.SetAsync(cacheKey, courseResponse, CacheEntryType.Course))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _courseService.GetCourseByIdAsync(courseId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEquivalentTo(courseResponse);
+
+        result.Value.AverageRating.Should().Be(5);
+        result.Value.AmountRatings.Should().Be(1);
+
+        _keyBuilderMock.Verify(x => x.GetCourseKey(courseId), Times.Once());
+        _cacheMock.Verify(x => x.GetAsync<CourseResponse>(cacheKey), Times.Once());
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+        _mapperMock.Verify(x => x.Map<CourseResponse>(course), Times.Once());
+        _cacheMock.Verify(x => x.SetAsync(cacheKey, courseResponse, CacheEntryType.Course), Times.Once());
     }
 
     [Fact]

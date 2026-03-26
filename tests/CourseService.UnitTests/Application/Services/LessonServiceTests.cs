@@ -5,7 +5,6 @@ using CourseService.Application.Courses.Errors;
 using CourseService.Application.Courses.Interfaces;
 using CourseService.Application.Courses.Services;
 using CourseService.Application.Messaging;
-using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using FluentAssertions;
