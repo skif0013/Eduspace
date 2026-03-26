@@ -1,4 +1,3 @@
-using DotNetEnv;
 using Microsoft.OpenApi.Models;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.Interfaces.Services;
@@ -10,20 +9,15 @@ using NotificationService.Infrastructure.SmtpClientFactory;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
-Env.Load(envPath);
-
-
 var emailSettings = new EmailSettings
 {
-    SmtpHost = Environment.GetEnvironmentVariable("SmtpSettings__Host") ?? "smtp.gmail.com",
-    SmtpPort = int.TryParse(Environment.GetEnvironmentVariable("SmtpSettings__Port"), out var port) ? port : 587,
-    EnableSsl = bool.TryParse(Environment.GetEnvironmentVariable("SmtpSettings__EnableSsl"), out var ssl) && ssl,
-    Username = Environment.GetEnvironmentVariable("SmtpSettings__Username") ?? "default@gmail.com",
-    Password = Environment.GetEnvironmentVariable("SmtpSettings__Password") ?? "default-password",
-    FromAddress = Environment.GetEnvironmentVariable("SmtpSettings__SenderEmail") ?? "no-reply@domain.com"
+    SmtpHost = builder.Configuration.GetValue<string>("SmtpSettings:Host"),
+    SmtpPort = builder.Configuration.GetValue<int>("SmtpSettings:Port"),
+    EnableSsl = builder.Configuration.GetValue<bool>("SmtpSettings:EnableSsl"),
+    Username = builder.Configuration.GetValue<string>("SmtpSettings:Username"),
+    Password = builder.Configuration.GetValue<string>("SmtpSettings:Password"),
+    FromAddress = builder.Configuration.GetValue<string>("SmtpSettings:SenderEmail")
 };
-
 
 builder.Services.AddScoped<IMessageService, MessageService>();
 
@@ -33,10 +27,6 @@ builder.Services.AddHostedService<RedisSubscriberService>();
 var redisEndPoint = builder.Configuration.GetValue<string>("RedisEndPoint");
 var redisUser = builder.Configuration.GetValue<string>("RedisUser");
 var redisPassword = builder.Configuration.GetValue<string>("RedisPassword");
-
-Console.WriteLine($"Redis EndPoint: {redisEndPoint}");
-Console.WriteLine($"Redis User: {redisUser}");
-Console.WriteLine($"Redis Password: {redisPassword}");
 
 builder.Services.AddSingleton<RedisMessageBroker>(sb =>
 {
@@ -50,9 +40,6 @@ builder.Services.AddSingleton<RedisMessageBroker>(sb =>
     var connectionString = config.ToString();
     return new RedisMessageBroker(connectionString);
 });
-
-
-
 
 builder.Services.AddSingleton(emailSettings);
 

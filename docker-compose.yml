@@ -10,7 +10,7 @@ services:
     ports:
       - "5001:8080"
     volumes:
-      - ./src/Gateway/ocelot.json:/app/ocelot.json:ro
+      - ./src/Gateway/ocelot.json:/app/ocelot.json
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
