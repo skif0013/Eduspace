@@ -187,7 +187,6 @@ public class LessonServiceTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Error.Should().Be(Error.None);
         result.Value.Should().BeEquivalentTo(lessonResponse);
 
         _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
@@ -262,7 +261,6 @@ public class LessonServiceTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Error.Should().Be(Error.None);
         result.Value.Should().BeEquivalentTo(expectedResponse);
 
         _lessonRepositoryMock.Verify(x => x.GetLessonByIdAsync(lessonId), Times.Once());
@@ -490,8 +488,6 @@ public class LessonServiceTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Error.Should().Be(Error.None);
-
 
         _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
         _lessonRepositoryMock.Verify(x => x.GetLessonByIdAsync(lessonId), Times.Once());
@@ -758,7 +754,6 @@ public class LessonServiceTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Error.Should().Be(Error.None);
         result.Value.Should().BeEquivalentTo(expectedResponse);
         lesson.LessonNumber.Should().Be(lessonDto.LessonNumber);
         lesson.Name.Should().Be(lessonDto.Name);

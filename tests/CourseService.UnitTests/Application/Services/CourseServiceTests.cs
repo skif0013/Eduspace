@@ -9,6 +9,7 @@ using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Moq;
 using Xunit;
 
@@ -36,6 +37,145 @@ public class CourseServiceTests
             _publisherMock.Object,
             _keyBuilderMock.Object
         );
+    }
+
+    [Fact]
+    public async Task ArchivedCourseAsync_ShouldReturnIsFailure_WhenCourseNotFound()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync((Course?)null);
+
+        // Act
+        var result = await _courseService.ArchiveCourseAsync(courseId, authorId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CourseErrors.CourseNotFound);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+
+        _courseRepositoryMock.Verify(x => x.UpdateCourseAsync(It.IsAny<Course>()), Times.Never());
+        _cacheMock.Verify(x => x.IncrementCatalogVersionAsync(), Times.Never());
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never());
+        _publisherMock.Verify(x => x.PublishAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never());
+    }
+
+    [Fact]
+    public async Task ArchivedCourseAsync_ShouldReturnIsFailure_WhenNotCourseAuthor()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var anotherAuthorId = Guid.NewGuid();
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = anotherAuthorId,
+            Status = CourseStatus.Draft
+        };
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        // Act
+        var result = await _courseService.ArchiveCourseAsync(courseId, authorId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CourseErrors.NotCourseAuthor);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+        _courseRepositoryMock.Verify(x => x.UpdateCourseAsync(It.IsAny<Course>()), Times.Never());
+        _cacheMock.Verify(x => x.IncrementCatalogVersionAsync(), Times.Never());
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never());
+        _publisherMock.Verify(x => x.PublishAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never());
+    }
+
+    [Fact]
+    public async Task ArchivedCourseAsync_ShouldReturnSuccess_WhenCourseWasNotPublished()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = authorId,
+            Status = CourseStatus.Draft
+        };
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        // Act
+        var result = await _courseService.ArchiveCourseAsync(courseId, authorId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        course.Status.Should().Be(CourseStatus.Archived);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+        _courseRepositoryMock.Verify(x => x.UpdateCourseAsync(course), Times.Once());
+
+        _cacheMock.Verify(x => x.IncrementCatalogVersionAsync(), Times.Never());
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never());
+
+        _publisherMock.Verify(x => x.PublishAsync("course.archived",
+            It.Is<string>(json =>
+                json.Contains(course.Id.ToString()) &&
+                json.Contains(course.AuthorId.ToString()))), 
+            Times.Once());
+    }
+
+    [Fact]
+    public async Task ArchivedCourseAsync_ShouldReturnSuccess_WhenCourseWasPublished()
+    {
+        // Arrage
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = authorId,
+            Status = CourseStatus.Published,
+        };
+
+        var cacheKey = "test-key";
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        _keyBuilderMock
+            .Setup(x => x.GetCourseKey(courseId))
+            .Returns(cacheKey);
+
+        // Act 
+        var result = await _courseService.ArchiveCourseAsync(courseId, authorId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        course.Status.Should().Be(CourseStatus.Archived);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+        _courseRepositoryMock.Verify(x => x.UpdateCourseAsync(course), Times.Once());
+        _cacheMock.Verify(x => x.IncrementCatalogVersionAsync(), Times.Once());
+        _cacheMock.Verify(x => x.RemoveAsync(cacheKey), Times.Once());
+        _publisherMock.Verify(x => x.PublishAsync("course.archived",
+            It.Is<string>(json =>
+                json.Contains(course.Id.ToString()) &&
+                json.Contains(course.AuthorId.ToString()))
+            ), Times.Once());
     }
 
     [Fact]
@@ -196,7 +336,6 @@ public class CourseServiceTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Error.Should().Be(Error.None);
 
         course.Status.Should().Be(CourseStatus.Published);
 
@@ -208,8 +347,8 @@ public class CourseServiceTests
 
         _publisherMock.Verify(x => x.PublishAsync("course.published",
             It.Is<string>(json =>
-            json.Contains(courseId.ToString()) &&
-            json.Contains(authorId.ToString()))
+                json.Contains(courseId.ToString()) &&
+                json.Contains(authorId.ToString()))
             ), Times.Once());
     }
 

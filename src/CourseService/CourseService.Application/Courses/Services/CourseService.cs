@@ -67,8 +67,8 @@ public class CourseService : ICourseService
         if (wasPublished)
         {
             await _cache.IncrementCatalogVersionAsync();
-            var cackeKey = _keyBuilder.GetCourseKey(courseId);
-            await _cache.RemoveAsync(cackeKey);
+            var cacheKey = _keyBuilder.GetCourseKey(courseId);
+            await _cache.RemoveAsync(cacheKey);
         }
 
         var @event = new CourseArchivedEvent(course.Id, course.AuthorId);
