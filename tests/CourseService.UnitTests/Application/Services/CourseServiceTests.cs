@@ -3,17 +3,12 @@ using CourseService.Application.Caching;
 using CourseService.Application.Courses.DTO;
 using CourseService.Application.Courses.Errors;
 using CourseService.Application.Courses.Interfaces;
-using CourseService.Application.Extentions;
 using CourseService.Application.Messaging;
-using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using FluentAssertions;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Moq;
-using System.Xml.Linq;
 using Xunit;
 
 namespace CourseService.UnitTests.Application.Services;
@@ -310,20 +305,43 @@ public class CourseServiceTests
         {
             CourseRatings = new List<CourseRating>
             {
-                new CourseRating { Rating = 5 },
                 new CourseRating { Rating = 1 },
+                new CourseRating { Rating = 4 },
+            }
+        };
+
+        var course2 = new Course
+        {
+            CourseRatings = new List<CourseRating>
+            {
+                new CourseRating { Rating = 4 },
+                new CourseRating { Rating = 5 },
+            }
+        };
+
+        var course3 = new Course
+        {
+            CourseRatings = new List<CourseRating>
+            {
+                new CourseRating { Rating = 5 },
+                new CourseRating { Rating = 5 },
             }
         };
 
         var pagedCourses = new PagedResult<Course>
         {
-            Items = new List<Course> { course },
-            TotalCount = 1
+            Items = new List<Course> { course , course2, course3 },
+            TotalCount = 3
         };
 
-        var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
+        const double expectedAverage1 = 2.5;
+        const double expectedAverage2 = 4.5;
+        const double expectedAverage3 = 5.0;
 
-        var mappedCourse = new CourseResponse();
+        const int expectedRatingsCount = 2;
+
+        var mappedCourses = new List<Course>();
+
 
         _cacheMock
             .Setup(x => x.GetCatalogVersionAsync())
@@ -342,10 +360,9 @@ public class CourseServiceTests
             .ReturnsAsync(pagedCourses);
 
         _mapperMock
-            .Setup(x => x.Map<CourseResponse>(course))
-            .Returns(mappedCourse);
-
-        //_cacheMock.Setup(x => x.SetAsync(cacheKey, response, CacheEntryType.Catalog));
+            .Setup(x => x.Map<CourseResponse>(It.IsAny<object>()))
+            .Callback((object src) => mappedCourses.Add((Course)src))
+            .Returns(() => new CourseResponse());
 
         // Act
         var result = await _courseService.GetPagedCoursesAsync(page, pageSize);
@@ -356,27 +373,37 @@ public class CourseServiceTests
         result.Value.Should().NotBeNull();
         result.Value.Page.Should().Be(page);
         result.Value.PageSize.Should().Be(pageSize);
-        result.Value.TotalCount.Should().Be(1);
+        result.Value.TotalCount.Should().Be(3);
         result.Value.TotalPages.Should().Be(1);
 
-        result.Value.Courses.Should().HaveCount(1);
-        result.Value.Courses.First().AverageRating.Should().Be(average);
-        result.Value.Courses.First().AmountRatings.Should().Be(amount);
+        result.Value.Courses.Should().HaveCount(3);
+
+        result.Value.Courses[0].AverageRating.Should().Be(expectedAverage1);
+        result.Value.Courses[1].AverageRating.Should().Be(expectedAverage2);
+        result.Value.Courses[2].AverageRating.Should().Be(expectedAverage3);
+
+        result.Value.Courses[0].AmountRatings.Should().Be(expectedRatingsCount);
+        result.Value.Courses[1].AmountRatings.Should().Be(expectedRatingsCount);
+        result.Value.Courses[2].AmountRatings.Should().Be(expectedRatingsCount);
+
+        mappedCourses.Should().HaveCount(3);
+        mappedCourses.Should().BeEquivalentTo(pagedCourses.Items);
 
         _cacheMock.Verify(x => x.GetCatalogVersionAsync(), Times.Once());
         _keyBuilderMock.Verify(x => x.GetCoursesPageKey(cacheVersion, page, pageSize), Times.Once());
         _cacheMock.Verify(x => x.GetAsync<PagedCoursesResponse>(cacheKey), Times.Once());
         
         _courseRepositoryMock.Verify(x => x.GetPagedCoursesAsync(page, pageSize), Times.Once());
-        _mapperMock.Verify(x => x.Map<CourseResponse>(course), Times.Once());
+
+        _mapperMock.Verify(x => x.Map<CourseResponse>(It.IsAny<Course>()), Times.Exactly(3));
 
         _cacheMock.Verify(x => x.SetAsync(
             cacheKey,
             It.Is<PagedCoursesResponse>(r =>
                 r.Page == page &&
                 r.PageSize == pageSize &&
-                r.TotalCount == pagedCourses.TotalCount &&
-                r.Courses.Count == 1),
+                r.TotalCount == 3 &&
+                r.Courses.Count == 3),
             CacheEntryType.Catalog),
             Times.Once);
     }
@@ -654,23 +681,184 @@ public class CourseServiceTests
             ), Times.Once());
     }
 
-    //[Fact]
-    //public async Task GetCourseByIdAsync_ReturnCourseResponse()
-    //{
-    //    var a = new { Name = "Test" };
-    //    var b = new { Name = "Test" };
+    [Fact]
+    public async Task UpdateCourseAsync_ShouldReturnCourseNotFoundError_WhenCourseDoesNotExist()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
 
-    //    a.Should().BeEquivalentTo(b);
-    //}
+        var courseDto = new CourseDTO();
 
-    //[Theory]
-    //[InlineData(1, 2, 4)]
-    //[Fact]
-    //public async Task GetLessonByIdAsync_ShouldReturnFaild()
-    //{
-    //    //result.Should().BeOfType<LessonResponse>();
-    //    //result.Should().ContainEquivalentOf(expected);
-    //    //result.Should().Contain(x => x.IsFree == true);
-    //}
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync((Course?)null);
 
+        // Act 
+        var result = await _courseService.UpdateCourseAsync(courseDto, courseId, authorId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CourseErrors.CourseNotFound);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+
+        _courseRepositoryMock.Verify(x => x.UpdateCourseAsync(It.IsAny<Course>()), Times.Never());
+        _mapperMock.Verify(x => x.Map<CourseResponse>(It.IsAny<Course>()), Times.Never());
+        _cacheMock.Verify(x => x.IncrementCatalogVersionAsync(), Times.Never());
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never());
+    }
+
+    [Fact]
+    public async Task UpdateCourseAsync_ShouldReturnNotCourseAuthorError_WhenAuthorDoesNotOwnCourse()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+        var courseDto = new CourseDTO
+        {
+            Name = "Ignored",
+            Description = "Ignored",
+            Price = 1
+        };
+
+        var anotherAuthorId = Guid.NewGuid();
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = anotherAuthorId,
+            Status = CourseStatus.Published
+        };
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        // Act 
+        var result = await _courseService.UpdateCourseAsync(courseDto, courseId, authorId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CourseErrors.NotCourseAuthor);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+
+        _courseRepositoryMock.Verify(x => x.UpdateCourseAsync(It.IsAny<Course>()), Times.Never());
+        _mapperMock.Verify(x => x.Map<CourseResponse>(It.IsAny<Course>()), Times.Never());
+        _cacheMock.Verify(x => x.IncrementCatalogVersionAsync(), Times.Never());
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never());
+    }
+
+
+    [Fact]
+    public async Task UpdateCourseAsync_ShouldReturnCourseArchivedError_WhenCourseIsArchived()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+        var courseDto = new CourseDTO
+        {
+            Name = "Ignored",
+            Description = "Ignored",
+            Price = 1
+        };
+
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = authorId,
+            Status = CourseStatus.Archived
+        };
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        // Act
+        var result = await _courseService.UpdateCourseAsync(courseDto, courseId, authorId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CourseErrors.CourseArchived);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+
+        _courseRepositoryMock.Verify(x => x.UpdateCourseAsync(It.IsAny<Course>()), Times.Never());
+        _mapperMock.Verify(x => x.Map<CourseResponse>(It.IsAny<Course>()), Times.Never());
+        _cacheMock.Verify(x => x.IncrementCatalogVersionAsync(), Times.Never());
+        _keyBuilderMock.Verify(x => x.GetCourseKey(It.IsAny<Guid>()), Times.Never());
+        _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never());
+    }
+
+    [Fact]
+    public async Task UpdateCourseAsync_ShouldUpdateCourseAndReturnSuccess_WhenAuthorIsOwnerAndCourseIsActive()
+    {
+        // Arrange
+        var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var courseDto = new CourseDTO
+        {
+            Name = "Updated-Name",
+            Description = "Updated-Description",
+            Price = 2,
+            IsFree = true,
+            AvatarURL = "Updated-url"
+        };
+
+        var course = new Course
+        {
+            Id = courseId,
+            AuthorId = authorId,
+            Name = "Name",
+            Description = "Description",
+            Price = 1,
+            IsFree = false,
+            AvatarURL = "url",
+            CourseRatings = new List<CourseRating>
+            {
+                new CourseRating { Rating = 1 },
+                new CourseRating { Rating = 5 }
+            }
+        };
+
+        var cacheKey = "test-key";
+
+        const double expectedAverage = 3.0;
+        const int expectedRatingsCount = 2;
+
+        _courseRepositoryMock
+            .Setup(x => x.GetCourseByIdAsync(courseId))
+            .ReturnsAsync(course);
+
+        _mapperMock
+            .Setup(x => x.Map<CourseResponse>(It.IsAny<Course>()))
+            .Returns(new CourseResponse());
+
+        _keyBuilderMock
+            .Setup(x => x.GetCourseKey(courseId))
+            .Returns(cacheKey);
+
+        // Act
+        var result = await _courseService.UpdateCourseAsync(courseDto, courseId, authorId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+
+        course.Name.Should().BeEquivalentTo(courseDto.Name);
+        course.Description.Should().BeEquivalentTo(courseDto.Description);
+        course.Price.Should().Be(courseDto.Price);
+        course.IsFree.Should().Be(courseDto.IsFree);
+        course.AvatarURL.Should().Be(courseDto.AvatarURL);
+
+        result.Value.AverageRating.Should().Be(expectedAverage);
+        result.Value.AmountRatings.Should().Be(expectedRatingsCount);
+
+        _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
+        _courseRepositoryMock.Verify(x => x.UpdateCourseAsync(course), Times.Once());
+        _mapperMock.Verify(x => x.Map<CourseResponse>(course), Times.Once());
+        _cacheMock.Verify(x => x.IncrementCatalogVersionAsync(), Times.Once());
+        _keyBuilderMock.Verify(x => x.GetCourseKey(courseId), Times.Once());
+        _cacheMock.Verify(x => x.RemoveAsync(cacheKey), Times.Once());
+    }
 }

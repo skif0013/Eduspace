@@ -244,6 +244,7 @@ public class CourseService : ICourseService
         course.Name = courseDTO.Name;
         course.Description = courseDTO.Description;
         course.Price = courseDTO.Price;
+        course.IsFree = courseDTO.IsFree;
         course.AvatarURL = courseDTO.AvatarURL;
         await _courseRepository.UpdateCourseAsync(course);
 
