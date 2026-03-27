@@ -32,7 +32,7 @@ public class FilesController : ControllerBase
         return Ok(result);
     }
     
-    [HttpDelete("{fileId}/delete")]
+    [HttpDelete("{fileId:guid}/delete")]
     public async Task<IActionResult> DeleteFile(Guid fileId)
     {
         await _fileService.DeleteAsync(fileId,_testUserId);

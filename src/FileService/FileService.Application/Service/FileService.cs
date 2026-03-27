@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using FileService.Application.Contracts.Repositories;
-using FileService.Application.DTOs;
 using FileService.Application.DTOs.BlobDTOs;
 using FileService.Domain.Models;
 using Microsoft.AspNetCore.StaticFiles;
@@ -13,11 +12,9 @@ public class FileService : IFileService
     private readonly IFileRepository _fileRepository;
     private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
-    private readonly FileExtensionContentTypeProvider _fileExtensionContentTypeProvider;
     
-    public FileService(IBlobService blobService, IFileRepository fileRepository, IUnitOfWork uow,  IMapper mapper,  FileExtensionContentTypeProvider fileExtensionContentTypeProvider)
+    public FileService(IBlobService blobService, IFileRepository fileRepository, IUnitOfWork uow,  IMapper mapper)
     {
-        _fileExtensionContentTypeProvider = fileExtensionContentTypeProvider;
         _mapper = mapper;
         _blobService = blobService;
         _fileRepository = fileRepository;
