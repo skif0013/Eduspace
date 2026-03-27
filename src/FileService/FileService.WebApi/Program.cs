@@ -4,6 +4,7 @@ using FileService.Application.Mapper;
 using FileService.Application.Service;
 using FileService.Infrastructure.Data;
 using FileService.Infrastructure.Repositories;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 

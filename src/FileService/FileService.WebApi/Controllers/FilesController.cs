@@ -1,6 +1,7 @@
 ﻿using FileService.Application.Contracts.Repositories;
 using FileService.Application.DTOs.BlobDTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace FileService.WebApi.Controllers;
 
@@ -10,11 +11,15 @@ namespace FileService.WebApi.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly IFileService _fileService;
+    private readonly IFileRepository _fileRepository;
+    private readonly FileExtensionContentTypeProvider _fileExtensionContentTypeProvider;
     
     private readonly Guid _testUserId = Guid.Parse("7a31636c-134b-4654-946d-315147321683");
     
-    public FilesController(IFileService fileService)
+    public FilesController(IFileService fileService, FileExtensionContentTypeProvider fileExtensionContentTypeProvider, IFileRepository fileRepository)
     {
+        _fileRepository = fileRepository;
+        _fileExtensionContentTypeProvider = fileExtensionContentTypeProvider;
         _fileService = fileService;
     }
 
@@ -61,14 +66,5 @@ public class FilesController : ControllerBase
         var response = await _fileService.GetAllFilsAsync(_testUserId, ct);
         
         return Ok(response);
-    }
-    
-    
-    [HttpGet("Download/{fileId:guid}")]
-    public async Task<IActionResult> DownloadFile([FromRoute]Guid fileId, CancellationToken ct)
-    {
-        Stream fileStream = await _fileService.DownloadAsync(fileId, _testUserId, ct);
-        
-        return File(fileStream, "application/octet-stream", "file_from_azure.dat");
     }
 }

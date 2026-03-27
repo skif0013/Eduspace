@@ -1,4 +1,5 @@
-﻿using FileService.Application.DTOs.BlobDTOs;
+﻿using FileService.Application.DTOs;
+using FileService.Application.DTOs.BlobDTOs;
 
 namespace FileService.Application.Contracts.Repositories;
 
@@ -13,6 +14,4 @@ public interface IFileService
     Task<FileResponse> GetFileLinkAsync(Guid fileId, Guid userId, CancellationToken ct = default);
     
     Task<IEnumerable<FileResponse>> GetAllFilsAsync(Guid userId, CancellationToken ct = default);
-    
-    Task<Stream> DownloadAsync(Guid fileId, Guid userId, CancellationToken ct = default);
 }

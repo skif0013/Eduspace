@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using FileService.Application.Contracts.Repositories;
+using FileService.Application.DTOs;
 using FileService.Application.DTOs.BlobDTOs;
 using FileService.Domain.Models;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace FileService.Application.Service;
 
@@ -11,9 +13,11 @@ public class FileService : IFileService
     private readonly IFileRepository _fileRepository;
     private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
+    private readonly FileExtensionContentTypeProvider _fileExtensionContentTypeProvider;
     
-    public FileService(IBlobService blobService, IFileRepository fileRepository, IUnitOfWork uow,  IMapper mapper)
+    public FileService(IBlobService blobService, IFileRepository fileRepository, IUnitOfWork uow,  IMapper mapper,  FileExtensionContentTypeProvider fileExtensionContentTypeProvider)
     {
+        _fileExtensionContentTypeProvider = fileExtensionContentTypeProvider;
         _mapper = mapper;
         _blobService = blobService;
         _fileRepository = fileRepository;
@@ -125,33 +129,5 @@ public class FileService : IFileService
         var response = dtos.Select(dto => dto with{ Url = _blobService.GetReadOnlyLink(dto.Id.ToString(), TimeSpan.FromHours(1))}).ToList();
         
         return response;
-    }
-
-    public async Task<Stream> DownloadAsync(Guid fileId, Guid userId,CancellationToken ct = default)
-    {
-        var fileMetadata = await _fileRepository.GetFileByIdAsync(fileId, userId, ct);
-
-        if (fileMetadata == null)
-        {
-            throw new KeyNotFoundException($"File with ID {fileId} or  access denied");
-        }
-
-        var destination = new MemoryStream();
-
-        try
-        {
-            await _blobService.DownloadAsync(fileMetadata.BlobPath, destination, ct);
-
-            destination.Position = 0;
-
-            return destination;
-        }
-        catch
-        {
-
-            await destination.DisposeAsync();
-
-            throw;
-        }
     }
 }
