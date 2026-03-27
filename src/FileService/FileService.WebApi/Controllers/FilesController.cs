@@ -1,7 +1,6 @@
 ﻿using FileService.Application.Contracts.Repositories;
 using FileService.Application.DTOs.BlobDTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 
 namespace FileService.WebApi.Controllers;
 
@@ -11,15 +10,11 @@ namespace FileService.WebApi.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly IFileService _fileService;
-    private readonly IFileRepository _fileRepository;
-    private readonly FileExtensionContentTypeProvider _fileExtensionContentTypeProvider;
     
     private readonly Guid _testUserId = Guid.Parse("7a31636c-134b-4654-946d-315147321683");
     
-    public FilesController(IFileService fileService, FileExtensionContentTypeProvider fileExtensionContentTypeProvider, IFileRepository fileRepository)
+    public FilesController(IFileService fileService)
     {
-        _fileRepository = fileRepository;
-        _fileExtensionContentTypeProvider = fileExtensionContentTypeProvider;
         _fileService = fileService;
     }
 
@@ -32,7 +27,7 @@ public class FilesController : ControllerBase
         return Ok(result);
     }
     
-    [HttpDelete("{fileId}/delete")]
+    [HttpDelete("{fileId:guid}/delete")]
     public async Task<IActionResult> DeleteFile(Guid fileId)
     {
         await _fileService.DeleteAsync(fileId,_testUserId);
