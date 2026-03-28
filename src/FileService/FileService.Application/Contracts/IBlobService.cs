@@ -9,4 +9,6 @@ public interface IBlobService
     Task<bool> DeleteAsync(string blobPath, CancellationToken ct = default);
     
     string GetReadOnlyLink(string blobPath, TimeSpan expiry);
+    
+    Task DownloadAsync(string blobPath, Stream destination, CancellationToken ct = default);
 }

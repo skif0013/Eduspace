@@ -93,7 +93,7 @@ public class FileService : IFileService
         
         fileMetadata.Delete();
         
-        _fileRepository.Update(fileMetadata);
+        _fileRepository.Remove(fileMetadata);
         await _uow.SaveChangesAsync();
 
         return true;
@@ -105,7 +105,7 @@ public class FileService : IFileService
 
         if (fileMetadata == null)
         {
-            throw new KeyNotFoundException($"File with ID {fileId} not found for user {userId}");
+            throw new KeyNotFoundException($"File with ID {fileId} not found or access denied");
         }
         
         string sharedUrl = _blobService.GetReadOnlyLink(fileMetadata.BlobPath, TimeSpan.FromHours(1));
@@ -114,5 +114,16 @@ public class FileService : IFileService
         { 
             Url = sharedUrl 
         };
+    }
+
+    public async  Task<IEnumerable<FileResponse>> GetAllFilsAsync(Guid userId, CancellationToken ct = default)
+    {
+        var fileMataData = await _fileRepository.GetFilesByUserIdAsync(userId, ct);
+
+        var dtos = _mapper.Map<IEnumerable<FileResponse>>(fileMataData);
+        
+        var response = dtos.Select(dto => dto with{ Url = _blobService.GetReadOnlyLink(dto.Id.ToString(), TimeSpan.FromHours(1))}).ToList();
+        
+        return response;
     }
 }
