@@ -10,11 +10,6 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5010);
-    options.ListenAnyIP(5011);
-});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -37,8 +32,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString, b => b.MigrationsAssembly("FileService.Infrastructure")));
 
 builder.Services.AddAuthorization();
-
-
 
 builder.Services.AddAutoMapper(typeof(FileMappingProfile).Assembly);
 builder.Services.AddScoped<IBlobService,BlobStorageService>();

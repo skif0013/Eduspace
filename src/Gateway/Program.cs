@@ -19,7 +19,7 @@ builder.Services.AddSwaggerForOcelot(builder.Configuration);
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.Authority = "http://localhost:5001";
+        options.Authority = "http://localhost:5002";
         options.Audience = "api";
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters

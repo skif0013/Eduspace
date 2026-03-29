@@ -5,7 +5,7 @@
       context: .
       dockerfile: QuizService.WebApi/Dockerfile
     ports:
-      - "8080:8080"
+      - "5006:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=quizdb;Username=postgres;Password=123
@@ -16,13 +16,14 @@
     image: postgres:15-alpine
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_DB=quizdb
+      POSTGRES_DB: quizdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123"
     ports:
-      - "5432:5432"
+      - "5436:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - quiz-db-data:/var/lib/postgresql/data
 
 volumes:
-  db-data:
+  quiz-db-data:
+      external: true

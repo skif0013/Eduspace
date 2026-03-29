@@ -1,5 +1,4 @@
 using System.Text;
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -17,11 +16,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5012);
-    options.ListenAnyIP(5013);
-});
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
@@ -44,13 +38,11 @@ builder.Services.AddHostedService<RedisSubscriberService>();
 //builder.Services.AddScoped<IEventHandler, UserCreatedEventHandler>();
 //builder.Services.AddScoped<IEventHandler, UserUpdatedEventHandler>();
 
-var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
-Env.Load(envPath);
 
+var redisEndPoint = builder.Configuration.GetValue<string>("RedisEndPoint");
+var redisUser = builder.Configuration.GetValue<string>("RedisUser");
+var redisPassword = builder.Configuration.GetValue<string>("RedisPassword");
 
-var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
-var redisUser = Environment.GetEnvironmentVariable("RedisUser");
-var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
 
 builder.Services.AddSingleton<RedisMessageBroker>(sb =>
 {
@@ -97,7 +89,7 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.AddSwaggerGen(option =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Test API", Version = "v1" });
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "User Service API", Version = "v1" });
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,

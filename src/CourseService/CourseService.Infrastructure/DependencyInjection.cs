@@ -5,7 +5,6 @@ using CourseService.Infrastructure.Caching;
 using CourseService.Infrastructure.Data;
 using CourseService.Infrastructure.Messaging.Redis;
 using CourseService.Infrastructure.Repositories;
-using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
@@ -19,8 +18,6 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        LoadEnvironment();
-
         services.AddDatabase(configuration);
 
         services.AddRedis(configuration);
@@ -28,12 +25,6 @@ public static class DependencyInjection
         services.AddRepositories();
 
         return services;
-    }
-
-    private static void LoadEnvironment()
-    {
-        var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
-        Env.Load(envPath);
     }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
@@ -46,9 +37,9 @@ public static class DependencyInjection
 
     private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
     {
-        var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
-        var redisUser = Environment.GetEnvironmentVariable("RedisUser");
-        var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
+        var redisEndPoint = configuration.GetValue<string>("RedisEndPoint");
+        var redisUser = configuration.GetValue<string>("RedisUser");
+        var redisPassword = configuration.GetValue<string>("RedisPassword");
 
         var redisOptions = new ConfigurationOptions
         {
@@ -82,9 +73,10 @@ public static class DependencyInjection
         services.AddSingleton<IMessagePublisher, RedisMessagePublisher>();
         services.AddSingleton<ICourseCache, RedisCourseCache>();
 
-        services.AddSingleton<IRedisKeyBuilder, RedisKeyBuilder>();
-
-        services.Configure<RadisCacheSettings>(configuration.GetSection("RedisCacheSettings"));
+        services.AddSingleton<IRedisKeyBuilder, RedisKeyBuilder>(); 
+        
+        // TODO: Move these settings to the root .env file at the project level to ensure they are shared across services
+        services.Configure<RadisCacheSettings>(configuration.GetSection("RedisCacheSettings")); 
 
         return services;
     }

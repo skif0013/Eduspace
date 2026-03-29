@@ -8,9 +8,9 @@ services:
       dockerfile: Dockerfile
       target: final-gateway
     ports:
-      - "5000:8080"
+      - "5001:8080"
     volumes:
-      - ./src/Gateway/ocelot.json:/app/ocelot.json:ro
+      - ./src/Gateway/ocelot.json:/app/ocelot.json
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
@@ -30,7 +30,9 @@ services:
       dockerfile: Dockerfile
       target: final-auth
     ports:
-      - "5001:8080"
+      - "5002:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=auth-db;Port=5432;Database=authservice;Username=postgres;Password=postgres
@@ -44,6 +46,8 @@ services:
 
   auth-db:
     image: postgres:16
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: authservice
       POSTGRES_USER: postgres
@@ -61,6 +65,8 @@ services:
       target: final-user
     ports:
       - "5003:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=user-db;Port=5432;Database=UserDB;Username=postgres;Password=postgres
@@ -72,6 +78,8 @@ services:
 
   user-db:
     image: postgres:16
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_DB: UserDB
       POSTGRES_USER: postgres
@@ -89,6 +97,8 @@ services:
       target: final-course
     ports:
       - "5004:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=course-db;Port=5432;Database=CourseDB;Username=postgres;Password=postgres
@@ -102,6 +112,8 @@ services:
 
   course-db:
     image: postgres:16
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_DB: CourseDB
       POSTGRES_USER: postgres
@@ -118,7 +130,9 @@ services:
       dockerfile: Dockerfile
       target: final-file
     ports:
-      - "5005:80"
+      - "5005:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=file-db;Port=5432;Database=FileDB;Username=postgres;Password=postgres
@@ -130,6 +144,8 @@ services:
 
   file-db:
     image: postgres:16
+    ports:
+      - "5435:5432"
     environment:
       POSTGRES_DB: FileDB
       POSTGRES_USER: postgres
@@ -147,6 +163,8 @@ services:
       target: final-quiz
     ports:
       - "5006:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=quiz-db;Port=5432;Database=quizdb;Username=postgres;Password=123
@@ -158,6 +176,8 @@ services:
 
   quiz-db:
     image: postgres:16
+    ports:
+      - "5436:5432"
     environment:
       POSTGRES_DB: quizdb
       POSTGRES_USER: postgres
@@ -175,6 +195,8 @@ services:
       target: final-notification
     ports:
       - "5007:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     restart: always
@@ -197,20 +219,13 @@ networks:
 
 volumes:
   auth-db-data:
+    external: true
   user-db-data:
+    external: true
   course-db-data:
+    external: true
   file-db-data:
+    external: true
   quiz-db-data:
+    external: true
   redis-data:
-  fileservice.webapi:
-    image: fileservice.webapi
-    build:
-      context: .
-      dockerfile: src/FileService/FileService.WebApi/Dockerfile
-
-  fileservice.webapi:
-    image: fileservice.webapi
-    build:
-      context: .
-      dockerfile: src/FileService/FileService.WebApi/Dockerfile
-

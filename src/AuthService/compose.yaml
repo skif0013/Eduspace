@@ -9,12 +9,11 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=authservice;Username=postgres;Password=postgres
     ports:
-      - "5010:5010"
-      - "5011:5011"
+      - "5002:8080"
     depends_on:
         - postgres
     env_file:
-      - .env
+      - ../../.env
     restart: always
 
   postgres:
@@ -24,11 +23,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5434:5432"
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - auth-db-data:/var/lib/postgresql/data
     restart: always
 
 volumes:
-  postgres_data:
-    driver: local
+  auth-db-data:
+    external: true

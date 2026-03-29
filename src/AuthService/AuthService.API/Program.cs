@@ -10,7 +10,6 @@ using AuthService.Infrastructure.Identity;
 using AuthService.Infrastructure.Redis;
 using AuthService.Infrastructure.Repositories;
 using AuthService.Infrastructure.Services;
-using DotNetEnv;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,12 +27,6 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "AuthService API"
     });
-});
-
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5010);
-    options.ListenAnyIP(5011);
 });
 
 #region config jwt
@@ -70,18 +63,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-if (builder.Environment.IsDevelopment())
-{
-    var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
-    Env.Load(envPath);
-}
-
-
-var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
-var redisUser = Environment.GetEnvironmentVariable("RedisUser");
-var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
-
-
+var redisEndPoint = builder.Configuration.GetValue<string>("RedisEndPoint");
+var redisUser = builder.Configuration.GetValue<string>("RedisUser");
+var redisPassword = builder.Configuration.GetValue<string>("RedisPassword");
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {

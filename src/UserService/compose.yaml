@@ -9,12 +9,11 @@
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=UserDB;Username=postgres;Password=postgres
     
     ports:
-      - "5012:5012"
-      - "5013:5013"
+      - "5003:8080"
     depends_on:
       - postgres
     env_file:
-      - .env
+      - ../../.env
     restart: always
 
   postgres:
@@ -24,11 +23,11 @@
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - user-db-data:/var/lib/postgresql/data
     restart: always
 
 volumes:
-  postgres_data:
-    driver: local
+  user-db-data:
+    external: true
