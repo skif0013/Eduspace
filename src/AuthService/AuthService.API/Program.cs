@@ -67,7 +67,6 @@ var redisEndPoint = builder.Configuration.GetValue<string>("RedisEndPoint");
 var redisUser = builder.Configuration.GetValue<string>("RedisUser");
 var redisPassword = builder.Configuration.GetValue<string>("RedisPassword");
 
-Console.WriteLine($"Redis EndPoint: {redisEndPoint}");
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var config = new StackExchange.Redis.ConfigurationOptions

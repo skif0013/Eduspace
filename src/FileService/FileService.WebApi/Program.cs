@@ -32,12 +32,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddAuthorization();
 
-
-var redisPassword = builder.Configuration.GetValue<string>("RedisPassword");
-
-Console.WriteLine($"Redis Password: {redisPassword}");
-
-
 builder.Services.AddAutoMapper(typeof(FileMappingProfile).Assembly);
 builder.Services.AddScoped<IBlobService,BlobStorageService>();
 builder.Services.AddScoped<IFileRepository, FileRepository>();
