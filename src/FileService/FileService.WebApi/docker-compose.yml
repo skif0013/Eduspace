@@ -9,26 +9,25 @@
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=fileservice;Username=postgres;Password=123
         
     ports:
-      - "5010:5010"
-      - "5011:5011"
+      - "5005:8080"
     depends_on:
       - postgres
     env_file:
-        - ../../../.env
+        - ../../../../.env
     restart: always
 
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_DB: fileservice
+      POSTGRES_DB: FileDB
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "5433:5432"
+      - "5435:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - file-db-data:/var/lib/postgresql/data
     restart: always
 
 volumes:
-  postgres_data:
-    driver: local
+  file-db-data:
+    external: true

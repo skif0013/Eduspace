@@ -219,8 +219,13 @@ networks:
 
 volumes:
   auth-db-data:
+    external: true
   user-db-data:
+    external: true
   course-db-data:
+    external: true
   file-db-data:
+    external: true
   quiz-db-data:
+    external: true
   redis-data:
