@@ -24,11 +24,10 @@ public class LessonServiceTests
     private readonly Mock<IMessagePublisher> _publisherMock = new();
     private readonly Mock<IRedisKeyBuilder> _keyBuilderMock = new();
 
-    private readonly LessonService _lessonService;
+    private readonly LessonService _lessonService; // SUT
 
     public LessonServiceTests()
     {
-        // SUT
         _lessonService = new LessonService(
             _courseRepositoryMock.Object,
             _cacheMock.Object,
@@ -41,7 +40,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task CreateLessonAsync_ShouldReturnFailure_WhenCourseNotFound()
+    public async Task CreateLessonAsync_ShouldReturnCourseNotFound_WhenCourseDoesNotExist()
     {
         var courseId = Guid.NewGuid();
         var authorId = Guid.NewGuid();
@@ -68,7 +67,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task CreateLessonAsync_ShouldReturnFailure_WhenNotCourseAuthor()
+    public async Task CreateLessonAsync_ShouldReturnNotCourseAuthor_WhenUserIsNotCourseAuthor()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -103,7 +102,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task CreateLessonAsync_ShouldReturnFailure_WhenCourseArchived()
+    public async Task CreateLessonAsync_ShouldReturnCourseArchived_WhenCourseIsArchived()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -139,7 +138,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task CreateLessonAsync_ShouldReturnSuccess_WhenValidData()
+    public async Task CreateLessonAsync_ShouldCreateLesson_WhenUserIsCourseAuthorAndDataIsValid()
     {
         var courseId = Guid.NewGuid();
         var authorId = Guid.NewGuid();
@@ -201,7 +200,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task GetLessonByIdAsync_ShouldReturnFailure_WhenLessonNotFound()
+    public async Task GetLessonByIdAsync_ShouldReturnLessonNotFound_WhenLessonDoesNotExist()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -222,7 +221,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task GetLessonByIdAsync_ShouldReturnSuccess_WhenLessonExists()
+    public async Task GetLessonByIdAsync_ShouldReturnLesson_WhenLessonExists()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -267,7 +266,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task DeleteLessonAsync_ShouldReturnFailure_WhenCourseNotFound()
+    public async Task DeleteLessonAsync_ShouldReturnCourseNotFound_WhenCourseDoesNotExist()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -293,7 +292,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task DeleteLessonAsync_ShouldReturnFailure_WhenNotCourseAuthor()
+    public async Task DeleteLessonAsync_ShouldReturnNotCourseAuthor_WhenUserIsNotCourseAuthor()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -328,7 +327,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task DeleteLessonAsync_ShouldReturnFailure_WhenCourseArchived()
+    public async Task DeleteLessonAsync_ShouldReturnCourseArchived_WhenCourseIsArchived()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -361,7 +360,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task DeleteLessonAsync_ShouldReturnFailure_WhenLessonNotFound()
+    public async Task DeleteLessonAsync_ShouldReturnLessonNotFound_WhenLessonDoesNotExist()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -398,7 +397,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task DeleteLessonAsync_ShouldReturnFailure_WhenLessonDoesNotBelongToCourse()
+    public async Task DeleteLessonAsync_ShouldReturnLessonNotInCourse_WhenLessonDoesNotBelongToCourse()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -443,7 +442,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task DeleteLessonAsync_ShouldReturnSuccess_WhenLessonDeleted()
+    public async Task DeleteLessonAsync_ShouldDeleteLesson_WhenLessonExistsInCourse()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -495,7 +494,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task UpdateLessonAsync_ShouldReturnFailure_WhenCourseNotFound()
+    public async Task UpdateLessonAsync_ShouldReturnCourseNotFound_WhenCourseDoesNotExist()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -524,7 +523,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task UpdateLessonAsync_ShouldReturnFailure_WhenNotCourseAuthor()
+    public async Task UpdateLessonAsync_ShouldReturnNotCourseAuthor_WhenUserIsNotCourseAuthor()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -562,7 +561,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task UpdateLessonAsync_ShouldReturnFailure_WhenCourseArchived()
+    public async Task UpdateLessonAsync_ShouldReturnCourseArchived_WhenCourseIsArchived()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -598,7 +597,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task UpdateLessonAsync_ShouldReturnFailure_WhenLessonNotFound()
+    public async Task UpdateLessonAsync_ShouldReturnLessonNotFound_WhenLessonDoesNotExist()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -638,7 +637,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task UpdateLessonAsync_ShouldReturnFailure_WhenLessonNotInCourse()
+    public async Task UpdateLessonAsync_ShouldReturnLessonNotFound_WhenLessonNotInCourse()
     {
         // Arrange
         var lessonId = Guid.NewGuid();
@@ -686,7 +685,7 @@ public class LessonServiceTests
     }
 
     [Fact]
-    public async Task UpdateLessonAsync_ShouldReturnSuccess_WhenValidData()
+    public async Task UpdateLessonAsync_ShouldUpdateLesson_WhenLessonBelongsToCourse()
     {
         // Arrange
         var lessonId = Guid.NewGuid();

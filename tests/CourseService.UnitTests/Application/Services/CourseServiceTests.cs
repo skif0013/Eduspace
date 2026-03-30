@@ -22,11 +22,10 @@ public class CourseServiceTests
     private readonly Mock<IMessagePublisher> _publisherMock = new();
     private readonly Mock<IRedisKeyBuilder> _keyBuilderMock = new();
 
-    private readonly CourseService.Application.Courses.Services.CourseService _courseService;
-    
+    private readonly CourseService.Application.Courses.Services.CourseService _courseService; // SUT
+
     public CourseServiceTests()
     {
-        // SUT
         _courseService = new CourseService.Application.Courses.Services.CourseService(
             _courseRepositoryMock.Object,
             _cacheMock.Object,
@@ -38,7 +37,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task ArchivedCourseAsync_ShouldReturnIsFailure_WhenCourseNotFound()
+    public async Task ArchivedCourseAsync_ShouldReturnCourseNotFound_WhenCourseDoesNotExist()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -64,7 +63,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task ArchivedCourseAsync_ShouldReturnIsFailure_WhenNotCourseAuthor()
+    public async Task ArchivedCourseAsync_ShouldReturnNotCourseAuthor_WhenUserIsNotCourseAuthor()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -97,7 +96,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task ArchivedCourseAsync_ShouldReturnSuccess_WhenCourseWasNotPublished()
+    public async Task ArchiveCourseAsync_ShouldArchiveCourseWithoutCacheInvalidation_WhenCourseIsNotPublished()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -135,7 +134,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task ArchivedCourseAsync_ShouldReturnSuccess_WhenCourseWasPublished()
+    public async Task ArchiveCourseAsync_ShouldArchiveCourseAndInvalidateCache_WhenCourseIsPublished()
     {
         // Arrage
         var courseId = Guid.NewGuid();
@@ -177,7 +176,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task CreateCourseAsync_ShouldReturnSuccess_WhenValidData()
+    public async Task CreateCourseAsync_ShouldCreareCourse_WhenUserIsCourseAndLessonAuthorAndDataIsValid()
     {
         // Arrange
         var authorId = Guid.NewGuid();
@@ -246,7 +245,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task GetPagedCoursesAsync_ShouldReturnCachedData_AndNotCallDependencies()
+    public async Task GetPagedCoursesAsync_ShouldReturnCachedCourses_WhenCacheHit()
     {
         // Arrange
         var page = 1;
@@ -292,7 +291,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task GetPagedCoursesAsync_ShouldReturnSuccess_AndData()
+    public async Task GetPagedCoursesAsync_ShouldReturnCoursesFromRepository_WhenCacheMiss()
     {
         // Arrange
         var page = 1;
@@ -409,7 +408,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task GetCourseByIdAsync_ShouldReturnFailure_WhenCourseNotFound()
+    public async Task GetCourseByIdAsync_ShouldReturnCourseNotFound_WhenCourseDoesNotExist()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -442,7 +441,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task GetCourseByIdAsync_ShouldReturnFailure_WhenCourseRequiresPayment()
+    public async Task GetCourseByIdAsync_ShouldReturnCourseRequiresPayment_WhenCourseIsNotFree()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -481,7 +480,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task GetCourseByIdAsync_ShouldReturnSuccess_WhenDataCached()
+    public async Task GetCourseByIdAsync_ShouldReturnCourseFromCache_WhenCacheHit()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -516,7 +515,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task GetCourseByIdAsync_ShouldReturnSuccess_WhenValidData()
+    public async Task GetCourseByIdAsync_ShouldReturnCourseFromRepository_WhenCacheMiss()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -577,7 +576,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task PublishCourseAsync_ShouldReturnFailure_WhenCourseNotFound()
+    public async Task PublishCourseAsync_ShouldReturnCourseNotFound_WhenCourseDoesNotExist()
     {
         // Arrage
         var courseId = Guid.NewGuid();
@@ -603,7 +602,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task PublishCourseAsync_ShouldReturnFailure_WhenNotCourseAuthor()
+    public async Task PublishCourseAsync_ShouldReturnNotCourseAuthor_WhenUserIsNotCourseAuthor()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -637,7 +636,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task PublishCourseAsync_ShouldReturnSuccess_WhenValidData()
+    public async Task PublishCourseAsync_ShouldSetStatusToPublished_WhenDataIsValid()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -682,7 +681,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task UpdateCourseAsync_ShouldReturnCourseNotFoundError_WhenCourseDoesNotExist()
+    public async Task UpdateCourseAsync_ShouldReturnCourseNotFound_WhenCourseDoesNotExist()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -710,7 +709,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task UpdateCourseAsync_ShouldReturnNotCourseAuthorError_WhenAuthorDoesNotOwnCourse()
+    public async Task UpdateCourseAsync_ShouldReturnNotCourseAuthor_WhenNotOwner()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -749,9 +748,8 @@ public class CourseServiceTests
         _cacheMock.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never());
     }
 
-
     [Fact]
-    public async Task UpdateCourseAsync_ShouldReturnCourseArchivedError_WhenCourseIsArchived()
+    public async Task UpdateCourseAsync_ShouldReturnCourseArchived_WhenCourseIsArchived()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -791,7 +789,7 @@ public class CourseServiceTests
     }
 
     [Fact]
-    public async Task UpdateCourseAsync_ShouldUpdateCourseAndReturnSuccess_WhenAuthorIsOwnerAndCourseIsActive()
+    public async Task UpdateCourseAsync_ShouldUpdateCourse_WhenUserIsOwnerAndCourseIsNotArchived()
     {
         // Arrange
         var courseId = Guid.NewGuid();

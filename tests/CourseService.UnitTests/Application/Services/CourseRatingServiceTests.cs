@@ -19,7 +19,7 @@ public class CourseRatingServiceTests
     private readonly Mock<ILogger<CourseRatingService>> _loggerMock = new();
     private readonly Mock<IRedisKeyBuilder> _keyBuilderMock = new();
 
-    private readonly ICourseRatingService _courseRatingService;
+    private readonly ICourseRatingService _courseRatingService; // SUT
 
     public CourseRatingServiceTests()
     {
@@ -105,7 +105,7 @@ public class CourseRatingServiceTests
     }
 
     [Fact]
-    public async Task CreateRatingAsync_ShouldRateCourseAndReturnSuccess_WhenUserHasNotRatedCourse()
+    public async Task CreateRatingAsync_ShouldCreateRating_WhenUserHasNotRatedCourse()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -187,7 +187,7 @@ public class CourseRatingServiceTests
     }
 
     [Fact]
-    public async Task UpdateRatingAsync_ShouldUpdateRateAndReturnSuccess_WhenRatingExists()
+    public async Task UpdateRatingAsync_ShouldUpdateRating_WhenRatingExists()
     {
         // Arrange
         var courseId = Guid.NewGuid();
