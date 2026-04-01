@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CourseService.Application.Messaging;
 
-namespace CourseService.IntegrationTests.Common.Fakes
+namespace CourseService.IntegrationTests.Common.Fakes;
+
+public class FakeMessagePublisher : IMessagePublisher
 {
-    internal class FakeMessagePublisher
+    public Task PublishAsync(string channel, string message)
     {
+        return Task.CompletedTask;
     }
 }
