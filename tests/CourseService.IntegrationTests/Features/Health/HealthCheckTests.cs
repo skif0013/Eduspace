@@ -1,14 +1,14 @@
 ﻿using CourseService.IntegrationTests.Common;
-using Microsoft.AspNetCore.Mvc.Testing;
+using FluentAssertions;
 using System.Net;
 
 namespace CourseService.IntegrationTests.Features.Health;
 
-public class HealthCheckTests : IClassFixture<CustomWebApplicationFactory>
+public class HealthCheckTests : IClassFixture<TestWebApplicationFactory>
 {
     private readonly HttpClient _client;
 
-    public HealthCheckTests(CustomWebApplicationFactory factory)
+    public HealthCheckTests(TestWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
     }
@@ -20,6 +20,6 @@ public class HealthCheckTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync("/some-random-url");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

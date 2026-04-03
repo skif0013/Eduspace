@@ -28,4 +28,13 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\Fixtures\" />
+    <Folder Include="Common\Helpers\" />
+    <Folder Include="Common\Constants\" />
+    <Folder Include="Features\CourseRatings\" />
+    <Folder Include="Features\Lessons\" />
+    <Folder Include="Collections\" />
+  </ItemGroup>
+
 </Project>

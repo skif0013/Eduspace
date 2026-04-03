@@ -6,22 +6,30 @@ using CourseService.Infrastructure.Data;
 using CourseService.Infrastructure.Messaging.Redis;
 using CourseService.Infrastructure.Repositories;
 using DotNetEnv;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 
 namespace CourseService.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services, 
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         LoadEnvironment();
 
-        services.AddDatabase(configuration);
+        if (!environment.IsEnvironment("Testing"))
+        {
+            services.AddDatabase(configuration);
+        }
 
         services.AddRedis(configuration);
 

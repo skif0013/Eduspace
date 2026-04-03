@@ -12,10 +12,12 @@ using StackExchange.Redis;
 
 namespace CourseService.IntegrationTests.Common;
 
-public class CustomWebApplicationFactory : WebApplicationFactory<Program>
+public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Testing");
+
         Environment.SetEnvironmentVariable("RedisEndPoint", "localhost:6379");
         Environment.SetEnvironmentVariable("RedisUser", "test");
         Environment.SetEnvironmentVariable("RedisPassword", "test");
