@@ -8,6 +8,7 @@ using System.Text.Json;
 using CourseService.Infrastructure.Data;
 using FluentAssertions;
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CourseService.IntegrationTests.Features.Courses;
 
@@ -208,5 +209,161 @@ public class GetCoursesTests : IClassFixture<TestWebApplicationFactory>
         result.PageSize.Should().Be(10);
         result.TotalCount.Should().Be(25);
         result.TotalPages.Should().Be(3);
+    }
+
+    [Fact]
+    public async Task Get_CourseById_WhenCourseExists_ShouldReturnCourse()
+    {
+        // Arrange
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        db.Database.EnsureDeleted();
+        db.Database.EnsureCreated();
+
+        var courseId = Guid.NewGuid();
+
+        db.Courses.Add(new Course
+        {
+            Id = courseId,
+            AuthorId = Guid.NewGuid(),
+            Name = "Test Course",
+            Description = "Test Description",
+            Price = 0,
+            IsFree = true,
+            Status = CourseStatus.Published,
+            CourseRatings = new List<CourseRating> 
+            { 
+                new CourseRating 
+                {
+                    CourseId = courseId,
+                    Rating = 5 
+                }
+            }
+        });
+
+        await db.SaveChangesAsync();
+
+        // Act 
+        var response = await _client.GetAsync($"/api/courses/{courseId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().NotBeNullOrEmpty();
+
+        var result = JsonSerializer.Deserialize<CourseResponse>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() }
+        });
+
+        result.Id.Should().Be(courseId);
+        result.AmountRatings.Should().Be(1);
+        result.AverageRating.Should().Be(5);
+    }
+
+    [Fact]
+    public async Task Get_CourseById_WhenCourseDoesNotExist_ShouldReturnNotFound()
+    {
+        // Arrange
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        db.Database.EnsureDeleted();
+        db.Database.EnsureCreated();
+
+        var courseId = Guid.NewGuid();
+        var anotherCourseId = Guid.NewGuid();
+
+        db.Courses.Add(new Course
+        {
+            Id = anotherCourseId,
+            AuthorId = Guid.NewGuid(),
+            Name = "Test Course",
+            Description = "Test Description",
+            Price = 0,
+            IsFree = true,
+            Status = CourseStatus.Published,
+            CourseRatings = new List<CourseRating>
+            {
+                new CourseRating
+                {
+                    CourseId = anotherCourseId,
+                    Rating = 5
+                }
+            }
+        });
+
+        await db.SaveChangesAsync();
+
+        // Act
+        var response = await _client.GetAsync($"/api/courses/{courseId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().NotBeNullOrEmpty();
+
+        var problem = JsonSerializer.Deserialize<ProblemDetails>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        problem.Should().NotBeNull();
+        problem!.Status.Should().Be(404);
+    }
+
+    [Fact]
+    public async Task Get_CourseById_WhenCourseIsPaid_ShouldReturnForbidden()
+    {
+        // Arrange
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        db.Database.EnsureDeleted();
+        db.Database.EnsureCreated();
+
+        var courseId = Guid.NewGuid();
+
+        db.Courses.Add(new Course
+        {
+            Id = courseId,
+            AuthorId = Guid.NewGuid(),
+            Name = "Test Course",
+            Description = "Test Description",
+            Price = 100,
+            IsFree = false,
+            Status = CourseStatus.Published,
+            CourseRatings = new List<CourseRating>
+            {
+                new CourseRating
+                {
+                    CourseId = courseId,
+                    Rating = 5
+                }
+            }
+        });
+
+        await db.SaveChangesAsync();
+
+        // Act
+        var response = await _client.GetAsync($"/api/courses/{courseId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().NotBeNullOrEmpty();
+
+        var problem = JsonSerializer.Deserialize<ProblemDetails>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        problem.Should().NotBeNull();
+        problem!.Status.Should().Be(403);
     }
 }
