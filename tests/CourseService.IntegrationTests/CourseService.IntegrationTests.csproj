@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\CourseService\CourseService.Application\CourseService.Application.csproj" />
     <ProjectReference Include="..\..\src\CourseService\CourseService.WebApi\CourseService.WebApi.csproj" />
   </ItemGroup>
 

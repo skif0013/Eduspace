@@ -1,7 +1,11 @@
 ﻿using CourseService.Application.Caching;
+using CourseService.Application.Courses.Validators;
 using CourseService.Application.Messaging;
 using CourseService.Infrastructure.Data;
 using CourseService.IntegrationTests.Common.Fakes;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +46,17 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             {
                 options.UseInMemoryDatabase("TestDb");
             });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = FakeAuthHandler.Scheme;
+                options.DefaultChallengeScheme = FakeAuthHandler.Scheme;
+            })
+            .AddScheme<AuthenticationSchemeOptions, FakeAuthHandler>(
+            FakeAuthHandler.Scheme, _ => { });
+
+            services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssemblyContaining<CourseDtoValidator>();
         });
     }
 }
