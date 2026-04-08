@@ -25,7 +25,9 @@ public class FakeAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
             return Task.FromResult(AuthenticateResult.Fail("Unauthorized"));
         }
 
-        var userId = Guid.NewGuid().ToString();
+        var userId = Request.Headers.TryGetValue("X-Test-UserId", out var headerUserId)
+            ? headerUserId.ToString()
+            : Guid.NewGuid().ToString();
 
         var claims = new[]
         {

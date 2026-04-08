@@ -12,12 +12,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CourseService.IntegrationTests.Common;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
+    private static readonly InMemoryDatabaseRoot _dbRoot = new();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -44,7 +48,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseInMemoryDatabase("TestDb");
+                options.UseInMemoryDatabase("TestDb", _dbRoot);
             });
 
             services.AddAuthentication(options =>
@@ -57,6 +61,12 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblyContaining<CourseDtoValidator>();
+        });
+
+        builder.ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddConsole();
         });
     }
 }

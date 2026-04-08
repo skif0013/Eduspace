@@ -4,16 +4,19 @@ using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using CourseService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CourseService.Infrastructure.Repositories
 {
     public class CourseRepository : ICourseRepository
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly ILogger<CourseRepository> _logger;
 
-        public CourseRepository(ApplicationDbContext context)
+        public CourseRepository(ApplicationDbContext context, ILogger<CourseRepository> logger)
         {
-            _dbContext = context;       
+            _dbContext = context;
+            _logger = logger;
         }
 
         public async Task<Course> CreateCourseAsync(Course course)
