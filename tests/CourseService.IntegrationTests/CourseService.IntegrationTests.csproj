@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -31,7 +31,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Fixtures\" />
-    <Folder Include="Common\Helpers\" />
     <Folder Include="Common\Constants\" />
     <Folder Include="Features\CourseRatings\" />
     <Folder Include="Features\Lessons\" />
