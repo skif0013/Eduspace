@@ -14,13 +14,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-using Microsoft.EntityFrameworkCore.Storage;
+using CourseService.IntegrationTests.Common.Fixtures;
 
 namespace CourseService.IntegrationTests.Common;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
-    //private static readonly InMemoryDatabaseRoot _dbRoot = new();
+    private readonly PostgresContainerFixture _postgres;
+
+    public TestWebApplicationFactory(PostgresContainerFixture postgres)
+    {
+        _postgres = postgres;
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -48,7 +53,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                //options.UseInMemoryDatabase("TestDb", _dbRoot);
+                options.UseNpgsql(_postgres.ConnectionString);
             });
 
             services.AddAuthentication(options =>
@@ -68,5 +73,14 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             logging.ClearProviders();
             logging.AddConsole();
         });
+    }
+
+    public async Task ResetDatabaseAsync()
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        await db.Database.EnsureDeletedAsync();
+        await db.Database.MigrateAsync();
     }
 }

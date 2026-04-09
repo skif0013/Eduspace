@@ -41,6 +41,9 @@ namespace CourseService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsFree")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -88,6 +91,43 @@ namespace CourseService.Infrastructure.Migrations
                     b.ToTable("CourseRatings");
                 });
 
+            modelBuilder.Entity("CourseService.Domain.Entities.Lesson", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("LessonNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("VideoUrl")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId", "LessonNumber")
+                        .IsUnique();
+
+                    b.ToTable("Lessons");
+                });
+
             modelBuilder.Entity("CourseService.Domain.Entities.CourseRating", b =>
                 {
                     b.HasOne("CourseService.Domain.Entities.Course", "Course")
@@ -99,9 +139,22 @@ namespace CourseService.Infrastructure.Migrations
                     b.Navigation("Course");
                 });
 
+            modelBuilder.Entity("CourseService.Domain.Entities.Lesson", b =>
+                {
+                    b.HasOne("CourseService.Domain.Entities.Course", "Course")
+                        .WithMany("Lessons")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("CourseService.Domain.Entities.Course", b =>
                 {
                     b.Navigation("CourseRatings");
+
+                    b.Navigation("Lessons");
                 });
 #pragma warning restore 612, 618
         }

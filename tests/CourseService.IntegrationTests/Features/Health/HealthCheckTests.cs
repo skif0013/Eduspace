@@ -1,15 +1,17 @@
 ﻿using CourseService.IntegrationTests.Common;
+using CourseService.IntegrationTests.Common.Fixtures;
 using FluentAssertions;
 using System.Net;
 
 namespace CourseService.IntegrationTests.Features.Health;
 
-public class HealthCheckTests : IClassFixture<TestWebApplicationFactory>
+public class HealthCheckTests : IClassFixture<PostgresContainerFixture>
 {
     private readonly HttpClient _client;
 
-    public HealthCheckTests(TestWebApplicationFactory factory)
+    public HealthCheckTests(PostgresContainerFixture postgres)
     {
+        var factory = new TestWebApplicationFactory(postgres);
         _client = factory.CreateClient();
     }
 

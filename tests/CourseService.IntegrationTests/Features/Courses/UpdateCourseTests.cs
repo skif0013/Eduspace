@@ -8,24 +8,27 @@ using FluentAssertions;
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
+using CourseService.IntegrationTests.Common.Fixtures;
 
 namespace CourseService.IntegrationTests.Features.Courses;
 
-public class UpdateCourseTests : IClassFixture<TestWebApplicationFactory>
+public class UpdateCourseTests : IClassFixture<PostgresContainerFixture>
 {
     private readonly HttpClient _client;
     private readonly TestWebApplicationFactory _factory;
 
-    public UpdateCourseTests(TestWebApplicationFactory factory)
+    public UpdateCourseTests(PostgresContainerFixture postgres)
     {
-        _client = factory.CreateClient();
-        _factory = factory;
+        _factory = new TestWebApplicationFactory(postgres);
+        _client = _factory.CreateClient();
     }
 
     [Fact]
     public async Task ShouldUpdateCourse_WhenRequestIsValid()
     {
         // Arrange
+        await _factory.ResetDatabaseAsync();
+
         var courseId = Guid.NewGuid();
         var authorId = Guid.NewGuid();
 
@@ -102,6 +105,8 @@ public class UpdateCourseTests : IClassFixture<TestWebApplicationFactory>
     public async Task ShouldReturnForbidden_WhenNotCourseAuthor()
     {
         // Arrange
+        await _factory.ResetDatabaseAsync();
+
         var courseId = Guid.NewGuid();
         var realAuthorId = Guid.NewGuid();
         var anoterAuthorId = Guid.NewGuid();
@@ -149,6 +154,8 @@ public class UpdateCourseTests : IClassFixture<TestWebApplicationFactory>
     public async Task ShouldReturnNotFound_WhenCourseDoesNotExist()
     {
         // Arrange
+        await _factory.ResetDatabaseAsync();
+
         var courseId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
@@ -187,7 +194,7 @@ public class UpdateCourseTests : IClassFixture<TestWebApplicationFactory>
             Description = "",
             Price = -10,
             IsFree = true,
-            AvatarURL = "http://someting.com"
+            AvatarURL = "http://test.com"
         };
 
         // Act

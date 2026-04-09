@@ -3,6 +3,7 @@ using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using CourseService.Infrastructure.Data;
 using CourseService.IntegrationTests.Common;
+using CourseService.IntegrationTests.Common.Fixtures;
 using CourseService.IntegrationTests.Common.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +13,23 @@ using System.Net.Http.Json;
 
 namespace CourseService.IntegrationTests.Features.Courses;
 
-public class GetCourseByIdTests : IClassFixture<TestWebApplicationFactory>
+public class GetCourseByIdTests : IClassFixture<PostgresContainerFixture>
 {
     private readonly HttpClient _client;
     private readonly TestWebApplicationFactory _factory;
 
-    public GetCourseByIdTests(TestWebApplicationFactory factory)
+    public GetCourseByIdTests(PostgresContainerFixture postgres)
     {
-        _client = factory.CreateClient();
-        _factory = factory;
+        _factory = new TestWebApplicationFactory(postgres);
+        _client = _factory.CreateClient();
     }
 
     [Fact]
     public async Task WhenCourseExists_ShouldReturnCourse()
     {
         // Arrange
+        await _factory.ResetDatabaseAsync();
+
         var courseId = Guid.NewGuid();
         using (var arrangeScope = _factory.Services.CreateScope())
         {
@@ -73,13 +76,15 @@ public class GetCourseByIdTests : IClassFixture<TestWebApplicationFactory>
     public async Task WhenCourseDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
+        await _factory.ResetDatabaseAsync();
+
         var courseId = Guid.NewGuid();
         var anotherCourseId = Guid.NewGuid();
 
         using (var arrangeScope = _factory.Services.CreateScope())
         {
             var db = arrangeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            
+
             db.Courses.Add(new Course
             {
                 Id = anotherCourseId,
@@ -110,6 +115,8 @@ public class GetCourseByIdTests : IClassFixture<TestWebApplicationFactory>
     public async Task WhenCourseIsPaid_ShouldReturnForbidden()
     {
         // Arrange
+        await _factory.ResetDatabaseAsync();
+
         var courseId = Guid.NewGuid();
 
         using (var arrangeScope = _factory.Services.CreateScope())
