@@ -2,7 +2,6 @@
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using CourseService.Infrastructure.Data;
-using CourseService.Infrastructure.Repositories;
 using CourseService.IntegrationTests.Common;
 using CourseService.IntegrationTests.Common.Helpers;
 using FluentAssertions;
@@ -10,8 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace CourseService.IntegrationTests.Features.Courses;
 
@@ -27,7 +24,7 @@ public class GetCourseByIdTests : IClassFixture<TestWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Get_CourseById_WhenCourseExists_ShouldReturnCourse()
+    public async Task WhenCourseExists_ShouldReturnCourse()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -73,7 +70,7 @@ public class GetCourseByIdTests : IClassFixture<TestWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Get_CourseById_WhenCourseDoesNotExist_ShouldReturnNotFound()
+    public async Task WhenCourseDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         var courseId = Guid.NewGuid();
@@ -110,7 +107,7 @@ public class GetCourseByIdTests : IClassFixture<TestWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Get_CourseById_WhenCourseIsPaid_ShouldReturnForbidden()
+    public async Task WhenCourseIsPaid_ShouldReturnForbidden()
     {
         // Arrange
         var courseId = Guid.NewGuid();

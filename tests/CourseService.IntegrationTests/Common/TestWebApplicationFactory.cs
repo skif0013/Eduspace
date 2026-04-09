@@ -20,7 +20,7 @@ namespace CourseService.IntegrationTests.Common;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private static readonly InMemoryDatabaseRoot _dbRoot = new();
+    //private static readonly InMemoryDatabaseRoot _dbRoot = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -48,7 +48,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseInMemoryDatabase("TestDb", _dbRoot);
+                //options.UseInMemoryDatabase("TestDb", _dbRoot);
             });
 
             services.AddAuthentication(options =>

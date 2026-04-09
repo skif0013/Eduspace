@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace CourseService.IntegrationTests.Common.Helpers;
 
-public class TestJsonOptions
+public static class TestJsonOptions
 {
     public static readonly JsonSerializerOptions Default = Create();
 

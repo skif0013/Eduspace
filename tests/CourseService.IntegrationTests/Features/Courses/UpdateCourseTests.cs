@@ -1,17 +1,12 @@
 ﻿using CourseService.Application.Courses.DTO;
 using CourseService.Infrastructure.Data;
 using CourseService.IntegrationTests.Common;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 using FluentAssertions;
 using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
-using CourseService.IntegrationTests.Common.Fakes;
-using Xunit.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourseService.IntegrationTests.Features.Courses;
@@ -20,13 +15,11 @@ public class UpdateCourseTests : IClassFixture<TestWebApplicationFactory>
 {
     private readonly HttpClient _client;
     private readonly TestWebApplicationFactory _factory;
-    private readonly ITestOutputHelper _output;
 
-    public UpdateCourseTests(TestWebApplicationFactory factory, ITestOutputHelper output)
+    public UpdateCourseTests(TestWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
         _factory = factory;
-        _output = output;
     }
 
     [Fact]
