@@ -12,7 +12,8 @@ using CourseService.IntegrationTests.Common.Fixtures;
 
 namespace CourseService.IntegrationTests.Features.Courses;
 
-public class GetCoursesTests : IClassFixture<PostgresContainerFixture>
+[Collection("Postgres collection")]
+public class GetCoursesTests
 {
     private readonly HttpClient _client;
     private readonly TestWebApplicationFactory _factory;

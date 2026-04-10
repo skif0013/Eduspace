@@ -5,7 +5,8 @@ using System.Net;
 
 namespace CourseService.IntegrationTests.Features.Health;
 
-public class HealthCheckTests : IClassFixture<PostgresContainerFixture>
+[Collection("Postgres collection")]
+public class HealthCheckTests
 {
     private readonly HttpClient _client;
 

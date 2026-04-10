@@ -4,8 +4,6 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using CourseService.IntegrationTests.Common.Fixtures;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 using CourseService.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +11,8 @@ using CourseService.IntegrationTests.Common.Helpers;
 
 namespace CourseService.IntegrationTests.Features.Courses;
 
-public class CreateCourseTests : IClassFixture<PostgresContainerFixture>
+[Collection("Postgres collection")]
+public class CreateCourseTests
 {
     private readonly HttpClient _client;
     private readonly TestWebApplicationFactory _factory;

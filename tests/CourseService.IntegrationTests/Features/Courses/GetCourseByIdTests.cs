@@ -13,7 +13,8 @@ using System.Net.Http.Json;
 
 namespace CourseService.IntegrationTests.Features.Courses;
 
-public class GetCourseByIdTests : IClassFixture<PostgresContainerFixture>
+[Collection("Postgres collection")]
+public class GetCourseByIdTests
 {
     private readonly HttpClient _client;
     private readonly TestWebApplicationFactory _factory;

@@ -35,7 +35,6 @@
     <Folder Include="Common\Constants\" />
     <Folder Include="Features\CourseRatings\" />
     <Folder Include="Features\Lessons\" />
-    <Folder Include="Collections\" />
   </ItemGroup>
 
 </Project>
