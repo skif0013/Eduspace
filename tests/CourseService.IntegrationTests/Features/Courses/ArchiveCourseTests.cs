@@ -10,25 +10,25 @@ using System.Net;
 namespace CourseService.IntegrationTests.Features.Courses;
 
 [Collection("Postgres collection")]
-public class PublishCourseTests
+public class ArchiveCourseTests
 {
     private readonly HttpClient _client;
     private readonly TestWebApplicationFactory _factory;
 
-    public PublishCourseTests(PostgresContainerFixture postgres)
+    public ArchiveCourseTests(PostgresContainerFixture postgres)
     {
         _factory = new TestWebApplicationFactory(postgres);
         _client = _factory.CreateClient();
     }
 
     [Fact]
-    public async Task ShouldPublishCourse_WhenRequestIsValid()
+    public async Task ShouldArchiveCourse_WhenRequestIsValid()
     {
         // Arrange
         await _factory.ResetDatabaseAsync();
 
-        var authorId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
 
         using (var arrangeScope = _factory.Services.CreateScope())
         {
@@ -42,16 +42,16 @@ public class PublishCourseTests
                 Description = "Test Description",
                 Price = 0,
                 IsFree = true,
-                Status = CourseStatus.Draft
+                Status = CourseStatus.Published
             });
-            
+
             await db.SaveChangesAsync();
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/publish");
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/archive");
         request.Headers.Add("X-Test-UserId", authorId.ToString());
 
-        // Act 
+        // Act
         var response = await _client.SendAsync(request);
 
         // Assert
@@ -80,13 +80,13 @@ public class PublishCourseTests
                 Description = "Test Description",
                 Price = 0,
                 IsFree = true,
-                Status = CourseStatus.Draft
+                Status = CourseStatus.Published
             });
 
             await db.SaveChangesAsync();
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/publish");
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/archive");
         request.Headers.Add("X-Test-UserId", authorId.ToString());
 
         // Act
@@ -105,7 +105,7 @@ public class PublishCourseTests
         var authorId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/publish");
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/archive");
         request.Headers.Add("X-Test-UserId", authorId.ToString());
 
         // Act 
@@ -123,7 +123,7 @@ public class PublishCourseTests
 
         var courseId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/publish");
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/archive");
         request.Headers.Add("X-Test-Auth-Fail", "true");
         // Act 
         var response = await _client.SendAsync(request);
