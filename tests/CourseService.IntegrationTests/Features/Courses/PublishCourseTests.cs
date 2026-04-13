@@ -3,6 +3,7 @@ using CourseService.Domain.Enums;
 using CourseService.Infrastructure.Data;
 using CourseService.IntegrationTests.Common;
 using CourseService.IntegrationTests.Common.Fixtures;
+using CourseService.IntegrationTests.Common.Helpers;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
@@ -48,8 +49,7 @@ public class PublishCourseTests
             await db.SaveChangesAsync();
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/publish");
-        request.Headers.Add("X-Test-UserId", authorId.ToString());
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Patch, $"/api/courses/{courseId}/publish", authorId);
 
         // Act 
         var response = await _client.SendAsync(request);
@@ -85,9 +85,8 @@ public class PublishCourseTests
 
             await db.SaveChangesAsync();
         }
-
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/publish");
-        request.Headers.Add("X-Test-UserId", authorId.ToString());
+        
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Patch, $"/api/courses/{courseId}/publish", authorId);
 
         // Act
         var response = await _client.SendAsync(request);
@@ -105,8 +104,7 @@ public class PublishCourseTests
         var authorId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/publish");
-        request.Headers.Add("X-Test-UserId", authorId.ToString());
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Patch, $"/api/courses/{courseId}/publish", authorId);
 
         // Act 
         var response = await _client.SendAsync(request);
@@ -123,8 +121,8 @@ public class PublishCourseTests
 
         var courseId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/publish");
-        request.Headers.Add("X-Test-Auth-Fail", "true");
+        var request = HttpRequestFactory.CreateUnauthorized(HttpMethod.Patch, $"/api/courses/{courseId}/publish");
+        
         // Act 
         var response = await _client.SendAsync(request);
 

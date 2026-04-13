@@ -9,6 +9,7 @@ using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using CourseService.IntegrationTests.Common.Fixtures;
+using CourseService.IntegrationTests.Common.Helpers;
 
 namespace CourseService.IntegrationTests.Features.Courses;
 
@@ -32,9 +33,6 @@ public class UpdateCourseTests
 
         var courseId = Guid.NewGuid();
         var authorId = Guid.NewGuid();
-
-        _client.DefaultRequestHeaders.Remove("X-Test-UserId");
-        _client.DefaultRequestHeaders.Add("X-Test-UserId", authorId.ToString());
 
         using (var arrangeScope = _factory.Services.CreateScope())
         {
@@ -64,8 +62,10 @@ public class UpdateCourseTests
             AvatarURL = "http://test.com"
         };
 
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Put, $"/api/courses/{courseId}", authorId, dto);
+
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/courses/{courseId}", dto);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -88,12 +88,7 @@ public class UpdateCourseTests
         var dto = new CourseDTO { Name = "Test" };
         var courseId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/courses/{courseId}")
-        {
-            Content = JsonContent.Create(dto)
-        };
-
-        request.Headers.Add("X-Test-Auth-Fail", "true");
+        var request = HttpRequestFactory.CreateUnauthorized(HttpMethod.Put, $"/api/courses/{courseId}", dto);
 
         // Act
         var response = await _client.SendAsync(request);
@@ -111,9 +106,6 @@ public class UpdateCourseTests
         var courseId = Guid.NewGuid();
         var realAuthorId = Guid.NewGuid();
         var anoterAuthorId = Guid.NewGuid();
-
-        _client.DefaultRequestHeaders.Remove("X-Test-UserId");
-        _client.DefaultRequestHeaders.Add("X-Test-UserId", anoterAuthorId.ToString());
 
         using (var arrangeScope = _factory.Services.CreateScope())
         {
@@ -144,8 +136,10 @@ public class UpdateCourseTests
             AvatarURL = "http://updatedtest.com"
         };
 
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Put, $"/api/courses/{courseId}", anoterAuthorId, dto);
+
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/courses/{courseId}", dto);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -160,9 +154,6 @@ public class UpdateCourseTests
         var courseId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
-        _client.DefaultRequestHeaders.Remove("X-Test-UserId");
-        _client.DefaultRequestHeaders.Add("X-Test-UserId", userId.ToString());
-
         var dto = new CourseDTO
         {
             Name = "Test Course",
@@ -172,8 +163,10 @@ public class UpdateCourseTests
             AvatarURL = "http://test.com"
         };
 
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Put, $"/api/courses/{courseId}", userId, dto);
+
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/courses/{courseId}", dto);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -186,9 +179,6 @@ public class UpdateCourseTests
         var courseId = Guid.NewGuid();
         var authorId = Guid.NewGuid();
 
-        _client.DefaultRequestHeaders.Remove("X-Test-UserId");
-        _client.DefaultRequestHeaders.Add("X-Test-UserId", authorId.ToString());
-
         var dto = new CourseDTO
         {
             Name = "",
@@ -198,8 +188,10 @@ public class UpdateCourseTests
             AvatarURL = "http://test.com"
         };
 
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Put, $"/api/courses/{courseId}", authorId, dto);
+
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/courses/{courseId}", dto);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -212,9 +204,6 @@ public class UpdateCourseTests
         var courseId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
-        _client.DefaultRequestHeaders.Remove("X-Test-UserId");
-        _client.DefaultRequestHeaders.Add("X-Test-UserId", userId.ToString());
-
         var dto = new CourseDTO
         {
             Name = "",
@@ -224,8 +213,10 @@ public class UpdateCourseTests
             AvatarURL = "invalid"
         };
 
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Put, $"/api/courses/{courseId}", userId, dto);
+
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/courses/{courseId}", dto);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

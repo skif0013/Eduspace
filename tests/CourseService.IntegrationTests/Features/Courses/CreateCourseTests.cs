@@ -31,9 +31,6 @@ public class CreateCourseTests
 
         var authorId = Guid.NewGuid();
 
-        _client.DefaultRequestHeaders.Remove("X-Test-UserId");
-        _client.DefaultRequestHeaders.Add("X-Test-UserId", authorId.ToString());
-
         var dto = new CourseDTO
         {
             Name = "Test Course",
@@ -43,8 +40,10 @@ public class CreateCourseTests
             AvatarURL = "http://test.com"
         };
 
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Post, "/api/courses", authorId, dto);
+
         // Act
-        var response = await _client.PostAsJsonAsync("/api/courses", dto);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -81,11 +80,10 @@ public class CreateCourseTests
             AvatarURL = "http://test.com"
         };
 
-        _client.DefaultRequestHeaders.Remove("X-Test-UserId");
-        _client.DefaultRequestHeaders.Add("X-Test-Auth-Fail", "true");
+        var request = HttpRequestFactory.CreateUnauthorized(HttpMethod.Post, "/api/courses", dto);
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/courses", dto);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -99,9 +97,6 @@ public class CreateCourseTests
 
         var authorId = Guid.NewGuid();
 
-        _client.DefaultRequestHeaders.Remove("X-Test-UserId");
-        _client.DefaultRequestHeaders.Add("X-Test-UserId", authorId.ToString());
-
         var dto = new CourseDTO
         {
             Name = "",
@@ -111,8 +106,10 @@ public class CreateCourseTests
             AvatarURL = "http://test.com"
         };
 
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Post, "/api/courses", authorId, dto);
+
         // Act
-        var response = await _client.PostAsJsonAsync("/api/courses", dto);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

@@ -3,6 +3,7 @@ using CourseService.Domain.Enums;
 using CourseService.Infrastructure.Data;
 using CourseService.IntegrationTests.Common;
 using CourseService.IntegrationTests.Common.Fixtures;
+using CourseService.IntegrationTests.Common.Helpers;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
@@ -48,8 +49,7 @@ public class ArchiveCourseTests
             await db.SaveChangesAsync();
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/archive");
-        request.Headers.Add("X-Test-UserId", authorId.ToString());
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Patch, $"/api/courses/{courseId}/archive", authorId);
 
         // Act
         var response = await _client.SendAsync(request);
@@ -86,8 +86,7 @@ public class ArchiveCourseTests
             await db.SaveChangesAsync();
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/courses/{courseId}/archive");
-        request.Headers.Add("X-Test-UserId", authorId.ToString());
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Patch, $"/api/courses/{courseId}/archive", authorId);
 
         // Act
         var response = await _client.SendAsync(request);
