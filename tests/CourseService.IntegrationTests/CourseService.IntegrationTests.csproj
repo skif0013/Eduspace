@@ -36,7 +36,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Constants\" />
-    <Folder Include="Features\Lessons\" />
   </ItemGroup>
 
 </Project>
