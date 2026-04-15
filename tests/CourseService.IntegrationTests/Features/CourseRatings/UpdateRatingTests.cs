@@ -15,25 +15,24 @@ using System.Net.Http.Json;
 namespace CourseService.IntegrationTests.Features.CourseRatings;
 
 [Collection("Postgres collection")]
-public class CreateRatingTests
+public class UpdateRatingTests
 {
     private readonly HttpClient _client;
     private readonly TestWebApplicationFactory _factory;
 
-    public CreateRatingTests(PostgresContainerFixture postgres)
+    public UpdateRatingTests(PostgresContainerFixture postgres)
     {
         _factory = new TestWebApplicationFactory(postgres);
         _client = _factory.CreateClient();
     }
 
     [Fact]
-    public async Task ShouldReturnCourseRating_WhenRequestIsValid()
+    public async Task ShouldUpdateRating_WhenRequestIsValid()
     {
-        // Arrange
+        // Arrange 
         await _factory.ResetDatabaseAsync();
 
         var courseId = Guid.NewGuid();
-        var authorId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
         var dto = new CourseRatingDTO { Rating = 5 };
@@ -45,9 +44,9 @@ public class CreateRatingTests
             var course = new Course
             {
                 Id = courseId,
-                AuthorId = authorId,
-                Name = "Test Course",
-                Description = "Test Description",
+                AuthorId = Guid.NewGuid(),
+                Name = "Test",
+                Description = "Test",
                 Price = 0,
                 IsFree = true,
                 AvatarURL = "http://test.com",
@@ -55,13 +54,23 @@ public class CreateRatingTests
             };
 
             db.Courses.Add(course);
+
+            var rating = new CourseRating
+            {
+                CourseId = courseId,
+                UserId = userId,
+                Rating = 4,
+            };
+
+            db.CourseRatings.Add(rating);
+
             await db.SaveChangesAsync();
         }
 
-        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Post, $"/api/courses/{courseId}/ratings", userId, dto);
+        var averageRating = 5.0;
+        var amountRating = 1;
 
-        var expectedRating = 5;
-        var expectedAvatage = 1;
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Put, $"/api/courses/{courseId}/ratings", userId, dto);
 
         // Act
         var response = await _client.SendAsync(request);
@@ -70,103 +79,62 @@ public class CreateRatingTests
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await response.Content.ReadFromJsonAsync<CourseRatingResponse>();
-
         content.Should().NotBeNull();
-        content.AverageRating.Should().Be(expectedRating);
-        content.AmountRatings.Should().Be(expectedAvatage);
+        content.AverageRating.Should().Be(averageRating);
+        content.AmountRatings.Should().Be(amountRating);
 
         // Assert DB
         using (var assertScope = _factory.Services.CreateScope())
         {
             var db = assertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            var ratings = await db.CourseRatings.Where(x => x.CourseId == courseId).ToListAsync();
-
-            ratings.Should().HaveCount(1);
-            var rating = ratings.Single();
-
-            rating.Rating.Should().Be(expectedRating);
-            rating.UserId.Should().Be(userId);
-            rating.CourseId.Should().Be(courseId);
+            var updated = await db.CourseRatings
+                .SingleAsync(x => x.CourseId == courseId && x.UserId == userId);
+            updated.Rating.Should().Be(dto.Rating);
         }
     }
 
     [Fact]
-    public async Task ShouldReturnNotFound_WhenCourseDoesNotExist()
-    {
-        // Arrange
-        var courseId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-
-        var dto = new CourseRatingDTO { Rating = 5 };
-
-        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Post, $"/api/courses/{courseId}/ratings", userId, dto);
-
-        // Act 
-        var response = await _client.SendAsync(request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-        var content = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-
-        content.Should().NotBeNull();
-        content.Status.Should().Be((int)HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    public async Task ShouldReturnConflict_WhenRatingAlradyExist()
+    public async Task ShouldReturnNotFound_WhenRatingDoesNotExist()
     {
         // Arrange
         await _factory.ResetDatabaseAsync();
 
         var courseId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var authorId = Guid.NewGuid();
 
         var dto = new CourseRatingDTO { Rating = 5 };
 
-        using (var arrangeScope = _factory.Services.CreateScope())
+        using (var scope = _factory.Services.CreateScope())
         {
-            var db = arrangeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            
-            var course = new Course
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            db.Courses.Add(new Course
             {
                 Id = courseId,
-                AuthorId = authorId,
-                Name = "Test Course",
-                Description = "Test Description",
+                AuthorId = Guid.NewGuid(),
+                Name = "Test",
+                Description = "Test",
                 Price = 0,
                 IsFree = true,
                 AvatarURL = "http://test.com",
-                Status = CourseStatus.Published,
-                CourseRatings = new List<CourseRating>
-                {
-                    new CourseRating
-                    {
-                        CourseId = courseId,
-                        UserId = userId,
-                        Rating = 5
-                    }
-                }
-            };
+                Status = CourseStatus.Published
+            });
 
-            db.Courses.Add(course);
             await db.SaveChangesAsync();
         }
 
-        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Post, $"/api/courses/{courseId}/ratings", userId, dto);
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Put, $"/api/courses/{courseId}/ratings", userId, dto);
 
         // Act
         var response = await _client.SendAsync(request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-        var content = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-
-        content.Should().NotBeNull();
-        content.Status.Should().Be((int)HttpStatusCode.Conflict);
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem.Should().NotBeNull();
+        problem!.Status.Should().Be((int)HttpStatusCode.NotFound); 
     }
 
     [Fact]
@@ -178,12 +146,9 @@ public class CreateRatingTests
         var courseId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
-        var dto = new CourseRatingDTO
-        {
-            Rating = 6
-        };
+        var dto = new CourseRatingDTO { Rating = 6 };
 
-        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Post, $"/api/courses/{userId}/ratings", courseId, dto);
+        var request = HttpRequestFactory.CreateAuthorized(HttpMethod.Put, $"/api/courses/{courseId}/ratings", userId, dto);
 
         // Act
         var response = await _client.SendAsync(request);
@@ -193,7 +158,7 @@ public class CreateRatingTests
 
         var content = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         content.Should().NotBeNull();
-        content.Errors.Should().ContainKey(nameof(CourseRatingDTO.Rating));
+        content!.Errors.Should().ContainKey(nameof(CourseRatingDTO.Rating));
     }
 
     [Fact]
@@ -203,13 +168,10 @@ public class CreateRatingTests
         await _factory.ResetDatabaseAsync();
 
         var courseId = Guid.NewGuid();
-        
-        var dto = new CourseRatingDTO
-        {
-            Rating = 5
-        };
+        var userId = Guid.NewGuid();
+        var dto = new CourseRatingDTO { Rating = 5 };
 
-        var request = HttpRequestFactory.CreateUnauthorized(HttpMethod.Post, $"/api/courses/{courseId}/ratings", dto);
+        var request = HttpRequestFactory.CreateUnauthorized(HttpMethod.Put, $"/api/courses/{courseId}/ratings", dto);
 
         // Act
         var response = await _client.SendAsync(request);
