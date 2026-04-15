@@ -119,11 +119,13 @@ public class CourseRatingServiceTests
         var course = new Course
         {
             Id = courseId,
-            CourseRatings = new List<CourseRating>
-            {
-                new CourseRating { Rating = 3 },
-                new CourseRating { Rating = 5 }
-            }
+        };
+
+        var ratings = new List<CourseRating>
+        {
+            new CourseRating { CourseId = courseId, Rating = 3 },
+            new CourseRating { CourseId = courseId, Rating = 5 },
+            new CourseRating { CourseId = courseId, Rating = dto.Rating }
         };
 
         var courseKey = "test-key";
@@ -138,6 +140,10 @@ public class CourseRatingServiceTests
         _ratingRepositoryMock
             .Setup(x => x.GetRatingByCourseIdAndUserIdAsync(courseId, userId))
             .ReturnsAsync((CourseRating?)null);
+
+        _ratingRepositoryMock
+            .Setup(x => x.GetRatingsByCourseIdAsync(courseId))
+            .ReturnsAsync(ratings);
 
         _keyBuilderMock
             .Setup(x => x.GetCourseKey(courseId))
@@ -155,6 +161,7 @@ public class CourseRatingServiceTests
         _courseRepositoryMock.Verify(x => x.GetCourseByIdAsync(courseId), Times.Once());
         _ratingRepositoryMock.Verify(x => x.GetRatingByCourseIdAndUserIdAsync(courseId, userId), Times.Once());
         _ratingRepositoryMock.Verify(x => x.CreateRatingAsync(It.IsAny<CourseRating>()), Times.Once());
+        _ratingRepositoryMock.Verify(x => x.GetRatingsByCourseIdAsync(courseId), Times.Once());
         _keyBuilderMock.Verify(x => x.GetCourseKey(courseId), Times.Once());
         _cacheMock.Verify(x => x.RemoveAsync(courseKey), Times.Once());
     }
