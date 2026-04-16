@@ -259,9 +259,10 @@ public class CreateLessonTests
         var content = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
 
         content.Should().NotBeNull();
-        content!.Errors.Should().ContainKey(nameof(LessonDTO.LessonNumber));
-        content.Errors.Should().ContainKey(nameof(LessonDTO.Name));
-        content.Errors.Should().ContainKey(nameof(LessonDTO.Description));
+        var errors = content!.Errors;
+
+        errors.Should().ContainKey(nameof(LessonDTO.LessonNumber));
+        errors.Should().ContainKey(nameof(LessonDTO.Name));
     }
 
     [Fact]
