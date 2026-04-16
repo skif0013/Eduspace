@@ -15,10 +15,17 @@ public static class ResultExtensions
 
         var statusCode = HttpErrorMapper.Map(result.Error);
 
-        return controller.Problem(
-            title: result.Error.Code,
-            detail: result.Error.Description,
-            statusCode: statusCode);
+        var problem = new ProblemDetails
+        {
+            Title = result.Error.Code,
+            Detail = result.Error.Description,
+            Status = statusCode
+        };
+
+        return new ObjectResult(problem)
+        {
+            StatusCode = statusCode
+        };
     }
 
     public static IActionResult ToActionResult<T>(this Result<T> result, ControllerBase controller)
@@ -30,24 +37,38 @@ public static class ResultExtensions
 
         var statusCode = HttpErrorMapper.Map(result.Error);
 
-        return controller.Problem(
-            title: result.Error.Code,
-            detail: result.Error.Description,
-            statusCode: statusCode);
+        if (statusCode == StatusCodes.Status400BadRequest)
+        {
+            var validation = new ValidationProblemDetails
+            {
+                Title = result.Error.Code,
+                Detail = result.Error.Description,
+                Status = statusCode
+            };
+
+            return new BadRequestObjectResult(validation);
+        }
+
+        var problem = new ProblemDetails
+        {
+            Title = result.Error.Code,
+            Detail = result.Error.Description,
+            Status = statusCode
+        };
+
+        return new ObjectResult(problem)
+        {
+            StatusCode = statusCode
+        };
     }
 
     public static IActionResult ToCreatedActionResult<T>(this Result<T> result, ControllerBase controller, string location)
     {
-        if (result.IsSuccess)
+        if (!result.IsSuccess)
         {
-            return controller.Created(location, result.Value);
+            return result.ToActionResult(controller);
         }
 
-        var statusCode = HttpErrorMapper.Map(result.Error);
-
-        return controller.Problem(
-            title: result.Error.Code,
-            detail: result.Error.Description,
-            statusCode: statusCode);
+        return controller.Created(location, result.Value);
     }
 }

@@ -4,7 +4,6 @@ using CourseService.Domain.Enums;
 using CourseService.Infrastructure.Data;
 using CourseService.IntegrationTests.Common;
 using CourseService.IntegrationTests.Common.Fixtures;
-using CourseService.IntegrationTests.Common.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -90,7 +89,7 @@ namespace CourseService.IntegrationTests.Features.Lessons
 
             using (var arrengeScope = _factory.Services.CreateScope())
             {
-                var db = assertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var db = arrengeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
                 var course = new Course
                 {
@@ -108,7 +107,7 @@ namespace CourseService.IntegrationTests.Features.Lessons
 
                 var lesson = new Lesson
                 {
-                    Id = anotherLessonId,
+                    Id = existingLessonId,
                     CourseId = courseId,
                     Name = "Test Lesson",
                     Description = "Test Description",
