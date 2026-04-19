@@ -44,14 +44,19 @@ public class QuestionService : IQuestionService
     
     public Task<QuestionResponseDTO> GetQuestionByIdAsync(Guid id)
     {
-        var find = _questionRepository.FindByIdAsync(id);
-        
+        return GetQuestionByIdInternalAsync(id);
+    }
+
+    private async Task<QuestionResponseDTO> GetQuestionByIdInternalAsync(Guid id)
+    {
+        var find = await _questionRepository.FindByIdAsync(id);
+
         if (find == null)
         {
             throw new Exception("Question not found");
         }
-        
-        return Task.FromResult(_questionMapper.ToResponse(find.Result));
+
+        return _questionMapper.ToResponse(find);
     }
 
     public async Task<IReadOnlyCollection<QuestionResponseDTO>> GetAllQuestionsAsync()
