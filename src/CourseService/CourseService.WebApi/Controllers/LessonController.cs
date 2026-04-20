@@ -56,7 +56,11 @@ public class LessonController : ControllerBase
         var authorId = User.GetUserId();
         var result = await _lessonService.CreateLessonAsync(lessonDTO, courseId, authorId);
 
-        return result.ToCreatedActionResult(this, $"/api/courses/{courseId}/lessons/{result.Value?.Id}");
+        if (!result.IsSuccess)
+        {
+            return result.ToActionResult(this);
+        }
+        return Created($"/api/courses/{courseId}/lessons/{result.Value?.Id}", result.Value);
     }
 
     /// <summary>

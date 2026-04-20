@@ -153,7 +153,7 @@ public class LessonService : ILessonService
         }
 
         var response = _mapper.Map<LessonResponse>(lesson);
-
+        
         return Result<LessonResponse>.Success(response);
     }
 

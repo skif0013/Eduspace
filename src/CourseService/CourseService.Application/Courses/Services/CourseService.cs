@@ -67,8 +67,8 @@ public class CourseService : ICourseService
         if (wasPublished)
         {
             await _cache.IncrementCatalogVersionAsync();
-            var cackeKey = _keyBuilder.GetCourseKey(courseId);
-            await _cache.RemoveAsync(cackeKey);
+            var cacheKey = _keyBuilder.GetCourseKey(courseId);
+            await _cache.RemoveAsync(cacheKey);
         }
 
         var @event = new CourseArchivedEvent(course.Id, course.AuthorId);
@@ -92,7 +92,7 @@ public class CourseService : ICourseService
 
         var response = _mapper.Map<CourseResponse>(createdCourse);
 
-        var @event = new CourseCreatedEvent(course.Id, course.AuthorId);
+        var @event = new CourseCreatedEvent(createdCourse.Id, createdCourse.AuthorId);
         var json = JsonSerializer.Serialize(@event);
         await _publisher.PublishAsync("course.created", json);
 
@@ -244,6 +244,7 @@ public class CourseService : ICourseService
         course.Name = courseDTO.Name;
         course.Description = courseDTO.Description;
         course.Price = courseDTO.Price;
+        course.IsFree = courseDTO.IsFree;
         course.AvatarURL = courseDTO.AvatarURL;
         await _courseRepository.UpdateCourseAsync(course);
 

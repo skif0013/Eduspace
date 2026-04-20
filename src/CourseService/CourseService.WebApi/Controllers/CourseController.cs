@@ -100,6 +100,7 @@ public class CourseController : ControllerBase
         var result = await _courseService.UpdateCourseAsync(courseDTO, courseId, authorId);
 
         return result.ToActionResult(this);
+        //return Ok("test");
     }
 
     /// <summary>

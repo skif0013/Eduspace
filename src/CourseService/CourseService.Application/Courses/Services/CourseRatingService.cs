@@ -55,7 +55,9 @@ public class CourseRatingService : ICourseRatingService
         };
         await _ratingRepository.CreateRatingAsync(rating);
 
-        var (average, amount) = CourseRatingExtensions.CalculateRating(course.CourseRatings);
+        var ratings = await _ratingRepository.GetRatingsByCourseIdAsync(courseId);
+
+        var (average, amount) = CourseRatingExtensions.CalculateRating(ratings);
 
         var response = new CourseRatingResponse
         {

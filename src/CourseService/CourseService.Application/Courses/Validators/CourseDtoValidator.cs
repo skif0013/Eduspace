@@ -15,9 +15,16 @@ public class CourseDtoValidator : AbstractValidator<CourseDTO>
             .MaximumLength(500);
 
         RuleFor(x => x.Price)
+            .Equal(0)
+            .When(x => x.IsFree)
+            .WithMessage("Price must be 0. When Course is free");
+
+        RuleFor(x => x.Price)
             .GreaterThanOrEqualTo(0)
             .LessThanOrEqualTo(1_000_000)
-            .WithMessage("Price must be greater than 0 and less than or equal to 1 000 000");
+            .When(x => !x.IsFree)
+            .WithMessage("Price must be greater than 0 and less than or equal to 1 000 000.  When Course is not free");
+
 
         RuleFor(x => x.AvatarURL)
             .MaximumLength(1000)
