@@ -235,3 +235,4 @@ docker-compose.override.yml
 *.log
 replay_pid*.log
 .idea/
+src/.DS_Store
