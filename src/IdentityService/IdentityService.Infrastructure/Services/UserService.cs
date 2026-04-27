@@ -1,5 +1,7 @@
+using System.Text.Json;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
+using IdentityService.Application.Interfaces.Repositories;
 using IdentityService.Application.Interfaces.Services;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Results;
@@ -17,18 +19,24 @@ public class UserService : IUserService
     private readonly RoleManager<RoleIdentity> _roleManager;
     private readonly ITokenService _tokenService;
     private readonly IMessageService _messageService;
+    private readonly IOutboxRepository _outboxRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UserService(
         UserManager<User> userManager,
         RoleManager<RoleIdentity> roleManager,
         ITokenService tokenService,
-        IMessageService messageService
+        IMessageService messageService,
+        IOutboxRepository outboxRepository,
+        IUnitOfWork unitOfWork
     )
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _tokenService = tokenService;
         _messageService = messageService;
+        _outboxRepository = outboxRepository;
+        _unitOfWork = unitOfWork;
     }
     
     public async Task<Result<string>> RegisterAsync(CreateUserDto createUserDto)
@@ -47,18 +55,6 @@ public class UserService : IUserService
         }
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        Console.WriteLine(token);
-        
-        /*using var client = new HttpClient();
-        string url = "http://emailservice:5003/api/Email/verify";
-        string json = $@"{{
-            ""to"": ""{request.Email}"",
-            ""code"": ""{token}""
-        }}";*/
-
-        //var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        //var response = await client.PostAsync(url, content);
         
         var confirmEmailEvent = new EmailVerifyEvent()
         {
@@ -67,7 +63,17 @@ public class UserService : IUserService
             VerificationLink = "",
             Code = token
         };
-        await _messageService.SendMessageAsync("email:verify", confirmEmailEvent);
+        
+        var outboxMessage = new OutboxMessage()
+        {
+            Id = Guid.NewGuid(),
+            Type = "UserCreated",
+            Content = JsonSerializer.Serialize(confirmEmailEvent),
+            OccurredOnUtc = DateTime.UtcNow
+        };
+
+        await _unitOfWork.OutboxRepository.AddAsync(outboxMessage);
+        await _unitOfWork.Commit();
         
         return Result<string>.Success("user created successfully");
     }
@@ -117,7 +123,25 @@ public class UserService : IUserService
         }
         
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        Console.WriteLine(token);
+        
+        var confirmEmailEvent = new EmailVerifyEvent()
+        {
+            To = user.Email,
+            UserName = user.UserName,
+            VerificationLink = "",
+            Code = token
+        };
+        
+        var outboxMessage = new OutboxMessage()
+        {
+            Id = Guid.NewGuid(),
+            Type = "UserForgotPassword",
+            Content = JsonSerializer.Serialize(confirmEmailEvent),
+            OccurredOnUtc = DateTime.UtcNow
+        };
+
+        await _unitOfWork.OutboxRepository.AddAsync(outboxMessage);
+        await _unitOfWork.Commit();
         
         return Result<string>.Success("Password reset successfully");
     }
@@ -165,7 +189,17 @@ public class UserService : IUserService
             Email = user.Email,
             EventType = "user:created"
         };
-        await _messageService.SendMessageAsync("user:created", message);
+        
+        var outboxMessage = new OutboxMessage()
+        {
+            Id = Guid.NewGuid(),
+            Type = "user:created",
+            Content = JsonSerializer.Serialize(message),
+            OccurredOnUtc = DateTime.UtcNow
+        };
+        
+        await _unitOfWork.OutboxRepository.AddAsync(outboxMessage);
+        await _unitOfWork.Commit();
         
         return Result<string>.Success("Email confirmed");
     }

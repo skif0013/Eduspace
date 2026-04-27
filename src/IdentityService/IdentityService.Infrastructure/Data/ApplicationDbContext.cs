@@ -1,3 +1,4 @@
+using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

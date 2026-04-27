@@ -11,6 +11,8 @@ using IdentityService.Infrastructure.Redis;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using DotNetEnv;
+using IdentityService.Infrastructure.BackgroundJobs;
+using IdentityService.Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -119,12 +121,16 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
-
+builder.Services.AddScoped<IOutboxRepository, OutboxRepository>(); 
 
 builder.Services.AddSingleton<IMessageHandler, UserUpdatedHandler>();
 builder.Services.AddHostedService<RedisSubscriberService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddHostedService<ProcessOutboxMessagesJob>();
 
 var app = builder.Build();
 
