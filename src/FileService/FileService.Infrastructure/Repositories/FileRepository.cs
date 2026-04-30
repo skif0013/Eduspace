@@ -16,9 +16,10 @@ public class FileRepository : IFileRepository
     }
 
     public async Task AddAsync(UserFileMetadata file, CancellationToken ct = default)
-    {
-      await _dbContext.UserFileMetadatas.AddAsync(file);
+    { 
+        await _dbContext.UserFileMetadatas.AddAsync(file);
     }
+
 
     public Task<List<UserFileMetadata>> GetFilesByUserIdAsync(Guid userId, CancellationToken ct = default)
     {
