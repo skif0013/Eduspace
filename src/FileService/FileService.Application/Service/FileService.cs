@@ -2,7 +2,6 @@
 using FileService.Application.Contracts.Repositories;
 using FileService.Application.DTOs.BlobDTOs;
 using FileService.Domain.Models;
-using Microsoft.AspNetCore.StaticFiles;
 
 namespace FileService.Application.Service;
 
