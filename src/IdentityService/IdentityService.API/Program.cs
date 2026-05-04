@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using IdentityService.API.Middleware;
 using IdentityService.Application.Interfaces;
@@ -11,32 +12,63 @@ using IdentityService.Infrastructure.Redis;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using DotNetEnv;
+using IdentityService.Application.Common.Models;
 using IdentityService.Infrastructure.BackgroundJobs;
 using IdentityService.Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsDevelopment())
+{
+    var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", ".env");
+    Env.Load(envPath);
+}
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(option =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Identity Service API", Version = "v1" });
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Title = "IdentityService API"
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
     });
 });
 
-builder.WebHost.ConfigureKestrel(options =>
+/*builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5010);
     options.ListenAnyIP(5011);
-});
+});*/
 
 #region config jwt
 var validIssuer = builder.Configuration.GetValue<string>("JwtTokenSettings:ValidIssuer");
@@ -64,25 +96,36 @@ builder.Services.AddAuthentication(options => {
                 Encoding.UTF8.GetBytes(symmetricSecurityKey)
             ),
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("-------------------------------------------");
+                Console.WriteLine($"Auth Failed. Exception: {context.Exception.Message}");
+                // Если проблема в подписи, тут будет написано "Signature validation failed"
+                Console.WriteLine("-------------------------------------------");
+                return Task.CompletedTask;
+            }
+        };
     });
 #endregion
+
+// ПОСМОТРИ В КОНСОЛЬ ПРИ ЗАПУСКЕ:
+Console.WriteLine($"[CONFIG] Issuer: {validIssuer}");
+Console.WriteLine($"[CONFIG] Audience: {validAudience}");
+Console.WriteLine($"[CONFIG] Key Length: {symmetricSecurityKey?.Length ?? 0}");
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-if (builder.Environment.IsDevelopment())
-{
-    var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
-    Env.Load(envPath);
-}
 
 
-var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
-var redisUser = Environment.GetEnvironmentVariable("RedisUser");
-var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
 
+var redisEndPoint = builder.Configuration["RedisEndPoint"];
+var redisUser = builder.Configuration["RedisUser"];
+var redisPassword = builder.Configuration["RedisPassword"];
 
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -98,6 +141,8 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 });
 
 builder.Services.AddSingleton<IRedisMessageBroker, RedisMessageBroker>();
+
+builder.Services.AddScoped<UserContext>();
 
 builder.Services.AddIdentity<User, RoleIdentity>(options =>
 {
@@ -146,10 +191,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<UserContextMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {

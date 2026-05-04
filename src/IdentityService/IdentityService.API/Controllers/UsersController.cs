@@ -17,14 +17,14 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<Result<string>> Register([FromBody] CreateUserDto createUserDto)
-    {
+    public async Task<Result<string>> Register([FromBody] CreateUserDto createUserDto)    // TODO почитать про паттерн резалт
+    {                                                                                     // TODO почитать про validateantiforgerytoken
         var result = await _userService.RegisterAsync(createUserDto);
         return result;
     }
 
     [HttpPost("login")]
-    public async Task<Result<TokenResponseDto>> LoginAsync([FromBody] AuthRequest request)
+    public async Task<Result<TokenResponseDto>> LoginAsync([FromBody] AuthRequest request) 
     {
         var result = await _userService.AuthenticateAsync(request);
         return result;
@@ -37,7 +37,7 @@ public class UsersController : ControllerBase
         return result;
     }
 
-    [HttpPost("ResetPassword")]
+    [HttpPost("ResetPassword")] // TODO разобраться с хттп методами
     public async Task<Result<string>> ResetPasswordAsync([FromBody] ResetPasswordDto request)
     {
         var result = await _userService.ResetPasswordAsync(request);

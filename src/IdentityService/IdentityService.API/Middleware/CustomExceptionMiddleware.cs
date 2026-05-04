@@ -3,7 +3,7 @@ using IdentityService.Domain.Results;
 
 namespace IdentityService.API.Middleware
 {
-    public class CustomExceptionMiddleware
+    public class CustomExceptionMiddleware //TODO почитать про праврильную работу со статус кодами и их выдачей в бекенд приложении асп.нет кор
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<CustomExceptionMiddleware> _logger;

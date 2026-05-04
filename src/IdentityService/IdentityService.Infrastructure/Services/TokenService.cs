@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using IdentityService.Application.Common.Models;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
 using IdentityService.Application.Interfaces.Repositories;
@@ -12,6 +13,7 @@ using IdentityService.Infrastructure.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace IdentityService.Infrastructure.Services;
 
@@ -20,12 +22,16 @@ public class TokenService : ITokenService
     private readonly IConfiguration _configuration;
     private readonly ITokenRepository _tokenRepository;
     private readonly UserManager<User> _userManager;
+    private readonly UserContext _userContext;
+    private readonly ILogger<TokenService> _logger;
 
-    public TokenService(IConfiguration configuration, ITokenRepository tokenRepository, UserManager<User> userManager)
+    public TokenService(IConfiguration configuration, ITokenRepository tokenRepository, UserManager<User> userManager, UserContext userContext, ILogger<TokenService> logger)
     {
         _configuration = configuration;
         _tokenRepository = tokenRepository;
         _userManager = userManager;
+        _userContext = userContext;
+        _logger = logger;
     }
     
     public async Task<TokenResponseDto> GetTokens(UserDto user)
@@ -103,6 +109,8 @@ public class TokenService : ITokenService
         
         RefreshToken.ExpiresAt = DateTime.UtcNow;
         await _tokenRepository.UpdateRefreshTokenAsync(RefreshToken);
+        
+        _logger.LogCritical("Refresh token revoked for user {UserId}", _userContext.UserId);
         
         return Result<bool>.Success(true);
     }

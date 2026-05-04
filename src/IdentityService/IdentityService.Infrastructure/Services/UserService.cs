@@ -54,7 +54,8 @@ public class UserService : IUserService
             return Result<string>.Failure($"Error creating user: {errors}");
         }
 
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user); 
+        // TODO вывести токен через встроенный класс Ilogger в консоль
         
         var confirmEmailEvent = new EmailVerifyEvent()
         {
@@ -180,7 +181,7 @@ public class UserService : IUserService
             Console.WriteLine("Role doesn't exist");
         }
 
-        await _userManager.AddToRoleAsync(user, roleExists.Result.Name.ToString());
+        await _userManager.AddToRoleAsync(user, roleExists.Result.Name.ToString()); // TODO прееделать этот асинхронный вызов
         
         var message = new CreateUserDTO()
         {
