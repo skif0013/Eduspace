@@ -8,4 +8,6 @@ public interface ITokenService
    
    Guid GetUserIdFromToken(string token);
    
+   string GetUserEmailFromToken(string token);
+   
 }

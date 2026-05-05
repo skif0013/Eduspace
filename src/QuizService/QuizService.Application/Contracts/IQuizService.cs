@@ -19,5 +19,5 @@ public interface IQuizService
     
     Task<QuizResponseDTO> PublishQuizAsync(Guid quizId);
     
-    Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId);
+    Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId, string token);
 }
