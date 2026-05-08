@@ -7,9 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\QuizService\QuizService.Application\QuizService.Application.csproj" />
         <ProjectReference Include="..\NotificationService.Domain\NotificationService.Domain.csproj" />
         <ProjectReference Include="..\NotificationService.Application\NotificationService.Application.csproj" />
+        <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -9,11 +9,12 @@ using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
 using QuizService.Infrastructure.Redis;
 using QuizService.Infrastructure.Redis.Configuration;
-using QuizService.Infrastructure.Redis.Serialization;
 using QuizService.Infrastructure.Repositories;
 using QuizService.Infrastructure.Persistence.UnitOfWork;
 using QuizService.Application.Repositories;
 using QuizService.Application.Services;
+using BuildingBlocks.Redis.Contracts;
+using BuildingBlocks.Redis.Serialization;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);

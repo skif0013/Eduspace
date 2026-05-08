@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
 using NotificationService.Infrastructure.Redis;
-using QuizService.Application.DTOs.EventDTOs;
+using BuildingBlocks.Redis.Events;
 
-namespace NotificationService.Infrastructure.Services;
+namespace NotificationService.Infrastructure.Service;
 public class QuizFinishedEmailHandler : ScopedMessageHandler
 {
     public QuizFinishedEmailHandler(IServiceScopeFactory scopeFactory)
