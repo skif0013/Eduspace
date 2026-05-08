@@ -1,16 +1,12 @@
-﻿using QuizService.Application.Contracts;
-using QuizService.Application.DTOs.EventDTOs;
-using QuizService.Application.Exceptions;
+﻿using BuildingBlocks.Redis.Contracts;
+using BuildingBlocks.Redis.Events;
+using BuildingBlocks.Redis.Exceptions;
 using QuizService.Infrastructure.Redis.Configuration;
-using QuizService.Infrastructure.Redis.Serialization;
+using BuildingBlocks.Redis.Serialization;
 using StackExchange.Redis;
 
 namespace QuizService.Infrastructure.Redis;
 
-/// <summary>
-/// Публикует события завершения квиза в Redis Stream
-/// Отвечает за надёжную доставку событий в систему
-/// </summary>
 public sealed class QuizFinishedEventStreamPublisher : IQuizFinishedEventPublisher
 {
     private readonly IDatabase _database;

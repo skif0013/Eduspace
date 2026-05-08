@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using StackExchange.Redis;
 
-namespace QuizService.Infrastructure.Redis.Serialization;
+namespace BuildingBlocks.Redis.Serialization;
 
 public interface IStreamEventSerializer
 {
