@@ -214,3 +214,17 @@ volumes:
       context: .
       dockerfile: src/FileService/FileService.WebApi/Dockerfile
 
+services:
+  identityservice.api:
+    image: identityservice.api
+    build:
+      context: .
+      dockerfile: src/IdentityService.API/Dockerfile
+
+services:
+  identityservice.api:
+    image: identityservice.api
+    build:
+      context: .
+      dockerfile: src/IdentityService/IdentityService.API/Dockerfile
+

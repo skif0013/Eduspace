@@ -44,7 +44,7 @@ builder.Services.AddHostedService<RedisSubscriberService>();
 //builder.Services.AddScoped<IEventHandler, UserCreatedEventHandler>();
 //builder.Services.AddScoped<IEventHandler, UserUpdatedEventHandler>();
 
-var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", ".env");
 Env.Load(envPath);
 
 
