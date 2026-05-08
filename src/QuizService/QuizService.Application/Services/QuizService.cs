@@ -1,7 +1,8 @@
-﻿using QuizService.Application.Contracts;
+﻿using BuildingBlocks.Redis.Contracts;
+using BuildingBlocks.Redis.Events;
+using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.DTOs;
-using QuizService.Application.DTOs.EventDTOs;
 using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
 using QuizService.Application.Exceptions;
