@@ -6,10 +6,6 @@ using StackExchange.Redis;
 
 namespace NotificationService.Infrastructure.Redis;
 
-/// <summary>
-/// Фоновый сервис для чтения событий из Redis Stream
-/// Использует consumer group для надёжной обработки с поддержкой retry
-/// </summary>
 public class RedisStreamSubscriberService : BackgroundService
 {
     private readonly IConnectionMultiplexer _multiplexer;
@@ -44,19 +40,7 @@ public class RedisStreamSubscriberService : BackgroundService
     private async Task InitializeConsumerGroupAsync()
     {
         var db = _multiplexer.GetDatabase();
-
-        try
-        {
-            await db.StreamCreateConsumerGroupAsync(_configuration.StreamKey, _configuration.ConsumerGroupName, "$");
-        }
-        catch (RedisCommandException ex) when (ex.Message.Contains("BUSYGROUP"))
-        {
-            _logger.LogDebug("Consumer group {GroupName} already exists", _configuration.ConsumerGroupName);
-        }
-        catch (RedisException ex)
-        {
-            throw new ConsumerGroupInitializationException(_configuration.ConsumerGroupName, _configuration.StreamKey, ex);
-        }
+        await db.StreamCreateConsumerGroupAsync(_configuration.StreamKey, _configuration.ConsumerGroupName, "$");
     }
 
     private async Task ConsumeMessagesAsync(CancellationToken stoppingToken)
@@ -73,15 +57,7 @@ public class RedisStreamSubscriberService : BackgroundService
                 continue;
             }
 
-            try
-            {
-                await ProcessMessagesAsync(messages, db);
-            }
-            catch (RedisConnectionException ex)
-            {
-                _logger.LogError(ex, "Redis connection error");
-                await Task.Delay(ErrorDelayMilliseconds, stoppingToken);
-            }
+            await ProcessMessagesAsync(messages, db);
         }
     }
 
