@@ -118,7 +118,7 @@ services:
       dockerfile: Dockerfile
       target: final-file
     ports:
-      - "5005:80"
+      - "5005:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=file-db;Port=5432;Database=FileDB;Username=postgres;Password=postgres
@@ -150,8 +150,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=quiz-db;Port=5432;Database=quizdb;Username=postgres;Password=123
+      - Redis__ConnectionString=redis:6379
     depends_on:
       - quiz-db
+      - redis
     restart: always
     networks:
       - eduspace-net
@@ -177,6 +179,9 @@ services:
       - "5007:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - Redis__ConnectionString=redis:6379
+    depends_on:
+      - redis
     restart: always
     networks:
       - eduspace-net
@@ -202,15 +207,3 @@ volumes:
   file-db-data:
   quiz-db-data:
   redis-data:
-  fileservice.webapi:
-    image: fileservice.webapi
-    build:
-      context: .
-      dockerfile: src/FileService/FileService.WebApi/Dockerfile
-
-  fileservice.webapi:
-    image: fileservice.webapi
-    build:
-      context: .
-      dockerfile: src/FileService/FileService.WebApi/Dockerfile
-

@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Redis", "src\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj", "{F0F0F0F0-F0F0-F0F0-F0F0-F0F0F0F0F0F3}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuthService", "AuthService", "{54C27F26-71CB-9721-02CF-9E5332C2F895}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.API", "src\AuthService\AuthService.API\AuthService.API.csproj", "{F9F6448E-22FB-4AB2-9ABA-FA0D8C352F68}"
@@ -83,6 +85,10 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F0F0F0F0-F0F0-F0F0-F0F0-F0F0F0F0F0F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0F0F0F0-F0F0-F0F0-F0F0-F0F0F0F0F0F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0F0F0F0-F0F0-F0F0-F0F0-F0F0F0F0F0F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0F0F0F0-F0F0-F0F0-F0F0-F0F0F0F0F0F3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F9F6448E-22FB-4AB2-9ABA-FA0D8C352F68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F9F6448E-22FB-4AB2-9ABA-FA0D8C352F68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9F6448E-22FB-4AB2-9ABA-FA0D8C352F68}.Debug|x64.ActiveCfg = Debug|Any CPU
