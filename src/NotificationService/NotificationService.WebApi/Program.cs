@@ -73,6 +73,8 @@ static void RegisterRedisServices(IServiceCollection services)
 
     services.AddSingleton(redisStreamConfig);
 
+    services.AddSingleton<RedisMessageBroker>();
+
     services.AddSingleton<IConnectionMultiplexer>(sp =>
     {
         var config = new ConfigurationOptions
