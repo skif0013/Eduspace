@@ -13,7 +13,7 @@ public class QuizFinishedEmailHandler : ScopedMessageHandler
     {
     }
 
-    public override string Channel => "quiz:finished:v1";
+    public override string Channel => "quiz.finished";
 
     protected override async Task HandleScopedAsync(string message, IServiceProvider serviceProvider)
     {
