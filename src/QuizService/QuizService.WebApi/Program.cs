@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +19,16 @@ using BuildingBlocks.Redis.Serialization;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Try to load .env if it exists (for local development)
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+if (File.Exists(envPath))
+{
+    DotNetEnv.Env.Load(envPath);
+}
+
+builder.Configuration.AddEnvironmentVariables();
+
 var configuration = builder.Configuration;
 
 var connectionString = configuration.GetConnectionString("DefaultConnection")

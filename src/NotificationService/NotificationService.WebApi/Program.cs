@@ -18,8 +18,12 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5006);
 });
 
-var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
-Env.Load(envPath);
+// Try to load .env if it exists (for local development)
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+if (File.Exists(envPath))
+{
+    DotNetEnv.Env.Load(envPath);
+}
 
 RegisterEmailServices(builder.Services);
 RegisterRedisServices(builder.Services);

@@ -110,34 +110,6 @@
     networks:
       - eduspace-net
 
-  file-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: final-file
-    ports:
-      - "5005:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=file-db;Port=5432;Database=FileDB;Username=postgres;Password=postgres
-    depends_on:
-      - file-db
-    restart: always
-    networks:
-      - eduspace-net
-
-  file-db:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: FileDB
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - file-db-data:/var/lib/postgresql/data
-    restart: always
-    networks:
-      - eduspace-net
-
   quiz-service:
     build:
       context: .
@@ -177,12 +149,43 @@
       - "5007:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - Redis__ConnectionString=redis:6379
+    env_file:
+      - .env
     depends_on:
       - redis
     restart: always
     networks:
       - eduspace-net
+
+  file-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final-file
+    ports:
+      - "5005:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    env_file:
+      - .env
+    depends_on:
+      - file-db
+    restart: always
+    networks:
+      - eduspace-net
+
+  file-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: fileservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123"
+    volumes:
+      - file-db-data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - eduspace-net
+      
 
   redis:
     image: redis:7-alpine

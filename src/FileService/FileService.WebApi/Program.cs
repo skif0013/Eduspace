@@ -1,20 +1,29 @@
 using Azure.Storage.Blobs;
+using DotNetEnv;
 using FileService.Application.Contracts.Repositories;
 using FileService.Application.Mapper;
 using FileService.Application.Service;
 using FileService.Infrastructure.Data;
 using FileService.Infrastructure.Repositories;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Try to load .env if it exists (for local development)
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+if (File.Exists(envPath))
+{
+    DotNetEnv.Env.Load(envPath);
+}
 
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5010);
     options.ListenAnyIP(5011);
 });
+
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
