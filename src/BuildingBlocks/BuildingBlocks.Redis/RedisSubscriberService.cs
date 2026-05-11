@@ -40,7 +40,28 @@ public class RedisStreamSubscriberService : BackgroundService
     private async Task InitializeConsumerGroupAsync()
     {
         var db = _multiplexer.GetDatabase();
-        await db.StreamCreateConsumerGroupAsync(_configuration.StreamKey, _configuration.ConsumerGroupName, "$");
+
+        try
+        {
+            await db.StreamCreateConsumerGroupAsync(
+                _configuration.StreamKey,
+                _configuration.ConsumerGroupName,
+                "$",
+                createStream: true);
+
+            _logger.LogInformation(
+                "Consumer group {Group} created for stream {Stream}",
+                _configuration.ConsumerGroupName,
+                _configuration.StreamKey);
+        }
+        catch (RedisServerException ex)
+            when (ex.Message.Contains("BUSYGROUP"))
+        {
+            _logger.LogInformation(
+                "Consumer group {Group} already exists for stream {Stream}",
+                _configuration.ConsumerGroupName,
+                _configuration.StreamKey);
+        }
     }
 
     private async Task ConsumeMessagesAsync(CancellationToken stoppingToken)
