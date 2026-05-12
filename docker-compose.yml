@@ -14,8 +14,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
-      - auth-service
-      - user-service
+      - identity-service
       - file-service
       - course-service
       - quiz-service
@@ -24,60 +23,32 @@ services:
     networks:
       - eduspace-net
 
-  auth-service:
+  identity-service:
     build:
       context: .
       dockerfile: Dockerfile
-      target: final-auth
+      target: final-identity
     ports:
       - "5001:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=auth-db;Port=5432;Database=authservice;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=identity-db;Port=5432;Database=IdentityService;Username=postgres;Password=postgres
       - Redis__ConnectionString=redis:6379
     depends_on:
-      - auth-db
+      - identity-db
       - redis
     restart: always
     networks:
       - eduspace-net
 
-  auth-db:
+  identity-db:
     image: postgres:16
     environment:
-      POSTGRES_DB: authservice
+      POSTGRES_DB: IdentityService
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - auth-db-data:/var/lib/postgresql/data
-    restart: always
-    networks:
-      - eduspace-net
-
-  user-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: final-user
-    ports:
-      - "5003:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=user-db;Port=5432;Database=UserDB;Username=postgres;Password=postgres
-    depends_on:
-      - user-db
-    restart: always
-    networks:
-      - eduspace-net
-
-  user-db:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: UserDB
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - user-db-data:/var/lib/postgresql/data
+      - identity-db-data:/var/lib/postgresql/data
     restart: always
     networks:
       - eduspace-net
@@ -196,35 +167,9 @@ networks:
     driver: bridge
 
 volumes:
-  auth-db-data:
-  user-db-data:
+  identity-db-data:
   course-db-data:
   file-db-data:
   quiz-db-data:
   redis-data:
-  fileservice.webapi:
-    image: fileservice.webapi
-    build:
-      context: .
-      dockerfile: src/FileService/FileService.WebApi/Dockerfile
-
-  fileservice.webapi:
-    image: fileservice.webapi
-    build:
-      context: .
-      dockerfile: src/FileService/FileService.WebApi/Dockerfile
-
-services:
-  identityservice.api:
-    image: identityservice.api
-    build:
-      context: .
-      dockerfile: src/IdentityService.API/Dockerfile
-
-services:
-  identityservice.api:
-    image: identityservice.api
-    build:
-      context: .
-      dockerfile: src/IdentityService/IdentityService.API/Dockerfile
-
+  

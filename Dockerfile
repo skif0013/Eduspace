@@ -11,18 +11,18 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-auth
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/AuthService/AuthService.API/AuthService.API.csproj", "src/AuthService/AuthService.API/"]
-COPY ["src/AuthService/AuthService.Application/AuthService.Application.csproj", "src/AuthService/AuthService.Application/"]
-COPY ["src/AuthService/AuthService.Domain/AuthService.Domain.csproj", "src/AuthService/AuthService.Domain/"]
-COPY ["src/AuthService/AuthService.Infrastructure/AuthService.Infrastructure.csproj", "src/AuthService/AuthService.Infrastructure/"]
-RUN dotnet restore "src/AuthService/AuthService.API/AuthService.API.csproj"
-COPY src/AuthService/ src/AuthService/
-WORKDIR /src/src/AuthService/AuthService.API
-RUN dotnet publish "AuthService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+COPY ["src/IdentityService/IdentityService.API/IdentityService.API.csproj", "src/IdentityService/IdentityService.API/"]
+COPY ["src/IdentityService/IdentityService.Application/IdentityService.Application.csproj", "src/IdentityService/IdentityService.Application/"]
+COPY ["src/IdentityService/IdentityService.Domain/IdentityService.Domain.csproj", "src/IdentityService/IdentityService.Domain/"]
+COPY ["src/IdentityService/IdentityService.Infrastructure/IdentityService.Infrastructure.csproj", "src/IdentityService/IdentityService.Infrastructure/"]
+RUN dotnet restore "src/IdentityService/IdentityService.API/IdentityService.API.csproj"
+COPY src/IdentityService/ src/IdentityService/
+WORKDIR /src/src/IdentityService/IdentityService.API
+RUN dotnet publish "IdentityService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM base9 AS final-auth
+FROM base9 AS final-identity
 COPY --from=build-auth /app/publish .
-ENTRYPOINT ["dotnet", "AuthService.API.dll"]
+ENTRYPOINT ["dotnet", "IdentityService.API.dll"]
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-user
 ARG BUILD_CONFIGURATION=Release
