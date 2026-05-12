@@ -8,7 +8,7 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-auth
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-identity
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/IdentityService/IdentityService.API/IdentityService.API.csproj", "src/IdentityService/IdentityService.API/"]

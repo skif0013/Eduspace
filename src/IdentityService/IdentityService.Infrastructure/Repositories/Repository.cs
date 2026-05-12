@@ -34,7 +34,7 @@ public class Repository<T> : IRepository<T> where T : class
         _dbSet.Update(entity);
     }
 
-    public async Task DeleteAsync(T entity)
+    public void Delete(T entity)
     {
         _dbSet.Remove(entity);
     }
