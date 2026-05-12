@@ -1,6 +1,6 @@
 ﻿namespace IdentityService.Domain.Results;
 
-public class Result<T> 
+public class Result<T>
 {
     public T? Data { get; set; }
     public bool IsError { get; set; }

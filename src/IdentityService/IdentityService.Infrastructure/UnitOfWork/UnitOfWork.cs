@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
     }
     
     public IOutboxRepository OutboxRepository => new OutboxRepository(_context);
+    public ITokenRepository TokenRepository => new TokenRepository(_context);
 
     public async Task Commit()
     {

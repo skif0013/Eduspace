@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using IdentityService.API.Middleware;
 using IdentityService.Application.Interfaces;
@@ -13,7 +12,7 @@ using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using DotNetEnv;
 using IdentityService.Application.Common.Models;
-//using IdentityService.Infrastructure.BackgroundJobs;
+using IdentityService.Infrastructure.BackgroundJobs;
 using IdentityService.Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,9 +20,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
-
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,70 +60,42 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-/*builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5010);
-    options.ListenAnyIP(5011);
-});*/
 
 #region config jwt
 var validIssuer = builder.Configuration.GetValue<string>("JwtTokenSettings:ValidIssuer");
 var validAudience = builder.Configuration.GetValue<string>("JwtTokenSettings:ValidAudience");
 var symmetricSecurityKey = builder.Configuration.GetValue<string>("JwtTokenSettings:SymmetricSecurityKey");
 
-builder.Services.AddAuthentication(options => {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.IncludeErrorDetails = true;
-        options.TokenValidationParameters = new TokenValidationParameters()
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            ClockSkew = TimeSpan.FromSeconds(30),
             ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
             ValidIssuer = validIssuer,
+            ValidateAudience = true,
             ValidAudience = validAudience,
+            ValidateLifetime = true,
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(symmetricSecurityKey)
             ),
-        };
-        options.Events = new JwtBearerEvents
-        {
-            OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine("-------------------------------------------");
-                Console.WriteLine($"Auth Failed. Exception: {context.Exception.Message}");
-                // Если проблема в подписи, тут будет написано "Signature validation failed"
-                Console.WriteLine("-------------------------------------------");
-                return Task.CompletedTask;
-            }
+            ValidateIssuerSigningKey = true,
         };
     });
 #endregion
 
-// ПОСМОТРИ В КОНСОЛЬ ПРИ ЗАПУСКЕ:
-Console.WriteLine($"[CONFIG] Issuer: {validIssuer}");
-Console.WriteLine($"[CONFIG] Audience: {validAudience}");
-Console.WriteLine($"[CONFIG] Key Length: {symmetricSecurityKey?.Length ?? 0}");
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-
-
+#region Redis settings
 
 var redisEndPoint = builder.Configuration["RedisEndPoint"];
 var redisUser = builder.Configuration["RedisUser"];
 var redisPassword = builder.Configuration["RedisPassword"];
-
-
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var config = new StackExchange.Redis.ConfigurationOptions
@@ -138,11 +106,11 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
         AbortOnConnectFail = false
     };
     return ConnectionMultiplexer.Connect(config);
+    
 });
+#endregion
 
-builder.Services.AddSingleton<IRedisMessageBroker, RedisMessageBroker>();
-
-builder.Services.AddScoped<UserContext>();
+#region Identity
 
 builder.Services.AddIdentity<User, RoleIdentity>(options =>
 {
@@ -161,6 +129,12 @@ builder.Services.AddIdentity<User, RoleIdentity>(options =>
 .AddRoles<RoleIdentity>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+#endregion
+
+builder.Services.AddSingleton<IRedisMessageBroker, RedisMessageBroker>();
+
+builder.Services.AddScoped<UserContext>();
+builder.Services.AddScoped<IUserContext>(sp => sp.GetRequiredService<UserContext>());
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -175,7 +149,7 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-//builder.Services.AddHostedService<ProcessOutboxMessagesJob>();
+builder.Services.AddHostedService<ProcessOutboxMessagesJob>();
 
 var app = builder.Build();
 
@@ -196,7 +170,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseMiddleware<UserContextMiddleware>();
+app.UseMiddleware<UserContextMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {

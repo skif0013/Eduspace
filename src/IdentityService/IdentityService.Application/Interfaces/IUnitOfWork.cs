@@ -7,4 +7,5 @@ public interface IUnitOfWork : IDisposable
     Task Commit();
     
     IOutboxRepository OutboxRepository { get; }
+    ITokenRepository TokenRepository { get; }
 }

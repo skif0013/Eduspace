@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using IdentityService.Application.Common.Models;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Results;
@@ -22,20 +23,9 @@ public class TokensController : ControllerBase
     }
 
     [HttpPost("RevokeRefreshToken")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<Result<bool>> RevokeRefreshToken([FromBody] RefreshTokenRequest request)
     {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
-
-        foreach (var claim in User.Claims) 
-        {
-            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
-        }
-        
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Result<bool>.Failure("User ID not found in token.");
-        }
-
         var result = await _tokenService.RevokeRefreshTokenAsync(request);
         return result;
     }

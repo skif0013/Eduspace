@@ -18,24 +18,18 @@ public class UserService : IUserService
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<RoleIdentity> _roleManager;
     private readonly ITokenService _tokenService;
-    private readonly IMessageService _messageService;
-    private readonly IOutboxRepository _outboxRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public UserService(
         UserManager<User> userManager,
         RoleManager<RoleIdentity> roleManager,
         ITokenService tokenService,
-        IMessageService messageService,
-        IOutboxRepository outboxRepository,
         IUnitOfWork unitOfWork
     )
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _tokenService = tokenService;
-        _messageService = messageService;
-        _outboxRepository = outboxRepository;
         _unitOfWork = unitOfWork;
     }
     
@@ -55,8 +49,6 @@ public class UserService : IUserService
         }
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user); 
-        // TODO вывести токен через встроенный класс Ilogger в консоль
-
         Console.WriteLine($"Email confirmation token for {user.Email}: {token}");
         
         var confirmEmailEvent = new EmailVerifyEvent()
@@ -70,7 +62,7 @@ public class UserService : IUserService
         var outboxMessage = new OutboxMessage()
         {
             Id = Guid.NewGuid(),
-            Type = "UserCreated",
+            Type = "identity.user.created",
             Content = JsonSerializer.Serialize(confirmEmailEvent),
             OccurredOnUtc = DateTime.UtcNow
         };
@@ -138,7 +130,7 @@ public class UserService : IUserService
         var outboxMessage = new OutboxMessage()
         {
             Id = Guid.NewGuid(),
-            Type = "UserForgotPassword",
+            Type = "identity.user.forgot_password",
             Content = JsonSerializer.Serialize(confirmEmailEvent),
             OccurredOnUtc = DateTime.UtcNow
         };
@@ -177,37 +169,18 @@ public class UserService : IUserService
         }
         await _userManager.ConfirmEmailAsync(user, request.Token);
         
-        var roleExists = _roleManager.FindByNameAsync("User".ToString());
+        var roleExists = _roleManager.FindByNameAsync("User");
         if (!roleExists.IsCompletedSuccessfully)
         {
             Console.WriteLine("Role doesn't exist");
         }
 
-        await _userManager.AddToRoleAsync(user, roleExists.Result.Name.ToString()); // TODO прееделать этот асинхронный вызов
-        
-        var message = new CreateUserDTO()
-        {
-            UserId = user.Id,
-            UserName = user.UserName,
-            Email = user.Email,
-            EventType = "user:created"
-        };
-        
-        var outboxMessage = new OutboxMessage()
-        {
-            Id = Guid.NewGuid(),
-            Type = "user:created",
-            Content = JsonSerializer.Serialize(message),
-            OccurredOnUtc = DateTime.UtcNow
-        };
-        
-        await _unitOfWork.OutboxRepository.AddAsync(outboxMessage);
-        await _unitOfWork.Commit();
+        await _userManager.AddToRoleAsync(user, roleExists.Result.Name);
         
         return Result<string>.Success("Email confirmed");
     }
     
-    public async Task<Result<string>> UpdateUserAsync(UpdateUserDTO userDto)
+    public async Task<Result<string>> UpdateUserAsync(UpdateUserDTO userDto) // TODO переделать на IUserContext + добавить смену пароля + добавить в будущем таблицу с юзер инфо где будет урла на его автарку
     {
         var user = await _userManager.FindByIdAsync(userDto.Id.ToString());
         if (user == null)

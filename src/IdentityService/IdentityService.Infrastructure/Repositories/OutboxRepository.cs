@@ -27,4 +27,4 @@ public class OutboxRepository : Repository<OutboxMessage>, IOutboxRepository
             .Take(batchSize)
             .ToListAsync();
     }
-}
+}   

@@ -1,7 +1,10 @@
-﻿namespace IdentityService.Application.Common.Models;
+﻿using IdentityService.Application.Interfaces;
 
-public class UserContext
+namespace IdentityService.Application.Common.Models;
+
+public class UserContext : IUserContext
 {
     public Guid UserId { get; set; }
+    public string Name { get; set; }
     public string Email { get; set; }
 }
