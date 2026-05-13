@@ -15,7 +15,6 @@ public class RedisStreamSubscriberService : BackgroundService
 
     private const int MessageReadBatchSize = 10;
     private const int PollDelayMilliseconds = 1000;
-    private const int ErrorDelayMilliseconds = 5000;
 
     public RedisStreamSubscriberService(
         IConnectionMultiplexer multiplexer,
