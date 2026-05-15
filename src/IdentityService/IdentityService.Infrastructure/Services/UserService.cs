@@ -75,7 +75,7 @@ public class UserService : IUserService
 
     public async Task<Result<TokenResponseDto>> AuthenticateAsync(AuthRequest request)
     {
-        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
             return Result<TokenResponseDto>.Failure("Invalid Email");
