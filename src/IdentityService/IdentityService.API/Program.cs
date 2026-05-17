@@ -92,22 +92,24 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 #region Redis settings
-
-var redisEndPoint = builder.Configuration["RedisEndPoint"];
-var redisUser = builder.Configuration["RedisUser"];
-var redisPassword = builder.Configuration["RedisPassword"];
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+// Don't register Redis in the "Testing" environment - tests use Testcontainers and don't need actual Redis
+if (!builder.Environment.IsEnvironment("Testing"))
 {
-    var config = new StackExchange.Redis.ConfigurationOptions
+    var redisEndPoint = builder.Configuration["RedisEndPoint"];
+    var redisUser = builder.Configuration["RedisUser"];
+    var redisPassword = builder.Configuration["RedisPassword"];
+    builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     {
-        EndPoints = { redisEndPoint },
-        User = redisUser,
-        Password = redisPassword,
-        AbortOnConnectFail = false
-    };
-    return ConnectionMultiplexer.Connect(config);
-    
-});
+        var config = new StackExchange.Redis.ConfigurationOptions
+        {
+            EndPoints = { redisEndPoint },
+            User = redisUser,
+            Password = redisPassword,
+            AbortOnConnectFail = false
+        };
+        return ConnectionMultiplexer.Connect(config);
+    });
+}
 #endregion
 
 #region Identity
@@ -131,8 +133,6 @@ builder.Services.AddIdentity<User, RoleIdentity>(options =>
 .AddDefaultTokenProviders();
 #endregion
 
-builder.Services.AddSingleton<IRedisMessageBroker, RedisMessageBroker>();
-
 builder.Services.AddScoped<UserContext>();
 builder.Services.AddScoped<IUserContext>(sp => sp.GetRequiredService<UserContext>());
 
@@ -143,13 +143,20 @@ builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IOutboxRepository, OutboxRepository>(); 
 
 builder.Services.AddSingleton<IMessageHandler, UserUpdatedHandler>();
-builder.Services.AddHostedService<RedisSubscriberService>();
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddSingleton<IRedisMessageBroker, RedisMessageBroker>();
+    builder.Services.AddHostedService<RedisSubscriberService>();
+}
 builder.Services.AddScoped<IMessageService, MessageService>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddHostedService<ProcessOutboxMessagesJob>();
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddHostedService<ProcessOutboxMessagesJob>();
+}
 
 var app = builder.Build();
 
@@ -183,3 +190,7 @@ using (var scope = app.Services.CreateScope())
 app.MapControllers();
 
 app.Run();
+
+// Expose Program type for WebApplicationFactory in integration tests
+public partial class Program { }
+
