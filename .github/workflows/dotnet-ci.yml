@@ -43,3 +43,17 @@ jobs:
           name: 'Test Results'
           path: 'TestResults/*.trx'
           reporter: dotnet-trx
+          
+  env:
+    AZURESTORAGE__CONNECTIONSTRING: ${{ secrets.AZURESTORAGE__CONNECTIONSTRING }}
+    ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}
+    REDISENDPOINT: ${{ secrets.REDISENDPOINT }}
+    REDISPASSWORD: ${{ secrets.REDISPASSWORD }}
+    REDISUSER: ${{ secrets.REDISUSER }}
+    SMTPSETTINGS__ENABLESSL: ${{ secrets.SMTPSETTINGS__ENABLESSL }}
+    SMTPSETTINGS__HOST: ${{ secrets.SMTPSETTINGS__HOST }}
+    SMTPSETTINGS__PASSWORD: ${{ secrets.SMTPSETTINGS__PASSWORD }}
+    SMTPSETTINGS__PORT: ${{ secrets.SMTPSETTINGS__PORT }}
+    SMTPSETTINGS__SENDEREMAIL: ${{ secrets.SMTPSETTINGS__SENDEREMAIL }}
+    SMTPSETTINGS__USERNAME: ${{ secrets.SMTPSETTINGS__USERNAME }}
+    
