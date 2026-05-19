@@ -11,8 +11,6 @@ permissions:
   pull-requests: write
   contents: read
 
- 
-
 jobs:
   build-test:
     runs-on: ubuntu-latest
@@ -29,7 +27,7 @@ jobs:
       SMTPSETTINGS__PORT: ${{ secrets.SMTPSETTINGS__PORT }}
       SMTPSETTINGS__SENDEREMAIL: ${{ secrets.SMTPSETTINGS__SENDEREMAIL }}
       SMTPSETTINGS__USERNAME: ${{ secrets.SMTPSETTINGS__USERNAME }}
-  
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,4 +56,3 @@ jobs:
           name: 'Test Results'
           path: 'TestResults/*.trx'
           reporter: dotnet-trx
-    
