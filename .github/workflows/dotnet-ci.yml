@@ -29,7 +29,6 @@ jobs:
       SMTPSETTINGS__PORT: ${{ secrets.SMTPSETTINGS__PORT }}
       SMTPSETTINGS__SENDEREMAIL: ${{ secrets.SMTPSETTINGS__SENDEREMAIL }}
       SMTPSETTINGS__USERNAME: ${{ secrets.SMTPSETTINGS__USERNAME }}
-      SMTPSETTINGS__USERNAME: ${{ secrets.SMTPSETTINGS__USERNAME }}
   
     steps:
       - name: Checkout code
