@@ -72,7 +72,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 if (builder.Environment.IsDevelopment())
 {
-    var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+    var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..","..","..", ".env");
     Env.Load(envPath);
 }
 

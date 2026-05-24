@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\QuizService.Domain\QuizService.Domain.csproj" />
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj" />
     </ItemGroup>
 
     <ItemGroup>

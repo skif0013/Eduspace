@@ -63,8 +63,13 @@ COPY ["src/NotificationService/NotificationService.WebApi/NotificationService.We
 COPY ["src/NotificationService/NotificationService.Application/NotificationService.Application.csproj", "src/NotificationService/NotificationService.Application/"]
 COPY ["src/NotificationService/NotificationService.Domain/NotificationService.Domain.csproj", "src/NotificationService/NotificationService.Domain/"]
 COPY ["src/NotificationService/NotificationService.Infrastructure/NotificationService.Infrastructure.csproj", "src/NotificationService/NotificationService.Infrastructure/"]
+COPY ["src/QuizService/QuizService.Application/QuizService.Application.csproj", "src/QuizService/QuizService.Application/"]
+COPY ["src/QuizService/QuizService.Domain/QuizService.Domain.csproj", "src/QuizService/QuizService.Domain/"]
+COPY ["src/BuildingBlocks/BuildingBlocks.Redis/BuildingBlocks.Redis.csproj", "src/BuildingBlocks/BuildingBlocks.Redis/"]
 RUN dotnet restore "src/NotificationService/NotificationService.WebApi/NotificationService.WebApi.csproj"
 COPY src/NotificationService/ src/NotificationService/
+COPY src/QuizService/ src/QuizService/
+COPY src/BuildingBlocks/ src/BuildingBlocks/
 WORKDIR /src/src/NotificationService/NotificationService.WebApi
 RUN dotnet publish "NotificationService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
@@ -79,8 +84,10 @@ COPY ["src/QuizService/QuizService.WebApi/QuizService.WebApi.csproj", "src/QuizS
 COPY ["src/QuizService/QuizService.Application/QuizService.Application.csproj", "src/QuizService/QuizService.Application/"]
 COPY ["src/QuizService/QuizService.Domain/QuizService.Domain.csproj", "src/QuizService/QuizService.Domain/"]
 COPY ["src/QuizService/QuizService.Infrastructure/QuizService.Infrastructure.csproj", "src/QuizService/QuizService.Infrastructure/"]
+COPY ["src/BuildingBlocks/BuildingBlocks.Redis/BuildingBlocks.Redis.csproj", "src/BuildingBlocks/BuildingBlocks.Redis/"]
 RUN dotnet restore "src/QuizService/QuizService.WebApi/QuizService.WebApi.csproj"
 COPY src/QuizService/ src/QuizService/
+COPY src/BuildingBlocks/ src/BuildingBlocks/
 WORKDIR /src/src/QuizService/QuizService.WebApi
 RUN dotnet publish "QuizService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
