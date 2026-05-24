@@ -53,7 +53,8 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseNpgsql(_postgres.ConnectionString);
+                options.UseNpgsql(_postgres.ConnectionString, b =>
+                    b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
             });
 
             services.AddAuthentication(options =>
@@ -81,6 +82,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         await db.Database.EnsureDeletedAsync();
-        await db.Database.MigrateAsync();
+        await db.Database.EnsureCreatedAsync();
     }
 }
