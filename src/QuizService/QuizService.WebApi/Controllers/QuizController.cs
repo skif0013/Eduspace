@@ -91,7 +91,12 @@ public class QuizController : ControllerBase
     [HttpPost("{id:guid}/finish")]
     public async Task<ActionResult<FinishQuizResponseDTO>> FinishQuiz([FromRoute] Guid id)
     {
-        var result = await _quizService.FinishQuizAsync(id);
+        var authHeader = Request.Headers.Authorization.ToString();
+        var token = authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+            ? authHeader["Bearer ".Length..]
+            : authHeader;
+
+        var result = await _quizService.FinishQuizAsync(id, token);
         
         return Ok(result);
     }

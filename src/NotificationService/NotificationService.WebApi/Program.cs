@@ -1,12 +1,14 @@
-using DotNetEnv;
+﻿using DotNetEnv;
 using Microsoft.OpenApi.Models;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.Interfaces.Services;
 using NotificationService.Domain.Models;
 using NotificationService.Infrastructure.Redis;
+using NotificationService.Infrastructure.Redis.Configuration;
 using NotificationService.Infrastructure.Service;
 using NotificationService.Infrastructure.Services;
 using NotificationService.Infrastructure.SmtpClientFactory;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,59 +18,20 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5006);
 });
 
-var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
-Env.Load(envPath);
-
-
-var emailSettings = new EmailSettings
+// Try to load .env if it exists (for local development)
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+if (File.Exists(envPath))
 {
-    SmtpHost = Environment.GetEnvironmentVariable("SmtpSettings__Host") ?? "smtp.gmail.com",
-    SmtpPort = int.TryParse(Environment.GetEnvironmentVariable("SmtpSettings__Port"), out var port) ? port : 587,
-    EnableSsl = bool.TryParse(Environment.GetEnvironmentVariable("SmtpSettings__EnableSsl"), out var ssl) && ssl,
-    Username = Environment.GetEnvironmentVariable("SmtpSettings__Username") ?? "default@gmail.com",
-    Password = Environment.GetEnvironmentVariable("SmtpSettings__Password") ?? "default-password",
-    FromAddress = Environment.GetEnvironmentVariable("SmtpSettings__SenderEmail") ?? "no-reply@domain.com"
-};
+    DotNetEnv.Env.Load(envPath);
+}
 
-
-builder.Services.AddScoped<IMessageService, MessageService>();
-
-builder.Services.AddSingleton<IMessageHandler, ConfimEmailHandler>();
-builder.Services.AddHostedService<RedisSubscriberService>();
-
-var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint");
-var redisUser = Environment.GetEnvironmentVariable("RedisUser");
-var redisPassword = Environment.GetEnvironmentVariable("RedisPassword");
-
-builder.Services.AddSingleton<RedisMessageBroker>(sb =>
-{
-    var config = new StackExchange.Redis.ConfigurationOptions
-    {
-        EndPoints = { redisEndPoint },
-        User = redisUser,
-        Password = redisPassword,
-        AbortOnConnectFail = false
-    };
-    var connectionString = config.ToString();
-    return new RedisMessageBroker(connectionString);
-});
-
-
-
-
-builder.Services.AddSingleton(emailSettings);
+RegisterEmailServices(builder.Services);
+RegisterRedisServices(builder.Services);
+RegisterNotificationHandlers(builder.Services);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "NotificationService API", Version = "v1" });
-});
-
-
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddTransient<IEmailCreateClient, ClientFactory>();
-
+ConfigureSwagger(builder.Services);
 
 var app = builder.Build();
 
@@ -81,3 +44,69 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 app.UseHttpsRedirection();
 app.Run();
+
+static void RegisterEmailServices(IServiceCollection services)
+{
+    var emailSettings = new EmailSettings
+    {
+        SmtpHost = Environment.GetEnvironmentVariable("SmtpSettings__Host") ?? "smtp.gmail.com",
+        SmtpPort = int.TryParse(Environment.GetEnvironmentVariable("SmtpSettings__Port"), out var port) ? port : 587,
+        EnableSsl = bool.TryParse(Environment.GetEnvironmentVariable("SmtpSettings__EnableSsl"), out var ssl) && ssl,
+        Username = Environment.GetEnvironmentVariable("SmtpSettings__Username") ?? "default@gmail.com",
+        Password = Environment.GetEnvironmentVariable("SmtpSettings__Password") ?? "default-password",
+        FromAddress = Environment.GetEnvironmentVariable("SmtpSettings__SenderEmail") ?? "no-reply@domain.com"
+    };
+
+    services.AddSingleton(emailSettings);
+    services.AddScoped<IEmailService, EmailService>();
+    services.AddTransient<IEmailCreateClient, ClientFactory>();
+    services.AddScoped<IMessageService, MessageService>();
+}
+
+static void RegisterRedisServices(IServiceCollection services)
+{
+    var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint") ?? "localhost:6379";
+    var quizFinishedStream = Environment.GetEnvironmentVariable("Redis__Streams__QuizFinished") ?? "quiz:finished:v1";
+    var consumerGroupName = "notification-service";
+    var consumerName = "notification-worker-1";
+
+    var redisStreamConfig = new RedisStreamConsumerConfiguration(
+        quizFinishedStream,
+        consumerGroupName,
+        consumerName);
+
+    services.AddSingleton(redisStreamConfig);
+
+    services.AddSingleton<RedisMessageBroker>();
+
+    services.AddSingleton<IConnectionMultiplexer>(sp =>
+    {
+        var config = new ConfigurationOptions
+        {
+            EndPoints = { redisEndPoint },
+            AbortOnConnectFail = false
+        };
+        return ConnectionMultiplexer.Connect(config);
+    });
+
+    services.AddHostedService<RedisStreamSubscriberService>();
+}
+
+static void RegisterNotificationHandlers(IServiceCollection services)
+{
+    services.AddSingleton<IMessageHandler, ConfimEmailHandler>();
+    services.AddSingleton<IMessageHandler, QuizFinishedEmailHandler>();
+}
+
+static void ConfigureSwagger(IServiceCollection services)
+{
+    services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "NotificationService API",
+            Version = "v1"
+        });
+    });
+}
+

@@ -4,11 +4,11 @@ namespace NotificationService.Infrastructure.Redis;
 
 public class RedisMessageBroker
 {
-    private readonly ConnectionMultiplexer _redis;
+    private readonly IConnectionMultiplexer _redis;
     private readonly ISubscriber _subscriber;
-    public RedisMessageBroker(string connectionString)
+    public RedisMessageBroker(IConnectionMultiplexer redis)
     {
-        _redis = ConnectionMultiplexer.Connect(connectionString);
+        _redis = redis;
         _subscriber = _redis.GetSubscriber();
     }
     

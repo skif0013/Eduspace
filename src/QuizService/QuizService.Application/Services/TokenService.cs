@@ -38,4 +38,12 @@ public class TokenService : ITokenService
         }
         return Guid.Parse(userIdClaim.Value);
     }
+
+    public string GetUserEmailFromToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jwtToken = tokenHandler.ReadJwtToken(token);
+        
+        return jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+    }
 }

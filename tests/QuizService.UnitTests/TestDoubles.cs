@@ -192,4 +192,14 @@ public sealed class NoOpTokenService : ITokenService
     public QuizService.Application.DTOs.UserContextDTO GetUserFromToken(string token) => new();
 
     public Guid GetUserIdFromToken(string token) => Guid.Empty;
+    
+    public string GetUserEmailFromToken(string token) => "test@example.com";
+}
+
+public sealed class NoOpEventPublisher : IQuizFinishedEventPublisher
+{
+    public Task PublishAsync(QuizFinishedEvent @event, CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
 }
