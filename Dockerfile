@@ -25,7 +25,7 @@ COPY --from=build-identity /app/publish .
 ENTRYPOINT ["dotnet", "IdentityService.API.dll"]
 
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-course
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-course
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/CourseService/CourseService.WebApi/CourseService.WebApi.csproj", "src/CourseService/CourseService.WebApi/"]
@@ -37,7 +37,7 @@ COPY src/CourseService/ src/CourseService/
 WORKDIR /src/src/CourseService/CourseService.WebApi
 RUN dotnet publish "CourseService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM base9 AS final-course
+FROM base8 AS final-course
 COPY --from=build-course /app/publish .
 ENTRYPOINT ["dotnet", "CourseService.WebApi.dll"]
 
