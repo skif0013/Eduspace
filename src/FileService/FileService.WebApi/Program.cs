@@ -11,17 +11,12 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Try to load .env if it exists (for local development)
-var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", ".env");
 if (File.Exists(envPath))
 {
     DotNetEnv.Env.Load(envPath);
 }
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5010);
-    options.ListenAnyIP(5011);
-});
 
 builder.Configuration.AddEnvironmentVariables();
 
@@ -63,7 +58,23 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     
-    db.Database.Migrate();
+    // Retry logic for database migrations
+    int maxAttempts = 10;
+    int delayMs = 3000;
+    
+    for (int i = 1; i <= maxAttempts; i++)
+    {
+        try
+        {
+            db.Database.Migrate();
+            break;
+        }
+        catch (Exception ex) when (i < maxAttempts)
+        {
+            Console.WriteLine($"Migration attempt {i}/{maxAttempts} failed: {ex.Message}");
+            System.Threading.Thread.Sleep(delayMs);
+        }
+    }
 }
 
 // Configure the HTTP request pipeline.

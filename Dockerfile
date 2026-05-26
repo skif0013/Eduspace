@@ -21,24 +21,9 @@ WORKDIR /src/src/IdentityService/IdentityService.API
 RUN dotnet publish "IdentityService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base9 AS final-identity
-COPY --from=build-auth /app/publish .
+COPY --from=build-identity /app/publish .
 ENTRYPOINT ["dotnet", "IdentityService.API.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-user
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["src/UserService/UserService.WebApi/UserService.WebApi.csproj", "src/UserService/UserService.WebApi/"]
-COPY ["src/UserService/UserService.Application/UserService.Application.csproj", "src/UserService/UserService.Application/"]
-COPY ["src/UserService/UserService.Domain/UserService.Domain.csproj", "src/UserService/UserService.Domain/"]
-COPY ["src/UserService/UserService.Infrastructure/UserService.Infrastructure.csproj", "src/UserService/UserService.Infrastructure/"]
-RUN dotnet restore "src/UserService/UserService.WebApi/UserService.WebApi.csproj"
-COPY src/UserService/ src/UserService/
-WORKDIR /src/src/UserService/UserService.WebApi
-RUN dotnet publish "UserService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base9 AS final-user
-COPY --from=build-user /app/publish .
-ENTRYPOINT ["dotnet", "UserService.WebApi.dll"]
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-course
 ARG BUILD_CONFIGURATION=Release
@@ -107,7 +92,7 @@ COPY src/FileService/ src/FileService/
 WORKDIR /src/src/FileService/FileService.WebApi
 RUN dotnet publish "FileService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final-file
+FROM base8 AS final-file
 WORKDIR /app
 EXPOSE 80
 ENV ASPNETCORE_URLS=http://+:80

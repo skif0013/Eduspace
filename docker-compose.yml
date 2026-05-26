@@ -134,9 +134,10 @@
       dockerfile: Dockerfile
       target: final-file
     ports:
-      - "5005:8080"
+      - "5005:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=file-db;Port=5432;Database=FileDB;Username=postgres;Password=postgres
     env_file:
       - .env
     depends_on:
@@ -148,11 +149,13 @@
   file-db:
     image: postgres:16
     environment:
-      POSTGRES_DB: fileservice
+      POSTGRES_DB: FileDB
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "123"
+      POSTGRES_PASSWORD: "postgres"
     volumes:
       - file-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
     restart: always
     networks:
       - eduspace-net
@@ -176,6 +179,7 @@ volumes:
   identity-db-data:
   course-db-data:
   file-db-data:
+    driver: local
   quiz-db-data:
   redis-data:
   
