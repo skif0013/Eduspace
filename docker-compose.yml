@@ -65,6 +65,8 @@
     depends_on:
       - course-db
       - redis
+    env_file:
+      - .env
     restart: always
     networks:
       - eduspace-net
