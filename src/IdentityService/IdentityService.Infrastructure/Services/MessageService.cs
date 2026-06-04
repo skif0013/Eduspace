@@ -1,22 +1,33 @@
 ﻿using System.Text.Json;
+using IdentityService.Application.Interfaces.Repositories;
 using IdentityService.Application.Interfaces.Services;
 
 using IdentityService.Infrastructure.Redis;
 using Shared.Messages;
+using StackExchange.Redis;
 
 
 namespace IdentityService.Infrastructure.Services;
 
 public class MessageService : IMessageService
 {
-    private readonly IRedisMessageBroker _redisMessageBroker;
-    public MessageService(IRedisMessageBroker redisMessageBroker)
+    private readonly IDatabase _redisDatabase;
+    public MessageService(IDatabase rD)
     {
-        _redisMessageBroker = redisMessageBroker;
+        _redisDatabase = rD;
     }
 
-    public async Task SendMessageAsync<T>(string actiom ,T message)
+    public async Task SendMessageAsync<T>(string action, T message)
     {
-        var res = await _redisMessageBroker.PublishAsync(actiom, JsonSerializer.Serialize(message));
+        var payload = message is string s
+            ? s
+            : JsonSerializer.Serialize(message);
+
+        await _redisDatabase.StreamAddAsync(
+            action,
+            new NameValueEntry[]
+            {
+                new("payload", payload)
+            });
     }
 }

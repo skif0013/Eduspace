@@ -12,11 +12,7 @@ using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5005);
-    options.ListenAnyIP(5006);
-});
+
 
 // Try to load .env if it exists (for local development)
 var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
@@ -56,7 +52,7 @@ static void RegisterEmailServices(IServiceCollection services)
         Password = Environment.GetEnvironmentVariable("SmtpSettings__Password") ?? "default-password",
         FromAddress = Environment.GetEnvironmentVariable("SmtpSettings__SenderEmail") ?? "no-reply@domain.com"
     };
-
+    Console.WriteLine($"Email Settings: Host={emailSettings.SmtpHost}, Port={emailSettings.SmtpPort}, SSL={emailSettings.EnableSsl}, Username={emailSettings.Username},  Password={emailSettings.Password}");
     services.AddSingleton(emailSettings);
     services.AddScoped<IEmailService, EmailService>();
     services.AddTransient<IEmailCreateClient, ClientFactory>();
@@ -65,13 +61,13 @@ static void RegisterEmailServices(IServiceCollection services)
 
 static void RegisterRedisServices(IServiceCollection services)
 {
-    var redisEndPoint = Environment.GetEnvironmentVariable("RedisEndPoint") ?? "localhost:6379";
-    var quizFinishedStream = Environment.GetEnvironmentVariable("Redis__Streams__QuizFinished") ?? "quiz:finished:v1";
+    var redisEndPoint =  "redis:6379";
+    var identityUserCreatedStream = "identity.user.created";
     var consumerGroupName = "notification-service";
     var consumerName = "notification-worker-1";
 
     var redisStreamConfig = new RedisStreamConsumerConfiguration(
-        quizFinishedStream,
+        identityUserCreatedStream,
         consumerGroupName,
         consumerName);
 
@@ -96,6 +92,7 @@ static void RegisterNotificationHandlers(IServiceCollection services)
 {
     services.AddSingleton<IMessageHandler, ConfimEmailHandler>();
     services.AddSingleton<IMessageHandler, QuizFinishedEmailHandler>();
+    services.AddSingleton<IMessageHandler, IdentityUserCreatedHandler>();
 }
 
 static void ConfigureSwagger(IServiceCollection services)
@@ -110,3 +107,4 @@ static void ConfigureSwagger(IServiceCollection services)
     });
 }
 
+app.Run();

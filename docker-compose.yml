@@ -35,6 +35,8 @@
     depends_on:
       - identity-db
       - redis
+    env_file:
+        - .env
     restart: always
     networks:
       - eduspace-net
@@ -45,6 +47,8 @@
       POSTGRES_DB: IdentityService
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
     volumes:
       - identity-db-data:/var/lib/postgresql/data
     restart: always
@@ -179,9 +183,12 @@ networks:
 
 volumes:
   identity-db-data:
+        external: true
   course-db-data:
+    driver: local
   file-db-data:
     driver: local
   quiz-db-data:
+    driver: local
   redis-data:
   

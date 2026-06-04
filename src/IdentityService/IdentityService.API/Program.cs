@@ -96,15 +96,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 if (!builder.Environment.IsEnvironment("Testing"))
 {
     var redisEndPoint = builder.Configuration["RedisEndPoint"];
-    var redisUser = builder.Configuration["RedisUser"];
-    var redisPassword = builder.Configuration["RedisPassword"];
+    //var redisUser = builder.Configuration["RedisUser"];
+    //var redisPassword = builder.Configuration["RedisPassword"];
     builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     {
         var config = new StackExchange.Redis.ConfigurationOptions
         {
             EndPoints = { redisEndPoint },
-            User = redisUser,
-            Password = redisPassword,
+            //User = redisUser,
+            //Password = redisPassword,
             AbortOnConnectFail = false
         };
         return ConnectionMultiplexer.Connect(config);
@@ -141,6 +141,12 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IOutboxRepository, OutboxRepository>(); 
+
+builder.Services.AddSingleton<IDatabase>(sp =>
+{
+    var mux = sp.GetRequiredService<IConnectionMultiplexer>();
+    return mux.GetDatabase();
+});
 
 builder.Services.AddSingleton<IMessageHandler, UserUpdatedHandler>();
 if (!builder.Environment.IsEnvironment("Testing"))

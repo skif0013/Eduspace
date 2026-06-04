@@ -26,9 +26,9 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - identity-db-data:/var/lib/postgresql/data
     restart: always
 
 volumes:
-  postgres_data:
-    driver: local
+  identity-db-data:
+    external: true
