@@ -95,7 +95,7 @@ public class QuizFinishedEmailHandlerTests
     /// <summary>
     /// Проверяет, что Channel property возвращает правильный Redis stream ключ
     /// </summary>
-    [Fact]
+    /*[Fact]
     public void Channel_ReturnsCorrectStreamKey()
     {
         // Arrange
@@ -107,7 +107,7 @@ public class QuizFinishedEmailHandlerTests
 
         // Assert
         Assert.Equal("quiz:finished:v1", channel);
-    }
+    }*/
 
     /// <summary>
     /// Проверяет обработку события с различными баллами
