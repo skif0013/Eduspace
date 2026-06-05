@@ -59,13 +59,13 @@ static void RegisterEmailServices(IServiceCollection services)
     services.AddScoped<IMessageService, MessageService>();
 }
 
-/*void RegisterRedisServices(IServiceCollection services)
+static void RegisterRedisServices(IServiceCollection services)
 {
     var redisEndPoint =  "redis:6379";
-    var identityUserCreatedStream = "identity.user.forgot_password";
+    var identityUserCreatedStream = "identity.user.created";
     var consumerGroupName = "notification-service";
     var consumerName = "notification-worker-1";
-    
+
     var redisStreamConfig = new RedisStreamConsumerConfiguration(
         identityUserCreatedStream,
         consumerGroupName,
@@ -86,50 +86,6 @@ static void RegisterEmailServices(IServiceCollection services)
     });
 
     services.AddHostedService<RedisStreamSubscriberService>();
-}*/
-
-void RegisterRedisServices(IServiceCollection services)
-{
-    var redisEndPoint = "redis:6379";
-    
-    // Регистрируем одно подключение Redis
-    services.AddSingleton<IConnectionMultiplexer>(sp =>
-    {
-        var config = new ConfigurationOptions
-        {
-            EndPoints = { redisEndPoint },
-            AbortOnConnectFail = false
-        };
-        return ConnectionMultiplexer.Connect(config);
-    });
-
-    services.AddSingleton<RedisMessageBroker>();
-
-    // Конфигурации для обоих потоков
-    var config1 = new RedisStreamConsumerConfiguration(
-        "identity.user.created",
-        "notification-service",
-        "notification-worker-1");
-    
-    var config2 = new RedisStreamConsumerConfiguration(
-        "identity.user.forgot_password",
-        "notification-service",
-        "notification-worker-2");
-
-    // Регистрируем оба BackgroundService'а с правильным конструктором
-    services.AddHostedService(sp => 
-        new RedisStreamSubscriberService(
-            sp.GetRequiredService<IConnectionMultiplexer>(),
-            sp.GetRequiredService<IEnumerable<IMessageHandler>>(),
-            config1,
-            sp.GetRequiredService<ILogger<RedisStreamSubscriberService>>()));
-    
-    services.AddHostedService(sp => 
-        new RedisStreamSubscriberService(
-            sp.GetRequiredService<IConnectionMultiplexer>(),
-            sp.GetRequiredService<IEnumerable<IMessageHandler>>(),
-            config2,
-            sp.GetRequiredService<ILogger<RedisStreamSubscriberService>>()));
 }
 
 static void RegisterNotificationHandlers(IServiceCollection services)
@@ -137,7 +93,6 @@ static void RegisterNotificationHandlers(IServiceCollection services)
     services.AddSingleton<IMessageHandler, ConfimEmailHandler>();
     services.AddSingleton<IMessageHandler, QuizFinishedEmailHandler>();
     services.AddSingleton<IMessageHandler, IdentityUserCreatedHandler>();
-    services.AddSingleton<IMessageHandler, IdentityUserForgotPasswordHandler>();
 }
 
 static void ConfigureSwagger(IServiceCollection services)

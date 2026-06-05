@@ -9,7 +9,6 @@ using IdentityService.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared.Messages;
-using BuildingBlocks.Redis.Events;
 
 namespace IdentityService.Infrastructure.Services;
 
@@ -120,10 +119,12 @@ public class UserService : IUserService
         
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         
-        var confirmEmailEvent = new UserResetPasswordEvent()
+        var confirmEmailEvent = new EmailVerifyEvent()
         {
-            UserEmail = request.Email,
-            Token = token
+            To = user.Email,
+            UserName = user.UserName,
+            VerificationLink = "",
+            Code = token
         };
         
         var outboxMessage = new OutboxMessage()

@@ -15,10 +15,8 @@ COPY ["src/IdentityService/IdentityService.API/IdentityService.API.csproj", "src
 COPY ["src/IdentityService/IdentityService.Application/IdentityService.Application.csproj", "src/IdentityService/IdentityService.Application/"]
 COPY ["src/IdentityService/IdentityService.Domain/IdentityService.Domain.csproj", "src/IdentityService/IdentityService.Domain/"]
 COPY ["src/IdentityService/IdentityService.Infrastructure/IdentityService.Infrastructure.csproj", "src/IdentityService/IdentityService.Infrastructure/"]
-COPY ["src/BuildingBlocks/BuildingBlocks.Redis/BuildingBlocks.Redis.csproj", "src/BuildingBlocks/BuildingBlocks.Redis/"]
 RUN dotnet restore "src/IdentityService/IdentityService.API/IdentityService.API.csproj"
 COPY src/IdentityService/ src/IdentityService/
-COPY src/BuildingBlocks/ src/BuildingBlocks/
 WORKDIR /src/src/IdentityService/IdentityService.API
 RUN dotnet publish "IdentityService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 

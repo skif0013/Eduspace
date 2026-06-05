@@ -6,7 +6,7 @@ using StackExchange.Redis;
 
 namespace NotificationService.Infrastructure.Redis;
 
-public class RedisStreamSubscriberService : BackgroundService //TODO: переделать бекграунд сервис 
+public class RedisStreamSubscriberService : BackgroundService
 {
     private readonly IConnectionMultiplexer _multiplexer;
     private readonly IEnumerable<IMessageHandler> _handlers;
