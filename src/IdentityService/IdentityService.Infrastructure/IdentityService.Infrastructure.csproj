@@ -9,6 +9,7 @@
     <ItemGroup>
         <ProjectReference Include="..\IdentityService.Domain\IdentityService.Domain.csproj" />
         <ProjectReference Include="..\IdentityService.Application\IdentityService.Application.csproj" />
+        <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj" />
     </ItemGroup>
 
     <ItemGroup>
