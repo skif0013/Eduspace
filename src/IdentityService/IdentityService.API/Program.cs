@@ -185,6 +185,33 @@ app.UseAuthorization();
 
 app.UseMiddleware<UserContextMiddleware>();
 
+// В начале после построения host, до app.Run()
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    var maxAttempts = 10;
+    var delay = TimeSpan.FromSeconds(2);
+
+    for (int attempt = 1; attempt <= maxAttempts; attempt++)
+    {
+        try
+        {
+            logger.LogInformation("Applying migrations (attempt {Attempt}/{Max})...", attempt, maxAttempts);
+            dbContext.Database.Migrate();
+            logger.LogInformation("Migrations applied.");
+            break;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to apply migrations (attempt {Attempt}). Retrying in {Delay}s...", attempt, delay.TotalSeconds);
+            if (attempt == maxAttempts) throw;
+            await Task.Delay(delay);
+        }
+    }
+}
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
