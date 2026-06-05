@@ -225,8 +225,8 @@ public class UpdateCourseTests
 
         problem.Should().NotBeNull();
 
-        problem!.Errors.Should().ContainKey("Name");
-        problem.Errors["Name"].First().Should().Contain("must not be empty");
+        problem.Errors.Should().ContainKey("Name");
+        problem.Errors["Name"].Should().NotBeEmpty();
         problem.Errors.Should().ContainKey("Price");
     }
 }

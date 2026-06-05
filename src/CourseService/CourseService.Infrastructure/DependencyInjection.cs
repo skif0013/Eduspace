@@ -40,7 +40,7 @@ public static class DependencyInjection
 
     private static void LoadEnvironment()
     {
-        var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+        var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", ".env");
         Env.Load(envPath);
     }
 

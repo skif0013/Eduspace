@@ -8,12 +8,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=CourseDB;Username=postgres;Password=postgres
     ports:
-      - "5016:5016"
-      - "5017:5017"
+      - "5004:8080"
+      - "5005:8081"
     depends_on:
       - postgres
     env_file:
-      - .env
+      - ../../.env
     restart: always
 
   postgres:

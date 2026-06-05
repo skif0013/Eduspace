@@ -8,39 +8,26 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-auth
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-identity
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/AuthService/AuthService.API/AuthService.API.csproj", "src/AuthService/AuthService.API/"]
-COPY ["src/AuthService/AuthService.Application/AuthService.Application.csproj", "src/AuthService/AuthService.Application/"]
-COPY ["src/AuthService/AuthService.Domain/AuthService.Domain.csproj", "src/AuthService/AuthService.Domain/"]
-COPY ["src/AuthService/AuthService.Infrastructure/AuthService.Infrastructure.csproj", "src/AuthService/AuthService.Infrastructure/"]
-RUN dotnet restore "src/AuthService/AuthService.API/AuthService.API.csproj"
-COPY src/AuthService/ src/AuthService/
-WORKDIR /src/src/AuthService/AuthService.API
-RUN dotnet publish "AuthService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+COPY ["src/IdentityService/IdentityService.API/IdentityService.API.csproj", "src/IdentityService/IdentityService.API/"]
+COPY ["src/IdentityService/IdentityService.Application/IdentityService.Application.csproj", "src/IdentityService/IdentityService.Application/"]
+COPY ["src/IdentityService/IdentityService.Domain/IdentityService.Domain.csproj", "src/IdentityService/IdentityService.Domain/"]
+COPY ["src/IdentityService/IdentityService.Infrastructure/IdentityService.Infrastructure.csproj", "src/IdentityService/IdentityService.Infrastructure/"]
+COPY ["src/BuildingBlocks/BuildingBlocks.Redis/BuildingBlocks.Redis.csproj", "src/BuildingBlocks/BuildingBlocks.Redis/"]
+RUN dotnet restore "src/IdentityService/IdentityService.API/IdentityService.API.csproj"
+COPY src/IdentityService/ src/IdentityService/
+COPY src/BuildingBlocks/ src/BuildingBlocks/
+WORKDIR /src/src/IdentityService/IdentityService.API
+RUN dotnet publish "IdentityService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM base9 AS final-auth
-COPY --from=build-auth /app/publish .
-ENTRYPOINT ["dotnet", "AuthService.API.dll"]
+FROM base9 AS final-identity
+COPY --from=build-identity /app/publish .
+ENTRYPOINT ["dotnet", "IdentityService.API.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-user
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["src/UserService/UserService.WebApi/UserService.WebApi.csproj", "src/UserService/UserService.WebApi/"]
-COPY ["src/UserService/UserService.Application/UserService.Application.csproj", "src/UserService/UserService.Application/"]
-COPY ["src/UserService/UserService.Domain/UserService.Domain.csproj", "src/UserService/UserService.Domain/"]
-COPY ["src/UserService/UserService.Infrastructure/UserService.Infrastructure.csproj", "src/UserService/UserService.Infrastructure/"]
-RUN dotnet restore "src/UserService/UserService.WebApi/UserService.WebApi.csproj"
-COPY src/UserService/ src/UserService/
-WORKDIR /src/src/UserService/UserService.WebApi
-RUN dotnet publish "UserService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM base9 AS final-user
-COPY --from=build-user /app/publish .
-ENTRYPOINT ["dotnet", "UserService.WebApi.dll"]
-
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-course
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-course
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/CourseService/CourseService.WebApi/CourseService.WebApi.csproj", "src/CourseService/CourseService.WebApi/"]
@@ -52,7 +39,7 @@ COPY src/CourseService/ src/CourseService/
 WORKDIR /src/src/CourseService/CourseService.WebApi
 RUN dotnet publish "CourseService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM base9 AS final-course
+FROM base8 AS final-course
 COPY --from=build-course /app/publish .
 ENTRYPOINT ["dotnet", "CourseService.WebApi.dll"]
 
@@ -107,7 +94,7 @@ COPY src/FileService/ src/FileService/
 WORKDIR /src/src/FileService/FileService.WebApi
 RUN dotnet publish "FileService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final-file
+FROM base8 AS final-file
 WORKDIR /app
 EXPOSE 80
 ENV ASPNETCORE_URLS=http://+:80
