@@ -186,7 +186,7 @@ app.UseAuthorization();
 app.UseMiddleware<UserContextMiddleware>();
 
 // В начале после построения host, до app.Run()
-using (var scope = app.Services.CreateScope())
+/*using (var scope = app.Services.CreateScope())
 {
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -210,7 +210,7 @@ using (var scope = app.Services.CreateScope())
             await Task.Delay(delay);
         }
     }
-}
+}*/
 
 using (var scope = app.Services.CreateScope())
 {
