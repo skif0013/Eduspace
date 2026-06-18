@@ -81,6 +81,8 @@
       POSTGRES_DB: CourseDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
     volumes:
       - course-db-data:/var/lib/postgresql/data
     restart: always
@@ -96,7 +98,7 @@
       - "5006:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=quiz-db;Port=5432;Database=quizdb;Username=postgres;Password=123
+      - ConnectionStrings__DefaultConnection=Host=quiz-db;Port=5432;Database=quizdb;Username=postgres;Password=postgres
       - Redis__ConnectionString=redis:6379
     depends_on:
       - quiz-db
@@ -110,7 +112,9 @@
     environment:
       POSTGRES_DB: quizdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "123"
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
     volumes:
       - quiz-db-data:/var/lib/postgresql/data
     restart: always
@@ -157,7 +161,7 @@
     environment:
       POSTGRES_DB: FileDB
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_PASSWORD: postgres
     volumes:
       - file-db-data:/var/lib/postgresql/data
     ports:
