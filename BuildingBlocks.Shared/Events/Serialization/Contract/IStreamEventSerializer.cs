@@ -5,8 +5,11 @@ namespace BuildingBlocks.Shared.Events.Serialization;
 
 public interface IStreamEventSerializer
 {
-    NameValueEntry[] SerializeEvent<T>(T @event) where T : class;
-    T DeserializeEvent<T>(NameValueEntry[] entries) where T : class;
+    NameValueEntry[] SerializeEvent<T>(T @event) where T : IntegrationEvent;
+    
+    T DeserializeEvent<T>(NameValueEntry[] entries) where T : IntegrationEvent;
+    
+    string GetEventType(NameValueEntry[] entries);
 }
 
 
