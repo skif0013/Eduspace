@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Shared.Events;
+﻿namespace BuildingBlocks.Redis.Events;
 
 public record IntegrationEvent(
     Guid Id,
