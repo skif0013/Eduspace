@@ -42,5 +42,4 @@ public class IdentityUserForgotPasswordHandler : ScopedMessageHandler
             Body = resetPasswordEventEvent.Token
         }; 
     }
-    
 }
