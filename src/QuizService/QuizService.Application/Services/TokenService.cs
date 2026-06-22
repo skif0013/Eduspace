@@ -28,7 +28,6 @@ public class TokenService : ITokenService
 
     public Guid GetUserIdFromToken(string token)
     {
-        
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
         var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
