@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Redis.Contracts;
+using BuildingBlocks.Redis.Contracts.Broker;
 using BuildingBlocks.Redis.Events;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
@@ -19,10 +20,10 @@ public class QuizService : IQuizService
     private readonly IQuizMapper _mapper;
     private readonly ITokenService _tokenService;
     private readonly IAttemptRepository _attemptRepository;
-    private readonly IQuizFinishedEventPublisher _eventPublisher;
+    private readonly IRedisMessageBroker _eventPublisher;
 
     public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper,
-        ITokenService tokenService, IAttemptRepository attemptRepository, IQuizFinishedEventPublisher eventPublisher)
+        ITokenService tokenService, IAttemptRepository attemptRepository, IRedisMessageBroker eventPublisher)
     {
         _quizRepository = quizRepository;
         _unitOfWork = unitOfWork;
@@ -111,8 +112,10 @@ public class QuizService : IQuizService
     private async Task PublishQuizFinishedEventAsync(QuizAttempt attempt, string token)
     {
         var userEmail = _tokenService.GetUserEmailFromToken(token);
+        
         var quizFinishedEvent = CreateQuizFinishedEvent(attempt, userEmail);
-        await _eventPublisher.PublishAsync(quizFinishedEvent);
+        
+        await _eventPublisher.PublishAsync("quiz-event",quizFinishedEvent);
     }
 
     private static QuizFinishedEvent CreateQuizFinishedEvent(QuizAttempt attempt, string userEmail)
