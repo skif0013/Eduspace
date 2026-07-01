@@ -13,11 +13,9 @@ public interface IQuizService
     
     Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request);
     
+    Task<QuizResponseDTO> PublishQuizAsync(Guid quizId, string token);
+    
     Task DeleteQuizAsync(Guid quizId);
     
     Task GetQuizByIdAsync(Guid quizId);
-    
-    Task<QuizResponseDTO> PublishQuizAsync(Guid quizId);
-    
-    Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId, string token);
 }

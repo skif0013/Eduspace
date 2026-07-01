@@ -1,6 +1,4 @@
-﻿using BuildingBlocks.Redis.Contracts;
-using BuildingBlocks.Redis.Contracts.Broker;
-using BuildingBlocks.Redis.Events;
+﻿using BuildingBlocks.Redis.Contracts.Broker;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.DTOs;
@@ -12,7 +10,6 @@ using QuizService.Domain.Models;
 
 namespace QuizService.Application.Services;
 
-
 public class QuizService : IQuizService
 {
     private readonly IQuizRepository _quizRepository;
@@ -21,10 +18,13 @@ public class QuizService : IQuizService
     private readonly ITokenService _tokenService;
     private readonly IAttemptRepository _attemptRepository;
     private readonly IRedisMessageBroker _eventPublisher;
+    private readonly IQuizIntegrationEventService _quizIntegrationEventService;
 
     public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper,
-        ITokenService tokenService, IAttemptRepository attemptRepository, IRedisMessageBroker eventPublisher)
+        ITokenService tokenService, IAttemptRepository attemptRepository, IRedisMessageBroker eventPublisher
+        , IQuizIntegrationEventService quizIntegrationEventService)
     {
+        _quizIntegrationEventService = quizIntegrationEventService;
         _quizRepository = quizRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -66,14 +66,18 @@ public class QuizService : IQuizService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task<QuizResponseDTO> PublishQuizAsync(Guid quizId)
+    //not mean redis just business logic
+    public async Task<QuizResponseDTO> PublishQuizAsync(Guid quizId, string token)
     {
         var quiz = await _quizRepository.GetWithQuestionsAndOptionsByIdAsync(quizId)
                    ?? throw new KeyNotFoundException($"Quiz with ID '{quizId}' not found");
         
         quiz.Publish();
+        
+        //token
+        await _quizIntegrationEventService.PublishQuizStartedAsync(quiz, token);
         await _unitOfWork.SaveChangesAsync();
-
+    
         return _mapper.MapToResponseDTO(quiz);
     }
     
@@ -82,14 +86,16 @@ public class QuizService : IQuizService
         await _quizRepository.FindByIdAsync(quizId);
     }
     
+    //TODO: implement this to controller
     public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId, string token)
     {
         var attempt = await _attemptRepository.GetByIdAsync(attemptId)
                       ?? throw new AttemptNotFoundException(attemptId);
 
+        await _quizIntegrationEventService.PublishQuizFinishedAsync(attempt, token);
+        
         FinishAttemptAndSaveChanges(attempt);
-        await PublishQuizFinishedEventAsync(attempt, token);
-
+        
         return _mapper.MapToFinishQuizResponseDTO(attempt);
     }
 
@@ -107,23 +113,5 @@ public class QuizService : IQuizService
     {
         attempt.Finish();
         await _unitOfWork.SaveChangesAsync();
-    }
-
-    private async Task PublishQuizFinishedEventAsync(QuizAttempt attempt, string token)
-    {
-        var userEmail = _tokenService.GetUserEmailFromToken(token);
-        
-        var quizFinishedEvent = CreateQuizFinishedEvent(attempt, userEmail);
-        
-        await _eventPublisher.PublishAsync("quiz-event",quizFinishedEvent);
-    }
-
-    private static QuizFinishedEvent CreateQuizFinishedEvent(QuizAttempt attempt, string userEmail)
-    {
-        return new QuizFinishedEvent(
-            AttemptId: attempt.Id,
-            UserEmail: userEmail,
-            TotalScore: attempt.TotalScore.ToString(),
-            IsPassed: attempt.IsPassed());
     }
 }
