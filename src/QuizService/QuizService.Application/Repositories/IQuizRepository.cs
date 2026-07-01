@@ -6,6 +6,8 @@ public interface IQuizRepository
 {
     Task<IReadOnlyCollection<Quiz>> GetAllQuizzesAsync();
     
+    Task GetUserQuizAsync(Guid userId, Guid quizId);
+    
     Task AddQuizAsync(Quiz quiz);
     
     Task<Quiz?> FindByIdAsync(Guid quizId);

@@ -17,7 +17,14 @@ public class QuizRepository : IQuizRepository
     public async Task<IReadOnlyCollection<Quiz>> GetAllQuizzesAsync() =>
         await _context.Quizzes.Include(g => g.Questions).ToListAsync();
 
-    
+
+    public Task GetUserQuizAsync(Guid userId, Guid quizId)
+    {
+        return _context.Quizzes
+            .Where(q => q.CreatorId == userId && q.Id == quizId)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task AddQuizAsync(Quiz quiz)
     {
          _context.Quizzes.Add(quiz);
