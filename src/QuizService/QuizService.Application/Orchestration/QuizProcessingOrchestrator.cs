@@ -15,6 +15,20 @@ public class QuizProcessingOrchestrator : IQuizIntegrationEventService
         _redisMessageBroker = redisMessageBroker;
     }
 
+
+    public Task PublishQuizStartedAsync(QuizAttempt attempt, string userToken)
+    {
+        var userMail = _tokenService.GetUserEmailFromToken(userToken);
+
+        var quizStartedEvent = new QuizStartedEvent(
+            AttemptId: attempt.Id,
+            UserEmail: userMail,
+            QuizId: attempt.QuizId.ToString()
+        );
+
+        return _redisMessageBroker.PublishAsync("quiz-started-stream", quizStartedEvent);
+    }
+
     public Task PublishQuizFinishedAsync(QuizAttempt attempt, string userToken)
     {
        var userMail = _tokenService.GetUserEmailFromToken(userToken);

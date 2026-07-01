@@ -4,5 +4,7 @@ namespace QuizService.Application.Contracts;
 
 public interface IQuizIntegrationEventService
 {
-    Task PublishQuizFinishedAsync(QuizAttempt attempt, string userToken);
+    //TODO: Fix
+    Task PublishQuizStartedAsync(Quiz quiz, string userToken);
+    Task PublishQuizFinishedAsync(Quiz quiz, string userToken);
 }
