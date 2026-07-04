@@ -7,15 +7,11 @@ namespace QuizService.Application.Contracts;
 
 public interface IQuizService
 {
-    Task<IEnumerable<QuizResponseDTO>> GetAllQuizzesAsync();
-    
     Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid creatorId);
     
     Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request);
     
-    Task<QuizResponseDTO> PublishQuizAsync(Guid quizId, string token);
+    Task<FinishQuizResponseDTO> FinishQuizAsync(Guid quizId, string token);
     
     Task DeleteQuizAsync(Guid quizId);
-    
-    Task GetQuizByIdAsync(Guid quizId);
 }
