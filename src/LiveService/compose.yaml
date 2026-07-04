@@ -1,0 +1,34 @@
+﻿# yaml
+services:
+  live.service:
+    image: ${DOCKER_REGISTRY-}liveservice
+    build:
+      context: ../../
+      dockerfile: src/LiveService/LiveService.WebApi/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5438;Database=LiveService;Username=postgres;Password=postgres
+    ports:
+      - "5008:8080"
+      - "50009:8081"
+    depends_on:
+        - postgres
+    env_file:
+      - ../../.env
+    restart: always
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: LiveService
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5438:5432"
+    volumes:
+      - live-db-data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  live-db-data:
+    external: true
