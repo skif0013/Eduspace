@@ -67,10 +67,13 @@ public class QuizService : IQuizService
     }
 
     //not mean redis just business logic
+    // мб в вообще его нужно убрать 
     public async Task<QuizResponseDTO> PublishQuizAsync(Guid quizId, string token)
     {
-        var quiz = await _quizRepository.GetWithQuestionsAndOptionsByIdAsync(quizId)
-                   ?? throw new KeyNotFoundException($"Quiz with ID '{quizId}' not found");
+        // var quiz = await _quizRepository.GetWithQuestionsAndOptionsByIdAsync(quizId)
+        //            ?? throw new KeyNotFoundException($"Quiz with ID '{quizId}' not found");
+
+        var attempt = await _attemptRepository.GetByIdAsync(quizId);
         
         quiz.Publish();
         
