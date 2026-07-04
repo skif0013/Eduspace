@@ -13,14 +13,18 @@ public class QuizController : ControllerBase
 {
     private readonly IQuizService _quizService;
     private readonly IAttemptService _attemptService;
+    private readonly IQuizIntegrationEventService _quizIntegrationEventService;
 
-    public QuizController(IQuizService quizService, IAttemptService attemptService)
+    public QuizController(IQuizService quizService, IAttemptService attemptService
+    , IQuizIntegrationEventService quizIntegrationEventService)
     {
+        _quizIntegrationEventService = quizIntegrationEventService;
         _quizService = quizService;
         _attemptService = attemptService;
     } 
 
     
+    //TODO:FIX
     [HttpPost]
     public async Task<ActionResult<QuizResponseDTO>> Create([FromBody] CreatingQuizRequestDTO request)
     {
@@ -31,22 +35,6 @@ public class QuizController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<QuizResponseDTO>> GetById([FromRoute] Guid id)
-    {
-        await _quizService.GetQuizByIdAsync(id);
-        
-        return Ok();
-    }
-
-    
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<QuizResponseDTO>>> GetAll()
-    {
-        var result = await _quizService.GetAllQuizzesAsync();
-        return Ok(result);
-    }
     
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] QuizUpdateRequestDTO request)
@@ -77,14 +65,6 @@ public class QuizController : ControllerBase
         [FromBody] SubmitAnswerRequestDTO request)
     {
         var result = await _attemptService.SubmitAnswerAsync(attemptId, request);
-        return Ok(result);
-    }
-
-    [HttpPatch("{id:guid}/publish")]
-    public async Task<ActionResult<QuizResponseDTO>> PublishQuiz([FromRoute] Guid id)
-    {
-        var result = await _quizService.PublishQuizAsync(id);
-        
         return Ok(result);
     }
     
