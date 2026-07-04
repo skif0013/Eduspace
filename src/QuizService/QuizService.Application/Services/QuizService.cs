@@ -33,21 +33,17 @@ public class QuizService : IQuizService
         _eventPublisher = eventPublisher;
     }
     
+    //TODO: Fix:  delete or chenge because in attemptService similar method already exists
     public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid creatorId)
     {
         var quiz = CreateNewQuiz(request, creatorId);
         await _quizRepository.AddQuizAsync(quiz);
         await _unitOfWork.SaveChangesAsync();
-
+        
+        await _quizIntegrationEventService.PublishQuizStartedAsync();
         return _mapper.MapToResponseDTO(quiz);
     }
     
-    public async Task<IEnumerable<QuizResponseDTO>> GetAllQuizzesAsync()
-    {
-        var quizzes = await _quizRepository.GetAllQuizzesAsync();
-        return quizzes.Select(q => _mapper.MapToResponseDTO(q));
-    }
-
     public async Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request)
     {
         var quiz = await _quizRepository.FindByIdAsync(quizId)
@@ -66,38 +62,16 @@ public class QuizService : IQuizService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    //not mean redis just business logic
-    // мб в вообще его нужно убрать 
-    public async Task<QuizResponseDTO> PublishQuizAsync(Guid quizId, string token)
-    {
-        // var quiz = await _quizRepository.GetWithQuestionsAndOptionsByIdAsync(quizId)
-        //            ?? throw new KeyNotFoundException($"Quiz with ID '{quizId}' not found");
 
-        var attempt = await _attemptRepository.GetByIdAsync(quizId);
-        
-        quiz.Publish();
-        
-        //token
-        await _quizIntegrationEventService.PublishQuizStartedAsync(quiz, token);
-        await _unitOfWork.SaveChangesAsync();
-    
-        return _mapper.MapToResponseDTO(quiz);
-    }
-    
-    public async Task GetQuizByIdAsync(Guid quizId)
-    {
-        await _quizRepository.FindByIdAsync(quizId);
-    }
-    
     //TODO: implement this to controller
     public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId, string token)
     {
         var attempt = await _attemptRepository.GetByIdAsync(attemptId)
                       ?? throw new AttemptNotFoundException(attemptId);
-
-        await _quizIntegrationEventService.PublishQuizFinishedAsync(attempt, token);
         
-        FinishAttemptAndSaveChanges(attempt);
+        await FinishAttemptAndSaveChanges(attempt);
+        
+        await _quizIntegrationEventService.PublishQuizFinishedAsync(attempt, token);
         
         return _mapper.MapToFinishQuizResponseDTO(attempt);
     }
