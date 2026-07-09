@@ -17,4 +17,10 @@ public class RedisEventPublisher : IEventPublisher
         string message = JsonSerializer.Serialize(@event);
         return subscriber.PublishAsync(RedisChannel.Literal(channel), message);
     }
+
+    public async Task PublishRawAsync(string channel, string rawJsonMessage)
+    {
+        var subscriber = _connection.GetSubscriber();
+        await subscriber.PublishAsync(RedisChannel.Literal(channel), rawJsonMessage);
+    }
 }
