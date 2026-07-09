@@ -56,12 +56,12 @@ public class UserService : IUserService
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-        // 3. Создаем объект нашего события (контракт)
+        
         var confirmEmailEvent = new EmailVerifyEvent()
         {
             To = user.Email,
             UserName = user.UserName,
-            VerificationLink = "", // Ссылку можно сформировать здесь или в хандлере
+            VerificationLink = $"https://yourapp.com/auth/verify?email={user.Email}&token={token}", 
             Code = token
         };
 
