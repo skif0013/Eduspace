@@ -1,13 +1,13 @@
 ﻿using System.Text.Json;
+using BuildingBlocks.Redis.Events.Handler;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
-using IdentityService.Infrastructure.Redis;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Messages;
 
 namespace IdentityService.Infrastructure.Services;
 
-public class UserUpdatedHandler : ScopedMessageHandler
+public  abstract class UserUpdatedHandler : ScopedMessageHandler
 {
     public UserUpdatedHandler(
         IServiceScopeFactory scopeFactory)
@@ -17,7 +17,8 @@ public class UserUpdatedHandler : ScopedMessageHandler
 
     public override string Channel => "user:updated";
 
-    protected override async Task HandleScopedAsync(string message, IServiceProvider serviceProvider)
+    //ovveride
+    protected async Task HandleScopedAsync(string message, IServiceProvider serviceProvider)
     {
         var userService = serviceProvider.GetRequiredService<IUserService>();
         

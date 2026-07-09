@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,14 +7,15 @@ using QuizService.Infrastructure.Data;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
-using QuizService.Infrastructure.Redis;
 using QuizService.Infrastructure.Redis.Configuration;
 using QuizService.Infrastructure.Repositories;
 using QuizService.Infrastructure.Persistence.UnitOfWork;
 using QuizService.Application.Repositories;
 using QuizService.Application.Services;
-using BuildingBlocks.Redis.Contracts;
+using BuildingBlocks.Redis.Contracts.Serealizer;
+using BuildingBlocks.Redis.Events.Handler;
 using BuildingBlocks.Redis.Serialization;
+using QuizService.Application.Orchestration;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,6 +76,7 @@ static void RegisterApplicationServices(IServiceCollection services)
 {
     services.AddScoped<IQuizService, QuizService.Application.Services.QuizService>();
     services.AddScoped<IQuizRepository, QuizRepository>();
+    services.AddScoped<IQuizIntegrationEventService, QuizProcessingOrchestrator>();
     services.AddScoped<IUnitOfWork, UnitOfWork>();
     services.AddScoped<IQuizMapper, QuizMapper>();
     services.AddScoped<ITokenService, TokenService>();
@@ -87,34 +88,26 @@ static void RegisterApplicationServices(IServiceCollection services)
     services.AddScoped<IAttemptService, AttemptService>();
 }
 
-static void RegisterRedisServices(IServiceCollection services, IConfiguration configuration)
+ static void RegisterRedisServices(IServiceCollection services, IConfiguration configuration)
 {
+    // 1. Собираем параметры подключения к самому Redis
     var redisEndpoint = configuration["Redis:Endpoint"] ?? "localhost:6379";
     var redisUser = configuration["Redis:User"];
     var redisPassword = configuration["Redis:Password"];
-    var quizFinishedStream = configuration["Redis:Streams:QuizFinished"] ?? "quiz:finished:v1";
 
-    var redisConfig = new RedisStreamPublisherConfiguration(
-        quizFinishedStream,
-        redisEndpoint,
-        redisUser,
-        redisPassword);
-
-    services.AddSingleton(redisConfig);
-
-    services.AddSingleton<ConnectionMultiplexer>(_ =>
+    var configOptions = new ConfigurationOptions
     {
-        var config = redisConfig.BuildConfigurationOptions();
-        return ConnectionMultiplexer.Connect(config);
-    });
+        EndPoints = { redisEndpoint },
+        User = redisUser,
+        Password = redisPassword,
+        AbortOnConnectFail = false 
+    };
 
-    services.AddSingleton<IStreamEventSerializer, JsonStreamEventSerializer>();
+    services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(configOptions));
 
-    services.AddScoped<IQuizFinishedEventPublisher>(sp =>
-        new QuizFinishedEventStreamPublisher(
-            sp.GetRequiredService<ConnectionMultiplexer>(),
-            redisConfig,
-            sp.GetRequiredService<IStreamEventSerializer>()));
+    services.AddSingleton<IStreamEventSerializer, StreamEventSerializer>();
+    
+    services.AddSingleton<ScopedMessageHandler, ConfimEmailHandler>();
 }
 
 static void ConfigureAuthentication(WebApplicationBuilder builder)
@@ -137,6 +130,8 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
             };
         });
 }
+
+#region swagger
 
 static void ConfigureSwagger(IServiceCollection services)
 {
@@ -165,4 +160,7 @@ static void ConfigureSwagger(IServiceCollection services)
         });
     });
 }
+
+#endregion
+
 

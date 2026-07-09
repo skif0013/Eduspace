@@ -40,7 +40,6 @@ public class QuizService : IQuizService
         await _quizRepository.AddQuizAsync(quiz);
         await _unitOfWork.SaveChangesAsync();
         
-        await _quizIntegrationEventService.PublishQuizStartedAsync();
         return _mapper.MapToResponseDTO(quiz);
     }
     
@@ -61,9 +60,7 @@ public class QuizService : IQuizService
         await _quizRepository.RemoveAsync(quiz);
         await _unitOfWork.SaveChangesAsync();
     }
-
-
-    //TODO: implement this to controller
+    
     public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId, string token)
     {
         var attempt = await _attemptRepository.GetByIdAsync(attemptId)

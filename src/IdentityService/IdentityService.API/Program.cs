@@ -1,4 +1,5 @@
 using System.Text;
+using BuildingBlocks.Redis;
 using IdentityService.API.Middleware;
 using IdentityService.Application.Interfaces;
 using IdentityService.Application.Interfaces.Repositories;
@@ -19,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NotificationService.Infrastructure.Redis.RedisBroker;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -109,6 +111,8 @@ if (!builder.Environment.IsEnvironment("Testing"))
         };
         return ConnectionMultiplexer.Connect(config);
     });
+    
+    builder.Services.AddSingleton<IEventPublisher, RedisEventPublisher>();
 }
 #endregion
 

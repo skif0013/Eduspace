@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using BuildingBlocks.Redis;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
 using IdentityService.Application.Interfaces.Repositories;
@@ -20,8 +21,10 @@ public class UserService : IUserService
     private readonly RoleManager<RoleIdentity> _roleManager;
     private readonly ITokenService _tokenService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEventPublisher _eventPublisher;
 
     public UserService(
+        IEventPublisher eventPublisher,
         UserManager<User> userManager,
         RoleManager<RoleIdentity> roleManager,
         ITokenService tokenService,
@@ -33,7 +36,7 @@ public class UserService : IUserService
         _tokenService = tokenService;
         _unitOfWork = unitOfWork;
     }
-    
+
     public async Task<Result<string>> RegisterAsync(CreateUserDto createUserDto)
     {
         var user = new User
@@ -41,7 +44,8 @@ public class UserService : IUserService
             UserName = createUserDto.UserName,
             Email = createUserDto.Email,
         };
-        
+
+
         var result = await _userManager.CreateAsync(user, createUserDto.Password);
         if (!result.Succeeded)
         {
@@ -49,28 +53,33 @@ public class UserService : IUserService
             return Result<string>.Failure($"Error creating user: {errors}");
         }
 
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user); 
-        Console.WriteLine($"Email confirmation token for {user.Email}: {token}");
-        
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        // 3. Создаем объект нашего события (контракт)
         var confirmEmailEvent = new EmailVerifyEvent()
         {
             To = user.Email,
             UserName = user.UserName,
-            VerificationLink = "",
+            VerificationLink = "", // Ссылку можно сформировать здесь или в хандлере
             Code = token
         };
-        
+
+
         var outboxMessage = new OutboxMessage()
         {
             Id = Guid.NewGuid(),
-            Type = "identity.user.created",
+            Type = "email:verify",
             Content = JsonSerializer.Serialize(confirmEmailEvent),
             OccurredOnUtc = DateTime.UtcNow
         };
 
+        // 5. Сохраняем сообщение в репозиторий Outbox (внутри той же транзакции)
         await _unitOfWork.OutboxRepository.AddAsync(outboxMessage);
+
+        // 6. Коммитим изменения. Теперь и юзер, и аутбокс железно сохранятся вместе
         await _unitOfWork.Commit();
-        
+
         return Result<string>.Success("user created successfully");
     }
 
