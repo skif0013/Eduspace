@@ -1,10 +1,12 @@
-﻿using DotNetEnv;
+﻿using BuildingBlocks.Redis.Contracts.Broker;
+using DotNetEnv;
 using Microsoft.OpenApi.Models;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.Interfaces.Services;
 using NotificationService.Domain.Models;
 using NotificationService.Infrastructure.Redis;
 using NotificationService.Infrastructure.Redis.Configuration;
+using NotificationService.Infrastructure.Redis.RedisBroker;
 using NotificationService.Infrastructure.Service;
 using NotificationService.Infrastructure.Services;
 using NotificationService.Infrastructure.SmtpClientFactory;
@@ -103,7 +105,7 @@ void RegisterRedisServices(IServiceCollection services)
         return ConnectionMultiplexer.Connect(config);
     });
 
-    services.AddSingleton<RedisMessageBroker>();
+    services.AddSingleton<IRedisMessageBroker,RedisMessageBroker>();
 
     // Конфигурации для обоих потоков
     var config1 = new RedisStreamConsumerConfiguration(
@@ -134,7 +136,7 @@ void RegisterRedisServices(IServiceCollection services)
 
 static void RegisterNotificationHandlers(IServiceCollection services)
 {
-    services.AddSingleton<IMessageHandler, ConfimEmailHandler>();
+    services.AddSingleton<IMessageHandler, ConfirmEmailHandler>();
     services.AddSingleton<IMessageHandler, QuizFinishedEmailHandler>();
     services.AddSingleton<IMessageHandler, IdentityUserCreatedHandler>();
     services.AddSingleton<IMessageHandler, IdentityUserForgotPasswordHandler>();

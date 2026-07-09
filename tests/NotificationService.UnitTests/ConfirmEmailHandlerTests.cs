@@ -14,7 +14,7 @@ public record EmailVerifyEventTest(string To, string UserName, string Code);
 /// Модульные тесты для ConfimEmailHandler
 /// Проверяют корректность обработки сообщений верификации email
 /// </summary>
-public class ConfimEmailHandlerTests
+public class ConfirmEmailHandlerTests
 {
     /// <summary>
     /// Проверяет, что handler правильно десериализует сообщение
@@ -42,7 +42,7 @@ public class ConfimEmailHandlerTests
             .Setup(x => x.GetService(typeof(IEmailService)))
             .Returns(mockEmailService.Object);
 
-        var handler = new ConfimEmailHandler(mockScopeFactory.Object);
+        var handler = new ConfirmEmailHandler(mockScopeFactory.Object);
 
         // Создаем тестовое событие
         var testEvent = new EmailVerifyEventTest(
@@ -73,7 +73,7 @@ public class ConfimEmailHandlerTests
     {
         // Arrange
         var mockScopeFactory = new Mock<IServiceScopeFactory>();
-        var handler = new ConfimEmailHandler(mockScopeFactory.Object);
+        var handler = new ConfirmEmailHandler(mockScopeFactory.Object);
 
         // Act
         var channel = handler.Channel;
@@ -98,7 +98,7 @@ public class ConfimEmailHandlerTests
         mockServiceScope.Setup(x => x.ServiceProvider).Returns(mockServiceProvider.Object);
         mockServiceProvider.Setup(x => x.GetService(typeof(IEmailService))).Returns(mockEmailService.Object);
 
-        var handler = new ConfimEmailHandler(mockScopeFactory.Object);
+        var handler = new ConfirmEmailHandler(mockScopeFactory.Object);
 
         var testEvent = new EmailVerifyEventTest(
             To: "",
@@ -135,7 +135,7 @@ public class ConfimEmailHandlerTests
         mockServiceScope.Setup(x => x.ServiceProvider).Returns(mockServiceProvider.Object);
         mockServiceProvider.Setup(x => x.GetService(typeof(IEmailService))).Returns(mockEmailService.Object);
 
-        var handler = new ConfimEmailHandler(mockScopeFactory.Object);
+        var handler = new ConfirmEmailHandler(mockScopeFactory.Object);
 
         var testEvent = new EmailVerifyEventTest(
             To: "test@test.com",
@@ -175,7 +175,7 @@ public class ConfimEmailHandlerTests
             .Setup(x => x.SendVerifyEmailAsync(It.IsAny<EmailVerifyDTO>()))
             .ThrowsAsync(testException);
 
-        var handler = new ConfimEmailHandler(mockScopeFactory.Object);
+        var handler = new ConfirmEmailHandler(mockScopeFactory.Object);
 
         var testEvent = new EmailVerifyEventTest(
             To: "user@example.com",
