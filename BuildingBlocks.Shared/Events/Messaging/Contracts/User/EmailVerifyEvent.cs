@@ -5,5 +5,6 @@ namespace BuildingBlocks.Shared.Events.Messaging.Contracts.User;
 public record EmailVerifyEvent(
     string To,
     string UserName,
-    string Code
+    string Code,
+    string VerificationLink
     ) : IntegrationEvent(new Guid(), DateTime.UtcNow);
