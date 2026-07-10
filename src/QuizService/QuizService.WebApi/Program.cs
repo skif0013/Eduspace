@@ -76,7 +76,6 @@ static void RegisterApplicationServices(IServiceCollection services)
 {
     services.AddScoped<IQuizService, QuizService.Application.Services.QuizService>();
     services.AddScoped<IQuizRepository, QuizRepository>();
-    services.AddScoped<IQuizIntegrationEventService, QuizProcessingOrchestrator>();
     services.AddScoped<IUnitOfWork, UnitOfWork>();
     services.AddScoped<IQuizMapper, QuizMapper>();
     services.AddScoped<ITokenService, TokenService>();
