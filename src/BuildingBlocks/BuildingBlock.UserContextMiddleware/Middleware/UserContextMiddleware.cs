@@ -15,7 +15,7 @@ public class UserContextMiddleware
     
     public async Task InvokeAsync(HttpContext context, UserContext userContext)
     {
-        if (context.User.Identity.IsAuthenticated)
+        if (context.User.Identity?.IsAuthenticated == true)
         {
             var userIdClaim = context.User.FindFirst("userId")?.Value;
             if (Guid.TryParse(userIdClaim, out var userId)) 
@@ -27,8 +27,8 @@ public class UserContextMiddleware
                 throw new UnauthorizedAccessException("Invalid userId claim.");
             }
 
-            userContext.Name = context.User.FindFirst(ClaimTypes.Name)?.Value;
-            userContext.Email = context.User.FindFirst(ClaimTypes.Email)?.Value;
+            userContext.Name = context.User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
+            userContext.Email = context.User.FindFirst(ClaimTypes.Email)?.Value  ?? string.Empty;
         }
         
         await _next(context);
