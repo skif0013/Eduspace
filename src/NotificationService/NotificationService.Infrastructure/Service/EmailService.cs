@@ -1,5 +1,4 @@
-﻿using System.Net.Mail;
-using Microsoft.Extensions.Configuration;
+using System.Net.Mail;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
 using NotificationService.Domain.Models;
@@ -12,11 +11,11 @@ public class EmailService : IEmailService
     private readonly IEmailCreateClient _emailCreateClient;
     private readonly EmailTemplates _emailTemplates;
     
-    public EmailService(EmailSettings emailSettings, IEmailCreateClient emailCreateClient, IConfiguration configuration)
+    public EmailService(EmailSettings emailSettings, IEmailCreateClient emailCreateClient, EmailTemplates emailTemplates)
     {
-        _emailTemplates = configuration.GetSection("EmailTemplates:Verification").Get<EmailTemplates>();
         _emailSettings = emailSettings;
         _emailCreateClient = emailCreateClient;
+        _emailTemplates = emailTemplates;
     }
 
     public async Task SendEmailAsync(EmailSendDTO dto)
