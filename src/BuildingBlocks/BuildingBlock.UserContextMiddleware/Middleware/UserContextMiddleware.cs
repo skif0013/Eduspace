@@ -13,16 +13,23 @@ public class UserContextMiddleware
         _next = next;
     }
     
-    public async Task InvokeAsync(HttpContext context, UserContext userContext)  // TODO сделать правильную обработку всех ошибок
+    public async Task InvokeAsync(HttpContext context, UserContext userContext)
     {
-        var userIdClaim = context.User.FindFirst("userId")?.Value;
-        if (Guid.TryParse(userIdClaim, out var userId)) 
+        if (context.User.Identity.IsAuthenticated)
         {
-            userContext.UserId = userId;
+            var userIdClaim = context.User.FindFirst("userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out var userId)) 
+            {
+                userContext.UserId = userId;
+            }
+            else 
+            {
+                throw new UnauthorizedAccessException("Invalid userId claim.");
+            }
+
+            userContext.Name = context.User.FindFirst(ClaimTypes.Name)?.Value;
+            userContext.Email = context.User.FindFirst(ClaimTypes.Email)?.Value;
         }
-        
-        userContext.Name = context.User.FindFirst(ClaimTypes.Name)?.Value;
-        userContext.Email = context.User.FindFirst(ClaimTypes.Email)?.Value;
         
         await _next(context);
     }
