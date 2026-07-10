@@ -7,9 +7,9 @@ namespace BuildingBlocks.Redis.Events;
 public class RedisSubscriberWorker : BackgroundService
 {
     private readonly IConnectionMultiplexer _connectionMultiplexer;
-    private readonly IEnumerable<ScopedMessageHandler> _messageHandlers;
+    private readonly IEnumerable<IScopedMessageHandler> _messageHandlers;
     
-    public RedisSubscriberWorker(IConnectionMultiplexer connectionMultiplexer, IEnumerable<ScopedMessageHandler> messageHandlers)
+    public RedisSubscriberWorker(IConnectionMultiplexer connectionMultiplexer, IEnumerable<IScopedMessageHandler> messageHandlers)
     {
         _connectionMultiplexer = connectionMultiplexer;
         _messageHandlers = messageHandlers;
