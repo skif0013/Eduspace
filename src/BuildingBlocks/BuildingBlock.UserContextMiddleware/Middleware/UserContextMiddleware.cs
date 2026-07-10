@@ -1,7 +1,8 @@
-﻿using System.Security.Claims;
-using IdentityService.Application.Common.Models;
-
-namespace IdentityService.API.Middleware;
+using System.Security.Claims;
+using BuildingBlock.UserContextMiddleware.Models;
+using Microsoft.AspNetCore.Http;
+    
+namespace BuildingBlock.UserContextMiddleware.Middleware;
 
 public class UserContextMiddleware
 {
@@ -11,11 +12,11 @@ public class UserContextMiddleware
     {
         _next = next;
     }
-
-    public async Task InvokeAsync(HttpContext context, UserContext userContext)
+    
+    public async Task InvokeAsync(HttpContext context, UserContext userContext)  // TODO сделать правильную обработку всех ошибок
     {
         var userIdClaim = context.User.FindFirst("userId")?.Value;
-        if (Guid.TryParse(userIdClaim, out var userId))
+        if (Guid.TryParse(userIdClaim, out var userId)) 
         {
             userContext.UserId = userId;
         }
