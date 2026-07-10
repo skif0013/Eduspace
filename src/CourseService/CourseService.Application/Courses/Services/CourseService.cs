@@ -264,4 +264,43 @@ public class CourseService : ICourseService
 
         return Result<CourseResponse>.Success(response);
     }
+
+    public async Task<Result> DeleteCourseAsync(Guid courseId, Guid authorId)
+    {
+        var findCourse = await _courseRepository.GetCourseByIdAsync(courseId);
+        if (findCourse == null)
+        {
+            _logger.LogInformation("Course {CourseId} not found", courseId);
+
+            return Result.Failure(CourseErrors.CourseNotFound);
+        }
+
+        await _courseRepository.DeleteCourseAsync(courseId);
+        await _cache.IncrementCatalogVersionAsync();
+        var key = _keyBuilder.GetCourseKey(courseId);
+        await _cache.RemoveAsync(key);
+
+        _logger.LogInformation(
+            "Course {CourseId} deleted by Author {AuthorId}",
+            courseId,
+            authorId);
+
+        return Result.Success();
+    }
+
+    public async Task<Result<CourseResponse>> FinishCourseAsync(Guid courseId)
+    {
+        var course = await _courseRepository.GetCourseByIdAsync(courseId);
+        if (course == null)
+        {
+            _logger.LogInformation("Course {CourseId} not found", courseId);
+
+            return Result<CourseResponse>.Failure(CourseErrors.CourseNotFound);
+        }
+
+        course.Finish();
+
+        var response = _mapper.Map<CourseResponse>(course);
+        return Result<CourseResponse>.Success(response);
+    }
 }
