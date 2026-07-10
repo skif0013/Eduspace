@@ -58,20 +58,4 @@ public class Quiz
         PassPercentage = passPercentage;
         ModifiedOn = DateTime.UtcNow;
     }
-
-    public void Publish()
-    {
-        if (!_questions.Any())
-            throw new InvalidOperationException("Cannot publish a quiz without questions.");
-        
-        IsPublished = true;
-        IsActive = true;
-        ModifiedOn = DateTime.UtcNow;
-    }
-
-    public void Archive()
-    {
-        IsActive = false;
-        ModifiedOn = DateTime.UtcNow;
-    }
 }
