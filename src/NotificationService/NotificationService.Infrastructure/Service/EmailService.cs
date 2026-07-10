@@ -57,4 +57,29 @@ public class EmailService : IEmailService
 
         await client.SendMailAsync(emailMessage); 
     }
+
+    public async Task SendResetPasswordEmailAsync(ResetPasswordDTO dto)
+    {
+        
+        using var client = _emailCreateClient.CreateClient();
+    
+        
+        var body = _emailTemplates.body
+            .Replace("{ResetPasswordLink}", dto.Token ?? "");
+    
+        var subject = "Reset your password";
+
+       
+        using var emailMessage = new MailMessage
+        {
+            From = new MailAddress(_emailSettings.FromAddress, _emailSettings.Username),
+            Subject = subject,
+            Body = body,
+            IsBodyHtml = true
+        };
+    
+        emailMessage.To.Add(dto.To);
+        
+        await client.SendMailAsync(emailMessage);
+    }
 }
