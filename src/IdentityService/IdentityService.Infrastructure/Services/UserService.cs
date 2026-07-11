@@ -24,7 +24,6 @@ public class UserService : IUserService
     private readonly IEventPublisher _eventPublisher;
 
     public UserService(
-        IEventPublisher eventPublisher,
         UserManager<User> userManager,
         RoleManager<RoleIdentity> roleManager,
         ITokenService tokenService,
