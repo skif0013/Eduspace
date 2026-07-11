@@ -1,26 +1,14 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using QuizService.Application;
+using QuizService.Infrastructure;
 using QuizService.Infrastructure.Data;
-using QuizService.Application.Contracts;
-using QuizService.Application.Contracts.IQuizAttempt;
-using QuizService.Application.Contracts.QuestionsContract;
-using QuizService.Infrastructure.Redis.Configuration;
-using QuizService.Infrastructure.Repositories;
-using QuizService.Infrastructure.Persistence.UnitOfWork;
-using QuizService.Application.Repositories;
-using QuizService.Application.Services;
-using BuildingBlocks.Redis.Contracts.Serealizer;
-using BuildingBlocks.Redis.Events.Handler;
-using BuildingBlocks.Redis.Serialization;
-using QuizService.Application.Orchestration;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Try to load .env if it exists (for local development)
 var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
 if (File.Exists(envPath))
 {
@@ -29,16 +17,8 @@ if (File.Exists(envPath))
 
 builder.Configuration.AddEnvironmentVariables();
 
-var configuration = builder.Configuration;
-
-var connectionString = configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
-
-RegisterApplicationServices(builder.Services);
-RegisterRedisServices(builder.Services, configuration);
+builder.Services.AddQuizApplicationServices();
+builder.Services.AddQuizInfrastructure(builder.Configuration, builder.Environment);
 ConfigureAuthentication(builder);
 
 builder.Services.AddAuthorization();
@@ -50,8 +30,11 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Database.Migrate();
+    }
 }
 
 if (app.Environment.IsDevelopment())
@@ -63,7 +46,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz Service API v1");
-    c.RoutePrefix = "";
+    c.RoutePrefix = string.Empty;
 });
 
 app.UseHttpsRedirection();
@@ -71,43 +54,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
-
-static void RegisterApplicationServices(IServiceCollection services)
-{
-    services.AddScoped<IQuizService, QuizService.Application.Services.QuizService>();
-    services.AddScoped<IQuizRepository, QuizRepository>();
-    services.AddScoped<IUnitOfWork, UnitOfWork>();
-    services.AddScoped<IQuizMapper, QuizMapper>();
-    services.AddScoped<ITokenService, TokenService>();
-    services.AddScoped<IQuestionService, QuestionService>();
-    services.AddScoped<IQuestionScoringService, QuestionScoringService>();
-    services.AddScoped<IQuestionRepository, QuestionRepository>();
-    services.AddScoped<IQuestionMapper, QuestionMapper>();
-    services.AddScoped<IAttemptRepository, AttemptRepository>();
-    services.AddScoped<IAttemptService, AttemptService>();
-}
-
- static void RegisterRedisServices(IServiceCollection services, IConfiguration configuration)
-{
-    // 1. Собираем параметры подключения к самому Redis
-    var redisEndpoint = configuration["Redis:Endpoint"] ?? "localhost:6379";
-    var redisUser = configuration["Redis:User"];
-    var redisPassword = configuration["Redis:Password"];
-
-    var configOptions = new ConfigurationOptions
-    {
-        EndPoints = { redisEndpoint },
-        User = redisUser,
-        Password = redisPassword,
-        AbortOnConnectFail = false 
-    };
-
-    services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(configOptions));
-
-    services.AddSingleton<IStreamEventSerializer, StreamEventSerializer>();
-    
-    services.AddSingleton<ScopedMessageHandler, ConfimEmailHandler>();
-}
 
 static void ConfigureAuthentication(WebApplicationBuilder builder)
 {
@@ -129,8 +75,6 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
             };
         });
 }
-
-#region swagger
 
 static void ConfigureSwagger(IServiceCollection services)
 {
@@ -159,7 +103,3 @@ static void ConfigureSwagger(IServiceCollection services)
         });
     });
 }
-
-#endregion
-
-
