@@ -13,26 +13,21 @@ public class QuizController : ControllerBase
 {
     private readonly IQuizService _quizService;
     private readonly IAttemptService _attemptService;
-    private readonly IQuizIntegrationEventService _quizIntegrationEventService;
 
-    public QuizController(IQuizService quizService, IAttemptService attemptService
-    , IQuizIntegrationEventService quizIntegrationEventService)
+    public QuizController(IQuizService quizService, IAttemptService attemptService)
     {
-        _quizIntegrationEventService = quizIntegrationEventService;
         _quizService = quizService;
         _attemptService = attemptService;
     } 
-
     
-    //TODO:FIX
     [HttpPost]
     public async Task<ActionResult<QuizResponseDTO>> Create([FromBody] CreatingQuizRequestDTO request)
     {
         var userId = Guid.NewGuid();
         
         var result = await _quizService.CreateQuizAsync(request, userId);
-        
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+
+        return Ok(result);
     }
 
     
