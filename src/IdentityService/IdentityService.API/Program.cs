@@ -8,7 +8,6 @@ using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure.Database;
 using IdentityService.Infrastructure.Database.InitialData;
 using IdentityService.Infrastructure.Identity;
-using IdentityService.Infrastructure.Redis;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using DotNetEnv;
@@ -20,7 +19,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using NotificationService.Infrastructure.Redis.RedisBroker;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -146,20 +144,6 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IOutboxRepository, OutboxRepository>(); 
 
-builder.Services.AddSingleton<IDatabase>(sp =>
-{
-    var mux = sp.GetRequiredService<IConnectionMultiplexer>();
-    return mux.GetDatabase();
-});
-
-builder.Services.AddSingleton<IMessageHandler, UserUpdatedHandler>();
-if (!builder.Environment.IsEnvironment("Testing"))
-{
-    builder.Services.AddSingleton<IRedisMessageBroker, RedisMessageBroker>();
-    builder.Services.AddHostedService<RedisSubscriberService>();
-}
-builder.Services.AddScoped<IMessageService, MessageService>();
-
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -220,4 +204,3 @@ app.Run();
 
 // Expose Program type for WebApplicationFactory in integration tests
 public partial class Program { }
-

@@ -9,6 +9,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\BuildingBlocks.Shared\BuildingBlocks.Shared.csproj" />
         <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj" />
+        <ProjectReference Include="..\..\CourseService\CourseService.Application\CourseService.Application.csproj" />
         <ProjectReference Include="..\NotificationService.Domain\NotificationService.Domain.csproj" />
     </ItemGroup>
 

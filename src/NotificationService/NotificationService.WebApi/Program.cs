@@ -11,7 +11,7 @@ if (File.Exists(envPath))
 }
 
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration, builder.Environment);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

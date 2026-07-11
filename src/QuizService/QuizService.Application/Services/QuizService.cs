@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Redis.Contracts.Broker;
-using QuizService.Application.Contracts;
+﻿using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuizDTOs;
@@ -15,22 +14,17 @@ public class QuizService : IQuizService
     private readonly IQuizRepository _quizRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IQuizMapper _mapper;
-    private readonly ITokenService _tokenService;
     private readonly IAttemptRepository _attemptRepository;
-    private readonly IRedisMessageBroker _eventPublisher;
-    private readonly IQuizIntegrationEventService _quizIntegrationEventService;
+    
 
-    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper,
-        ITokenService tokenService, IAttemptRepository attemptRepository, IRedisMessageBroker eventPublisher
-        , IQuizIntegrationEventService quizIntegrationEventService)
+    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper, 
+        IAttemptRepository attemptRepository
+        )
     {
-        _quizIntegrationEventService = quizIntegrationEventService;
         _quizRepository = quizRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _tokenService = tokenService;
         _attemptRepository = attemptRepository;
-        _eventPublisher = eventPublisher;
     }
     
     //TODO: Fix:  delete or chenge because in attemptService similar method already exists
@@ -67,8 +61,6 @@ public class QuizService : IQuizService
                       ?? throw new AttemptNotFoundException(attemptId);
         
         await FinishAttemptAndSaveChanges(attempt);
-        
-        await _quizIntegrationEventService.PublishQuizFinishedAsync(attempt, token);
         
         return _mapper.MapToFinishQuizResponseDTO(attempt);
     }

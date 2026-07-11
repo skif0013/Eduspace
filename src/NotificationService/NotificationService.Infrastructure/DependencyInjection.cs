@@ -17,10 +17,15 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IHostEnvironment environment)
     {
         services.AddEmailServices(configuration);
-        services.AddRedis(configuration);
+
+        if (!environment.IsEnvironment("Testing"))
+        {
+            services.AddRedis(configuration);
+        }
 
         return services;
     }

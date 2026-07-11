@@ -73,11 +73,9 @@ public class UserService : IUserService
             Content = JsonSerializer.Serialize(confirmEmailEvent),
             OccurredOnUtc = DateTime.UtcNow
         };
-
-        // 5. Сохраняем сообщение в репозиторий Outbox (внутри той же транзакции)
+        
         await _unitOfWork.OutboxRepository.AddAsync(outboxMessage);
-
-        // 6. Коммитим изменения. Теперь и юзер, и аутбокс железно сохранятся вместе
+        
         await _unitOfWork.Commit();
 
         return Result<string>.Success("user created successfully");
@@ -131,7 +129,7 @@ public class UserService : IUserService
         
         var confirmEmailEvent = new UserResetPasswordEvent()
         {
-            UserEmail = request.Email,
+            To = request.Email,
             Token = token
         };
         
