@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
-using QuizService.Application.Mapper;
 using QuizService.Application.Services;
 
 namespace QuizService.Application;
