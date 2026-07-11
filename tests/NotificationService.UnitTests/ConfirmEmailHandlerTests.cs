@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
-using NotificationService.Infrastructure.Services;
+using NotificationService.Application.Redis.EventHadlers;
 
 namespace NotificationService.UnitTests;
 
@@ -53,7 +53,7 @@ public class ConfirmEmailHandlerTests
         var message = JsonSerializer.Serialize(testEvent);
 
         // Act
-        await handler.HandleAsync(message);
+        await handler.HandleMessageAsync(message);
 
         // Assert
         mockEmailService.Verify(
@@ -108,7 +108,7 @@ public class ConfirmEmailHandlerTests
         var message = JsonSerializer.Serialize(testEvent);
 
         // Act
-        await handler.HandleAsync(message);
+        await handler.HandleMessageAsync(message);
 
         // Assert
         mockEmailService.Verify(
@@ -145,7 +145,7 @@ public class ConfirmEmailHandlerTests
         var message = JsonSerializer.Serialize(testEvent);
 
         // Act
-        await handler.HandleAsync(message);
+        await handler.HandleMessageAsync(message);
 
         // Assert
         mockEmailService.Verify(
@@ -185,7 +185,7 @@ public class ConfirmEmailHandlerTests
         var message = JsonSerializer.Serialize(testEvent);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => handler.HandleAsync(message));
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => handler.HandleMessageAsync(message));
         Assert.Equal("Email service error", exception.Message);
     }
 }
