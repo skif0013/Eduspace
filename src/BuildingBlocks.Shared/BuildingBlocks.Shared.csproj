@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj" />
       <ProjectReference Include="..\src\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj" />
     </ItemGroup>
 

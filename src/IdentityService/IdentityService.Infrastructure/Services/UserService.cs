@@ -1,16 +1,14 @@
 ﻿using System.Text.Json;
 using BuildingBlocks.Redis;
+using BuildingBlocks.Redis.Events;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
-using IdentityService.Application.Interfaces.Repositories;
-using IdentityService.Application.Interfaces.Services;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Results;
 using IdentityService.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Shared.Messages;
-using BuildingBlocks.Redis.Events;
+
 
 namespace IdentityService.Infrastructure.Services;
 
