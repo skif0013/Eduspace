@@ -1,9 +1,12 @@
-﻿using System.Text;
+﻿
+using System.Text;
+using BuildingBlock.UserContextMiddleware.Middleware;
+using BuildingBlock.UserContextMiddleware.Models;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+
 using QuizService.Infrastructure.Data;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
@@ -16,6 +19,8 @@ using QuizService.Application.Repositories;
 using QuizService.Application.Services;
 using BuildingBlocks.Redis.Contracts;
 using BuildingBlocks.Redis.Serialization;
+using Microsoft.OpenApi.Models;
+//using Microsoft.OpenApi;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,10 +46,40 @@ RegisterApplicationServices(builder.Services);
 RegisterRedisServices(builder.Services, configuration);
 ConfigureAuthentication(builder);
 
+
+builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen(option =>
+{
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Quiz Service API", Version = "v1" });
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-ConfigureSwagger(builder.Services);
+//ConfigureSwagger(builder.Services);
 
 var app = builder.Build();
 
@@ -59,15 +94,25 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+//app.UseSwagger();
+/*app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz Service API v1");
     c.RoutePrefix = "";
-});
+});*/
+
+
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    { 
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz Service API v1");
+        options.RoutePrefix = "swagger"; 
+    });
+
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<UserContextMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
@@ -78,13 +123,13 @@ static void RegisterApplicationServices(IServiceCollection services)
     services.AddScoped<IQuizRepository, QuizRepository>();
     services.AddScoped<IUnitOfWork, UnitOfWork>();
     services.AddScoped<IQuizMapper, QuizMapper>();
-    services.AddScoped<ITokenService, TokenService>();
     services.AddScoped<IQuestionService, QuestionService>();
     services.AddScoped<IQuestionScoringService, QuestionScoringService>();
     services.AddScoped<IQuestionRepository, QuestionRepository>();
     services.AddScoped<IQuestionMapper, QuestionMapper>();
     services.AddScoped<IAttemptRepository, AttemptRepository>();
     services.AddScoped<IAttemptService, AttemptService>();
+    services.AddScoped<UserContext>();
 }
 
 static void RegisterRedisServices(IServiceCollection services, IConfiguration configuration)
@@ -138,7 +183,7 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
         });
 }
 
-static void ConfigureSwagger(IServiceCollection services)
+/*static void ConfigureSwagger(IServiceCollection services)
 {
     services.AddSwaggerGen(options =>
     {
@@ -164,5 +209,5 @@ static void ConfigureSwagger(IServiceCollection services)
             { securityScheme, Array.Empty<string>() }
         });
     });
-}
+}*/
 

@@ -1,25 +1,6 @@
 ﻿services:
 
-  ocelot-gateway:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: final-gateway
-    ports:
-      - "5000:8080"
-    volumes:
-      - ./src/Gateway/ocelot.json:/app/ocelot.json:ro
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    depends_on:
-      - identity-service
-      - file-service
-      - course-service
-      - quiz-service
-      - notification-service
-    restart: always
-    networks:
-      - eduspace-net
+  
 
   identity-service:
     build:
