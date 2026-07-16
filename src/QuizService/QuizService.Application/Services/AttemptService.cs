@@ -4,6 +4,7 @@ using QuizService.Application.Contracts.QuestionsContract;
 using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.Repositories;
 using QuizService.Domain.Models;
+using BuildingBlock.UserContextMiddleware.Models;
 
 namespace QuizService.Application.Services;
 
@@ -15,9 +16,10 @@ public class AttemptService : IAttemptService
     private readonly IQuestionScoringService _questionScoringService;
     private readonly IQuizMapper _quizMapper;
     private readonly IQuizRepository _quizRepository;
+    private readonly UserContext _userContext;
     
     
-    public AttemptService(IAttemptRepository attemptRepository,IQuestionRepository questionRepository, IUnitOfWork unitOfWork, IQuestionScoringService questionScoringService,IQuizMapper quizMapper, IQuizRepository quizRepository)
+    public AttemptService(IAttemptRepository attemptRepository,IQuestionRepository questionRepository, IUnitOfWork unitOfWork, IQuestionScoringService questionScoringService,IQuizMapper quizMapper, IQuizRepository quizRepository, UserContext userContext)
     {
         _quizRepository = quizRepository;
         _quizMapper = quizMapper;
@@ -25,10 +27,12 @@ public class AttemptService : IAttemptService
         _questionRepository = questionRepository;
         _unitOfWork = unitOfWork;
         _questionScoringService = questionScoringService;
+        _userContext = userContext;
     }
     
-    public async Task<QuizStartResponseDTO> StartQuizAsync(Guid quizId, Guid userId)
+    public async Task<QuizStartResponseDTO> StartQuizAsync(Guid quizId)
     {
+        var userId = _userContext.UserId;
         if (await _attemptRepository.HasActiveAttemptAsync(quizId, userId))
             throw new Exception("User already has an active attempt for this quiz");
 

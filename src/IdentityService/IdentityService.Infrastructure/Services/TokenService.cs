@@ -11,6 +11,7 @@ using IdentityService.Domain.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using BuildingBlock.UserContextMiddleware.Models;
 
 namespace IdentityService.Infrastructure.Services;
 
@@ -19,14 +20,14 @@ public class TokenService : ITokenService
     private readonly IConfiguration _configuration;
     private readonly ITokenRepository _tokenRepository;
     private readonly UserManager<User> _userManager;
-    private readonly IUserContext _userContext;
     private readonly ILogger<TokenService> _logger;
     private IUnitOfWork _unitOfWork;
+    private readonly UserContext _userContext;
 
     public TokenService(IConfiguration configuration,
     ITokenRepository tokenRepository,
     UserManager<User> userManager, 
-    IUserContext userContext, 
+    UserContext userContext, 
     ILogger<TokenService> logger,
     IUnitOfWork unitOfWork)
     {

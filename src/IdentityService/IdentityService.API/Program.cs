@@ -11,7 +11,6 @@ using IdentityService.Infrastructure.Redis;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using DotNetEnv;
-using IdentityService.Application.Common.Models;
 using IdentityService.Infrastructure.BackgroundJobs;
 using IdentityService.Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +19,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using BuildingBlock.UserContextMiddleware.Middleware;
+using BuildingBlock.UserContextMiddleware.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,7 +60,6 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
-
 
 #region config jwt
 var validIssuer = builder.Configuration.GetValue<string>("JwtTokenSettings:ValidIssuer");
@@ -134,7 +134,6 @@ builder.Services.AddIdentity<User, RoleIdentity>(options =>
 #endregion
 
 builder.Services.AddScoped<UserContext>();
-builder.Services.AddScoped<IUserContext>(sp => sp.GetRequiredService<UserContext>());
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -216,4 +215,3 @@ app.Run();
 
 // Expose Program type for WebApplicationFactory in integration tests
 public partial class Program { }
-

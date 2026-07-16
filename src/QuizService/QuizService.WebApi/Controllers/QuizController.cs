@@ -19,27 +19,20 @@ public class QuizController : ControllerBase
         _quizService = quizService;
         _attemptService = attemptService;
     } 
-
     
     [HttpPost]
     public async Task<ActionResult<QuizResponseDTO>> Create([FromBody] CreatingQuizRequestDTO request)
     {
-        var userId = Guid.NewGuid();
-        
-        var result = await _quizService.CreateQuizAsync(request, userId);
-        
+        var result = await _quizService.CreateQuizAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
-
     
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<QuizResponseDTO>> GetById([FromRoute] Guid id)
     {
         await _quizService.GetQuizByIdAsync(id);
-        
         return Ok();
     }
-
     
     [HttpGet]
     public async Task<ActionResult<IEnumerable<QuizResponseDTO>>> GetAll()
@@ -66,8 +59,7 @@ public class QuizController : ControllerBase
     [HttpPost("{id:guid}/start")]
     public async Task<ActionResult<QuizStartResponseDTO>> StartQuiz([FromRoute] Guid id)
     {
-        var userId = Guid.NewGuid(); 
-        var result = await _attemptService.StartQuizAsync(id, userId);
+        var result = await _attemptService.StartQuizAsync(id);
         return Ok(result);
     }
 
@@ -84,20 +76,13 @@ public class QuizController : ControllerBase
     public async Task<ActionResult<QuizResponseDTO>> PublishQuiz([FromRoute] Guid id)
     {
         var result = await _quizService.PublishQuizAsync(id);
-        
         return Ok(result);
     }
     
     [HttpPost("{id:guid}/finish")]
     public async Task<ActionResult<FinishQuizResponseDTO>> FinishQuiz([FromRoute] Guid id)
     {
-        var authHeader = Request.Headers.Authorization.ToString();
-        var token = authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
-            ? authHeader["Bearer ".Length..]
-            : authHeader;
-
-        var result = await _quizService.FinishQuizAsync(id, token);
-        
+        var result = await _quizService.FinishQuizAsync(id);
         return Ok(result);
     }
 }
