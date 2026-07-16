@@ -112,8 +112,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseMiddleware<UserContextMiddleware>();
 app.UseAuthorization();
+app.UseMiddleware<UserContextMiddleware>();
 app.MapControllers();
 app.Run();
 
@@ -178,7 +178,7 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
                 ValidIssuer = configuration["JwtTokenSettings:ValidIssuer"] ?? "your_issuer",
                 ValidAudience = configuration["JwtTokenSettings:ValidAudience"] ?? "your_audience",
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(configuration["JwtTokenSettings:Secret"] ?? "super_secret_key"))
+                    Encoding.UTF8.GetBytes(configuration["JwtTokenSettings:SymmetricSecurityKey"] ?? "super_secret_key"))
             };
         });
 }
