@@ -221,7 +221,7 @@ $RECYCLE.BIN/
 *.cer
 *.crt
 
-**/Migrations/*.cs
+
 
 TestResults/
 *.trx

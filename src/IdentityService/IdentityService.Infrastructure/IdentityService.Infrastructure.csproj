@@ -12,6 +12,7 @@
         <ProjectReference Include="..\IdentityService.Domain\IdentityService.Domain.csproj" />
         <ProjectReference Include="..\IdentityService.Application\IdentityService.Application.csproj" />
         <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj" />
+        <ProjectReference Include="..\..\BuildingBlocks\BuildingBlock.UserContextMiddleware\BuildingBlock.UserContextMiddleware.csproj" />
     </ItemGroup>
 
     <ItemGroup>

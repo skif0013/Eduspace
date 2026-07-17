@@ -1,5 +1,4 @@
 using System.Text;
-using BuildingBlocks.Redis;
 using IdentityService.API.Middleware;
 using IdentityService.Application.Interfaces;
 using IdentityService.Application.Interfaces.Repositories;
@@ -8,10 +7,10 @@ using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure.Database;
 using IdentityService.Infrastructure.Database.InitialData;
 using IdentityService.Infrastructure.Identity;
+using IdentityService.Infrastructure.Redis;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using DotNetEnv;
-using IdentityService.Application.Common.Models;
 using IdentityService.Infrastructure.BackgroundJobs;
 using IdentityService.Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +19,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using BuildingBlock.UserContextMiddleware.Middleware;
+using BuildingBlock.UserContextMiddleware.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,7 +60,6 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
-
 
 #region config jwt
 var validIssuer = builder.Configuration.GetValue<string>("JwtTokenSettings:ValidIssuer");
@@ -109,8 +109,6 @@ if (!builder.Environment.IsEnvironment("Testing"))
         };
         return ConnectionMultiplexer.Connect(config);
     });
-    
-    builder.Services.AddSingleton<IEventPublisher, RedisEventPublisher>();
 }
 #endregion
 
@@ -136,13 +134,26 @@ builder.Services.AddIdentity<User, RoleIdentity>(options =>
 #endregion
 
 builder.Services.AddScoped<UserContext>();
-builder.Services.AddScoped<IUserContext>(sp => sp.GetRequiredService<UserContext>());
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IOutboxRepository, OutboxRepository>(); 
+
+builder.Services.AddSingleton<IDatabase>(sp =>
+{
+    var mux = sp.GetRequiredService<IConnectionMultiplexer>();
+    return mux.GetDatabase();
+});
+
+builder.Services.AddSingleton<IMessageHandler, UserUpdatedHandler>();
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddSingleton<IRedisMessageBroker, RedisMessageBroker>();
+    builder.Services.AddHostedService<RedisSubscriberService>();
+}
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -23,13 +23,17 @@ public class QuizController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<QuizResponseDTO>> Create([FromBody] CreatingQuizRequestDTO request)
     {
-        var userId = Guid.NewGuid();
-        
-        var result = await _quizService.CreateQuizAsync(request, userId);
-
-        return Ok(result);
+        var result = await _quizService.CreateQuizAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
-
+    
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<QuizResponseDTO>> GetById([FromRoute] Guid id)
+    {
+        await _quizService.GetQuizByIdAsync(id);
+        return Ok();
+    }
+    
     
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] QuizUpdateRequestDTO request)
@@ -49,8 +53,7 @@ public class QuizController : ControllerBase
     [HttpPost("{id:guid}/start")]
     public async Task<ActionResult<QuizStartResponseDTO>> StartQuiz([FromRoute] Guid id)
     {
-        var userId = Guid.NewGuid(); 
-        var result = await _attemptService.StartQuizAsync(id, userId);
+        var result = await _attemptService.StartQuizAsync(id);
         return Ok(result);
     }
 
@@ -66,13 +69,7 @@ public class QuizController : ControllerBase
     [HttpPost("{id:guid}/finish")]
     public async Task<ActionResult<FinishQuizResponseDTO>> FinishQuiz([FromRoute] Guid id)
     {
-        var authHeader = Request.Headers.Authorization.ToString();
-        var token = authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
-            ? authHeader["Bearer ".Length..]
-            : authHeader;
-
-        var result = await _quizService.FinishQuizAsync(id, token);
-        
+        var result = await _quizService.FinishQuizAsync(id);
         return Ok(result);
     }
 }

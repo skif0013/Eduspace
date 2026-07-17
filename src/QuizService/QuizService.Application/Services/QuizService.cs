@@ -1,4 +1,10 @@
-﻿using QuizService.Application.Contracts;
+
+using QuizService.Application.Contracts;
+using BuildingBlock.UserContextMiddleware.Models;
+using BuildingBlocks.Redis.Contracts;
+using BuildingBlocks.Redis.Events;
+using QuizService.Application.Contracts;
+
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuizDTOs;
@@ -14,23 +20,26 @@ public class QuizService : IQuizService
     private readonly IQuizRepository _quizRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IQuizMapper _mapper;
+    private readonly UserContext _userContext;
     private readonly IAttemptRepository _attemptRepository;
     
 
-    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper, 
-        IAttemptRepository attemptRepository
-        )
+
+    public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper,
+        UserContext userContext, IAttemptRepository attemptRepository, IQuizFinishedEventPublisher eventPublisher)
     {
         _quizRepository = quizRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _userContext = userContext;
         _attemptRepository = attemptRepository;
     }
     
-    //TODO: Fix:  delete or chenge because in attemptService similar method already exists
-    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid creatorId)
+    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request)
+
     {
-        var quiz = CreateNewQuiz(request, creatorId);
+        var userId = _userContext.UserId;
+        var quiz = CreateNewQuiz(request, userId);
         await _quizRepository.AddQuizAsync(quiz);
         await _unitOfWork.SaveChangesAsync();
         
@@ -55,11 +64,10 @@ public class QuizService : IQuizService
         await _unitOfWork.SaveChangesAsync();
     }
     
-    public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId, string token)
+    public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId)
     {
         var attempt = await _attemptRepository.GetByIdAsync(attemptId)
                       ?? throw new AttemptNotFoundException(attemptId);
-        
         await FinishAttemptAndSaveChanges(attempt);
         
         return _mapper.MapToFinishQuizResponseDTO(attempt);

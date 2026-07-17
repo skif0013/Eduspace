@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -10,12 +10,13 @@
       <ProjectReference Include="..\..\..\BuildingBlocks.Shared\BuildingBlocks.Shared.csproj" />
       <ProjectReference Include="..\QuizService.Domain\QuizService.Domain.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj" />
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlock.UserContextMiddleware\BuildingBlock.UserContextMiddleware.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="JWT" Version="8.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.15.0" />
+      <PackageReference Include="JWT" Version="9.0.3" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.17" />
+      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.19.1" />
     </ItemGroup>
 
 </Project>
