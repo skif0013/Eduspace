@@ -64,7 +64,7 @@ FROM base9 AS final-notification
 COPY --from=build-notification /app/publish .
 ENTRYPOINT ["dotnet", "NotificationService.WebApi.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-quiz
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-quiz
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/QuizService/QuizService.WebApi/QuizService.WebApi.csproj", "src/QuizService/QuizService.WebApi/"]
@@ -78,11 +78,11 @@ COPY src/BuildingBlocks/ src/BuildingBlocks/
 WORKDIR /src/src/QuizService/QuizService.WebApi
 RUN dotnet publish "QuizService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM base8 AS final-quiz
+FROM base9 AS final-quiz
 COPY --from=build-quiz /app/publish .
 ENTRYPOINT ["dotnet", "QuizService.WebApi.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-file
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-file     
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/FileService/FileService.WebApi/FileService.WebApi.csproj", "src/FileService/FileService.WebApi/"]
@@ -101,7 +101,7 @@ ENV ASPNETCORE_URLS=http://+:80
 COPY --from=build-file /app/publish .
 ENTRYPOINT ["dotnet", "FileService.WebApi.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-gateway
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-gateway
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Gateway/OcelotGeatwey.csproj", "src/Gateway/"]

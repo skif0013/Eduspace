@@ -9,7 +9,7 @@ public interface IQuizService
 {
     Task<IEnumerable<QuizResponseDTO>> GetAllQuizzesAsync();
     
-    Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid creatorId);
+    Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request);
     
     Task UpdateQuizAsync(Guid quizId, QuizUpdateRequestDTO request);
     
@@ -19,5 +19,5 @@ public interface IQuizService
     
     Task<QuizResponseDTO> PublishQuizAsync(Guid quizId);
     
-    Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId, string token);
+    Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId);
 }

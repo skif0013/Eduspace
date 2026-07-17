@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Redis.Contracts;
+﻿using BuildingBlock.UserContextMiddleware.Models;
+using BuildingBlocks.Redis.Contracts;
 using BuildingBlocks.Redis.Events;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
@@ -17,24 +18,25 @@ public class QuizService : IQuizService
     private readonly IQuizRepository _quizRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IQuizMapper _mapper;
-    private readonly ITokenService _tokenService;
+    private readonly UserContext _userContext;
     private readonly IAttemptRepository _attemptRepository;
     private readonly IQuizFinishedEventPublisher _eventPublisher;
 
     public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper,
-        ITokenService tokenService, IAttemptRepository attemptRepository, IQuizFinishedEventPublisher eventPublisher)
+        UserContext userContext, IAttemptRepository attemptRepository, IQuizFinishedEventPublisher eventPublisher)
     {
         _quizRepository = quizRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _tokenService = tokenService;
+        _userContext = userContext;
         _attemptRepository = attemptRepository;
         _eventPublisher = eventPublisher;
     }
     
-    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request, Guid creatorId)
+    public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request)
     {
-        var quiz = CreateNewQuiz(request, creatorId);
+        var userId = _userContext.UserId;
+        var quiz = CreateNewQuiz(request, userId);
         await _quizRepository.AddQuizAsync(quiz);
         await _unitOfWork.SaveChangesAsync();
 
@@ -81,13 +83,13 @@ public class QuizService : IQuizService
         await _quizRepository.FindByIdAsync(quizId);
     }
     
-    public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId, string token)
+    public async Task<FinishQuizResponseDTO> FinishQuizAsync(Guid attemptId)
     {
         var attempt = await _attemptRepository.GetByIdAsync(attemptId)
                       ?? throw new AttemptNotFoundException(attemptId);
 
         FinishAttemptAndSaveChanges(attempt);
-        await PublishQuizFinishedEventAsync(attempt, token);
+        await PublishQuizFinishedEventAsync(attempt);
 
         return _mapper.MapToFinishQuizResponseDTO(attempt);
     }
@@ -108,9 +110,9 @@ public class QuizService : IQuizService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    private async Task PublishQuizFinishedEventAsync(QuizAttempt attempt, string token)
+    private async Task PublishQuizFinishedEventAsync(QuizAttempt attempt)
     {
-        var userEmail = _tokenService.GetUserEmailFromToken(token);
+        var userEmail = _userContext.Email;
         var quizFinishedEvent = CreateQuizFinishedEvent(attempt, userEmail);
         await _eventPublisher.PublishAsync(quizFinishedEvent);
     }
