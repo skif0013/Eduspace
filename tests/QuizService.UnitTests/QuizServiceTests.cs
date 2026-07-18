@@ -1,9 +1,10 @@
-﻿using QuizService.Application.Contracts;
+using QuizService.Application.Contracts;
 using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.DTOs.QuizDTOs.ResponeDTO;
 using QuizService.Application.Repositories;
 using QuizService.Domain.Models;
+using BuildingBlock.UserContextMiddleware.Models;
 using QuizAppService = QuizService.Application.Services.QuizService;
 using QuizMapper = QuizService.Application.Services.QuizMapper;
 
@@ -18,7 +19,9 @@ public class QuizServiceTests
         var quizRepository = new FakeQuizRepository();
         var unitOfWork = new FakeUnitOfWork();
         var mapper = new QuizMapper();
-        var service = new QuizAppService(quizRepository, unitOfWork, mapper, new NoOpTokenService(), new FakeAttemptRepository(), new NoOpEventPublisher());
+        var userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var userContext = new UserContext { UserId = userId, Name = "Test User", Email = "test@example.com" };
+        var service = new QuizAppService(quizRepository, unitOfWork, mapper, userContext, new FakeAttemptRepository());
         var request = new CreatingQuizRequestDTO
         {
             Name = "C# Basics",
@@ -27,7 +30,7 @@ public class QuizServiceTests
         };
 
         // Act
-        var result = await service.CreateQuizAsync(request, Guid.Parse("11111111-1111-1111-1111-111111111111"));
+        var result = await service.CreateQuizAsync(request);
 
         // Assert
         Assert.Single(quizRepository.Quizzes);
@@ -41,24 +44,23 @@ public class QuizServiceTests
     }
 
     [Fact]
-    public async Task GetAllQuizzesAsync_ReturnsMappedQuizzes()
+    public async Task GetQuizByIdAsync_ReturnsMappedQuiz()
     {
         // Arrange
         var quizRepository = new FakeQuizRepository();
         var unitOfWork = new FakeUnitOfWork();
         var mapper = new QuizMapper();
-        var quiz1 = TestData.CreateQuiz(name: "Quiz 1");
-        var quiz2 = TestData.CreateQuiz(name: "Quiz 2");
-        quizRepository.Quizzes.AddRange([quiz1, quiz2]);
-        var service = new QuizAppService(quizRepository, unitOfWork, mapper, new NoOpTokenService(), new FakeAttemptRepository(), new NoOpEventPublisher());
+        var userContext = new UserContext { UserId = Guid.NewGuid(), Name = "Test User", Email = "test@example.com" };
+        var quiz = TestData.CreateQuiz(name: "Test Quiz");
+        quizRepository.Quizzes.Add(quiz);
+        var service = new QuizAppService(quizRepository, unitOfWork, mapper, userContext, new FakeAttemptRepository());
 
         // Act
-        var result = (await service.GetAllQuizzesAsync()).ToList();
+        var result = await service.GetQuizByIdAsync(quiz.Id);
 
         // Assert
-        Assert.Equal(2, result.Count);
-        Assert.Contains(result, q => q.Name == "Quiz 1");
-        Assert.Contains(result, q => q.Name == "Quiz 2");
+        Assert.Equal(quiz.Id, result.Id);
+        Assert.Equal("Test Quiz", result.Name);
     }
 
     [Fact]
@@ -68,9 +70,10 @@ public class QuizServiceTests
         var quizRepository = new FakeQuizRepository();
         var unitOfWork = new FakeUnitOfWork();
         var mapper = new QuizMapper();
+        var userContext = new UserContext { UserId = Guid.NewGuid(), Name = "Test User", Email = "test@example.com" };
         var quiz = TestData.CreateQuiz(name: "Old name", description: "Old desc", passPercentage: 50);
         quizRepository.Quizzes.Add(quiz);
-        var service = new QuizAppService(quizRepository, unitOfWork, mapper, new NoOpTokenService(), new FakeAttemptRepository(), new NoOpEventPublisher());
+        var service = new QuizAppService(quizRepository, unitOfWork, mapper, userContext, new FakeAttemptRepository());
 
         var request = new QuizUpdateRequestDTO
         {
@@ -97,9 +100,10 @@ public class QuizServiceTests
         var quizRepository = new FakeQuizRepository();
         var unitOfWork = new FakeUnitOfWork();
         var mapper = new QuizMapper();
+        var userContext = new UserContext { UserId = Guid.NewGuid(), Name = "Test User", Email = "test@example.com" };
         var quiz = TestData.CreateQuiz(name: "To remove");
         quizRepository.Quizzes.Add(quiz);
-        var service = new QuizAppService(quizRepository, unitOfWork, mapper, new NoOpTokenService(), new FakeAttemptRepository(), new NoOpEventPublisher());
+        var service = new QuizAppService(quizRepository, unitOfWork, mapper, userContext, new FakeAttemptRepository());
 
         // Act
         await service.DeleteQuizAsync(quiz.Id);
@@ -111,32 +115,6 @@ public class QuizServiceTests
     }
 
     [Fact]
-    public async Task PublishQuizAsync_PublishesQuizWithQuestions_AndReturnsDto()
-    {
-        // Arrange
-        var quizRepository = new FakeQuizRepository();
-        var unitOfWork = new FakeUnitOfWork();
-        var mapper = new QuizMapper();
-        var quiz = TestData.CreateQuiz(name: "Publish me");
-        var question = TestData.CreateQuestion(quiz.Id, order: 2, text: "Q1", options: [("A", true, 10, 1)]);
-        TestData.AttachQuestions(quiz, question);
-        quizRepository.Quizzes.Add(quiz);
-        quizRepository.GetWithQuestionsAndOptionsHandler = _ => Task.FromResult<Quiz?>(quiz);
-        var service = new QuizAppService(quizRepository, unitOfWork, mapper, new NoOpTokenService(), new FakeAttemptRepository(), new NoOpEventPublisher());
-
-        // Act
-        var result = await service.PublishQuizAsync(quiz.Id);
-
-        // Assert
-        Assert.True(quiz.IsPublished);
-        Assert.True(quiz.IsActive);
-        Assert.Equal(1, unitOfWork.SaveChangesCallCount);
-        Assert.Equal(1, result.QuestionsCount);
-        Assert.Single(result.Questions!);
-        Assert.Equal("Q1", result.Questions![0].Text);
-    }
-
-    [Fact]
     public async Task FinishQuizAsync_FinishesAttempt_AndMapsSummaryDto()
     {
         // Arrange
@@ -144,7 +122,8 @@ public class QuizServiceTests
         var attemptRepository = new FakeAttemptRepository();
         var unitOfWork = new FakeUnitOfWork();
         var mapper = new QuizMapper();
-        var service = new QuizAppService(quizRepository, unitOfWork, mapper, new NoOpTokenService(), attemptRepository, new NoOpEventPublisher());
+        var userContext = new UserContext { UserId = Guid.NewGuid(), Name = "Test User", Email = "test@example.com" };
+        var service = new QuizAppService(quizRepository, unitOfWork, mapper, userContext, attemptRepository);
 
         var quiz = TestData.CreateQuiz(name: "Final");
         TestData.AttachQuestions(quiz, TestData.CreateQuestion(quiz.Id, text: "Question", options: [("Correct", true, 10, 1)]));
@@ -154,7 +133,7 @@ public class QuizServiceTests
         attemptRepository.Attempts.Add(attempt);
 
         // Act
-        var result = await service.FinishQuizAsync(attempt.Id, "dummy-token");
+        var result = await service.FinishQuizAsync(attempt.Id);
 
         // Assert
         Assert.Equal(attempt.Id, result.AttemptId);
@@ -166,4 +145,3 @@ public class QuizServiceTests
         Assert.NotNull(attempt.FinishedAt);
     }
 }
-

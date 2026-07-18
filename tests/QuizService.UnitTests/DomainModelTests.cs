@@ -1,4 +1,4 @@
-﻿using QuizService.Domain.Enum;
+using QuizService.Domain.Enum;
 using QuizService.Domain.Models;
 
 namespace QuizService.UnitTests;
@@ -23,26 +23,6 @@ public class DomainModelTests
         Assert.Equal("New", quiz.Name);
         Assert.Equal("New desc", quiz.Description);
         Assert.Equal(90, quiz.PassPercentage);
-    }
-
-    [Fact]
-    public void Quiz_Publish_Throws_WithoutQuestions()
-    {
-        var quiz = TestData.CreateQuiz();
-
-        Assert.Throws<InvalidOperationException>(quiz.Publish);
-    }
-
-    [Fact]
-    public void Quiz_Publish_SetsFlags_WhenQuestionsExist()
-    {
-        var quiz = TestData.CreateQuiz();
-        TestData.AttachQuestions(quiz, TestData.CreateQuestion(quiz.Id));
-
-        quiz.Publish();
-
-        Assert.True(quiz.IsPublished);
-        Assert.True(quiz.IsActive);
     }
 
     [Fact]
@@ -92,19 +72,6 @@ public class DomainModelTests
     }
 
     [Fact]
-    public void AnswerOption_Update_ChangesFields()
-    {
-        var option = new AnswerOption("A", false, 0, 1);
-
-        option.Update("B", true, 5, 2);
-
-        Assert.Equal("B", option.Text);
-        Assert.True(option.IsCorrectAnswer);
-        Assert.Equal(5, option.Score);
-        Assert.Equal(2, option.Order);
-    }
-
-    [Fact]
     public void QuizAttempt_AddAnswer_AccumulatesScore_AndStoresAnswer()
     {
         var attempt = TestData.CreateAttempt(Guid.NewGuid());
@@ -148,4 +115,3 @@ public class DomainModelTests
         Assert.NotNull(attempt.FinishedAt);
     }
 }
-

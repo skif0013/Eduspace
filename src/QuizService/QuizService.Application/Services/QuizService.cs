@@ -1,10 +1,5 @@
-
 using QuizService.Application.Contracts;
 using BuildingBlock.UserContextMiddleware.Models;
-using BuildingBlocks.Redis.Contracts;
-using BuildingBlocks.Redis.Events;
-using QuizService.Application.Contracts;
-
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuizDTOs;
@@ -22,11 +17,9 @@ public class QuizService : IQuizService
     private readonly IQuizMapper _mapper;
     private readonly UserContext _userContext;
     private readonly IAttemptRepository _attemptRepository;
-    
-
 
     public QuizService(IQuizRepository quizRepository, IUnitOfWork unitOfWork, IQuizMapper mapper,
-        UserContext userContext, IAttemptRepository attemptRepository, IQuizFinishedEventPublisher eventPublisher)
+        UserContext userContext, IAttemptRepository attemptRepository)
     {
         _quizRepository = quizRepository;
         _unitOfWork = unitOfWork;
@@ -36,13 +29,19 @@ public class QuizService : IQuizService
     }
     
     public async Task<QuizResponseDTO> CreateQuizAsync(CreatingQuizRequestDTO request)
-
     {
         var userId = _userContext.UserId;
-        var quiz = CreateNewQuiz(request, userId);
+        var quiz = new Quiz(userId, request.Name, request.Description, request.PassPercentage);
         await _quizRepository.AddQuizAsync(quiz);
         await _unitOfWork.SaveChangesAsync();
         
+        return _mapper.MapToResponseDTO(quiz);
+    }
+    
+    public async Task<QuizResponseDTO> GetQuizByIdAsync(Guid quizId)
+    {
+        var quiz = await _quizRepository.FindByIdAsync(quizId)
+                   ?? throw new KeyNotFoundException($"Quiz with ID '{quizId}' not found");
         return _mapper.MapToResponseDTO(quiz);
     }
     
@@ -51,7 +50,7 @@ public class QuizService : IQuizService
         var quiz = await _quizRepository.FindByIdAsync(quizId)
                    ?? throw new KeyNotFoundException($"Quiz with ID '{quizId}' not found");
 
-        UpdateQuizProperties(quiz, request);
+        quiz.UpdateBasicInfo(request.Name, request.Description, request.Category, request.PassPercentage);
         await _unitOfWork.SaveChangesAsync();
     }
 
@@ -68,24 +67,10 @@ public class QuizService : IQuizService
     {
         var attempt = await _attemptRepository.GetByIdAsync(attemptId)
                       ?? throw new AttemptNotFoundException(attemptId);
-        await FinishAttemptAndSaveChanges(attempt);
         
-        return _mapper.MapToFinishQuizResponseDTO(attempt);
-    }
-
-    private static Quiz CreateNewQuiz(CreatingQuizRequestDTO request, Guid creatorId)
-    {
-        return new Quiz(creatorId, request.Name, request.Description, request.PassPercentage);
-    }
-
-    private static void UpdateQuizProperties(Quiz quiz, QuizUpdateRequestDTO request)
-    {
-        quiz.UpdateBasicInfo(request.Name, request.Description, request.Category, request.PassPercentage);
-    }
-
-    private async Task FinishAttemptAndSaveChanges(QuizAttempt attempt)
-    {
         attempt.Finish();
         await _unitOfWork.SaveChangesAsync();
+        
+        return _mapper.MapToFinishQuizResponseDTO(attempt);
     }
 }

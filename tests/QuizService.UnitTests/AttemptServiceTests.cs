@@ -1,6 +1,7 @@
-﻿using QuizService.Application.DTOs.QuizDTOs;
+using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.Services;
 using QuizService.Domain.Models;
+using BuildingBlock.UserContextMiddleware.Models;
 using AttemptAppService = QuizService.Application.Services.AttemptService;
 using QuestionMapper = QuizService.Application.Services.QuestionMapper;
 using QuizMapper = QuizService.Application.Services.QuizMapper;
@@ -22,7 +23,9 @@ public class AttemptServiceTests
         var unitOfWork = new FakeUnitOfWork();
         var scoringService = new QuestionScoringService();
         var mapper = new QuizMapper();
-        var service = new AttemptAppService(attemptRepository, questionRepository, unitOfWork, scoringService, mapper, quizRepository);
+        var userId = Guid.Parse("33333333-3333-3333-3333-333333333333");
+        var userContext = new UserContext { UserId = userId, Name = "Test User", Email = "test@example.com" };
+        var service = new AttemptAppService(attemptRepository, questionRepository, unitOfWork, scoringService, mapper, quizRepository, userContext);
 
         var quiz = TestData.CreateQuiz(name: "Attempt quiz");
         var q2 = TestData.CreateQuestion(quiz.Id, text: "Second", order: 2, options: [("B", true, 10, 1)]);
@@ -31,7 +34,7 @@ public class AttemptServiceTests
         quizRepository.GetWithQuestionsAndOptionsHandler = _ => Task.FromResult<Quiz?>(quiz);
 
         // Act
-        var result = await service.StartQuizAsync(quiz.Id, Guid.Parse("33333333-3333-3333-3333-333333333333"));
+        var result = await service.StartQuizAsync(quiz.Id);
 
         // Assert
         Assert.Single(attemptRepository.Attempts);
@@ -56,10 +59,11 @@ public class AttemptServiceTests
         var unitOfWork = new FakeUnitOfWork();
         var scoringService = new QuestionScoringService();
         var mapper = new QuizMapper();
-        var service = new AttemptAppService(attemptRepository, questionRepository, unitOfWork, scoringService, mapper, quizRepository);
+        var userContext = new UserContext { UserId = Guid.NewGuid(), Name = "Test User", Email = "test@example.com" };
+        var service = new AttemptAppService(attemptRepository, questionRepository, unitOfWork, scoringService, mapper, quizRepository, userContext);
 
         // Act + Assert
-        var ex = await Assert.ThrowsAsync<Exception>(() => service.StartQuizAsync(Guid.NewGuid(), Guid.NewGuid()));
+        var ex = await Assert.ThrowsAsync<Exception>(() => service.StartQuizAsync(Guid.NewGuid()));
         Assert.Equal("User already has an active attempt for this quiz", ex.Message);
     }
 
@@ -73,7 +77,8 @@ public class AttemptServiceTests
         var unitOfWork = new FakeUnitOfWork();
         var scoringService = new QuestionScoringService();
         var mapper = new QuizMapper();
-        var service = new AttemptAppService(attemptRepository, questionRepository, unitOfWork, scoringService, mapper, quizRepository);
+        var userContext = new UserContext { UserId = Guid.NewGuid(), Name = "Test User", Email = "test@example.com" };
+        var service = new AttemptAppService(attemptRepository, questionRepository, unitOfWork, scoringService, mapper, quizRepository, userContext);
 
         var quiz = TestData.CreateQuiz(name: "Quiz");
         var question = TestData.CreateQuestion(quiz.Id, text: "Choose one", maxScore: 10, options:
@@ -116,7 +121,8 @@ public class AttemptServiceTests
         var unitOfWork = new FakeUnitOfWork();
         var scoringService = new QuestionScoringService();
         var mapper = new QuizMapper();
-        var service = new AttemptAppService(attemptRepository, questionRepository, unitOfWork, scoringService, mapper, quizRepository);
+        var userContext = new UserContext { UserId = Guid.NewGuid(), Name = "Test User", Email = "test@example.com" };
+        var service = new AttemptAppService(attemptRepository, questionRepository, unitOfWork, scoringService, mapper, quizRepository, userContext);
 
         questionRepository.GetWithOptionsByIdHandler = _ => Task.FromResult(TestData.CreateQuestion(Guid.NewGuid()));
         attemptRepository.GetByIdHandler = _ => Task.FromResult<QuizAttempt?>(null);
@@ -126,4 +132,3 @@ public class AttemptServiceTests
         Assert.Equal("Attempt not found", ex.Message);
     }
 }
-

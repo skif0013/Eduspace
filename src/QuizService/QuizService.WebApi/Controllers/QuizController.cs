@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.DTOs;
@@ -30,8 +30,8 @@ public class QuizController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<QuizResponseDTO>> GetById([FromRoute] Guid id)
     {
-        await _quizService.GetQuizByIdAsync(id);
-        return Ok();
+        var result = await _quizService.GetQuizByIdAsync(id);
+        return Ok(result);
     }
     
     

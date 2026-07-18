@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\BuildingBlocks.Shared\BuildingBlocks.Shared.csproj" />
+      <ProjectReference Include="..\..\BuildingBlocks.Shared\BuildingBlocks.Shared.csproj" />
       <ProjectReference Include="..\QuizService.Domain\QuizService.Domain.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Redis\BuildingBlocks.Redis.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlock.UserContextMiddleware\BuildingBlock.UserContextMiddleware.csproj" />
