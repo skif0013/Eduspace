@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\BuildingBlocks.Shared\BuildingBlocks.Shared.csproj" />
         <ProjectReference Include="..\..\BuildingBlocks.Shared\BuildingBlocks.Shared.csproj" />
         <ProjectReference Include="..\IdentityService.Domain\IdentityService.Domain.csproj" />
         <ProjectReference Include="..\IdentityService.Application\IdentityService.Application.csproj" />
