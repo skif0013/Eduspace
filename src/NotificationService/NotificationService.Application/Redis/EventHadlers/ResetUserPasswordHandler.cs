@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
 
-namespace NotificationService.Application.Redis.EventHadlers;
+namespace NotificationService.Application.Redis.EventHadnlers;
 
 public class ResetUserPasswordHandler : ScopedMessageHandler<UserResetPasswordEvent>
 {

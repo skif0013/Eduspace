@@ -4,7 +4,7 @@ using CourseService.Application.Courses.DTO;
 using Microsoft.Extensions.DependencyInjection;
 using NotificationService.Application.Contracts;
 
-namespace NotificationService.Application.Redis.EventHadlers;
+namespace NotificationService.Application.Redis.EventHadnlers;
 
 public class CourseFinishHandler : ScopedMessageHandler<CourseFinishEvent>
 {

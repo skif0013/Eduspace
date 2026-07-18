@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
-using NotificationService.Application.Redis.EventHadlers;
+using NotificationService.Application.Redis.EventHadnlers;
 
 namespace NotificationService.UnitTests;
 

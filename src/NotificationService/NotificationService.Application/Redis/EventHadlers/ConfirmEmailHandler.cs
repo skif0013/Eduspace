@@ -5,7 +5,7 @@ using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
 using StackExchange.Redis;
 
-namespace NotificationService.Application.Redis.EventHadlers;
+namespace NotificationService.Application.Redis.EventHadnlers;
 
 public class ConfirmEmailHandler : ScopedMessageHandler<EmailVerifyEvent>
 {
