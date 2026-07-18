@@ -21,12 +21,10 @@ public class RedisSubscriberWorker : BackgroundService
 
         foreach (var handler in _messageHandlers)
         {
-            // Подписываемся на канал, указанный в хандлере
             await subscriber.SubscribeAsync(RedisChannel.Literal(handler.Channel), async (channel, message) =>
             {
                 try
                 {
-                    // Передаем сырую строку сообщения в наш ScopedMessageHandler
                     await handler.HandleMessageAsync(message.ToString());
                 }
                 catch (Exception ex)
