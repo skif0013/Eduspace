@@ -7,11 +7,11 @@ using NotificationService.Application.Redis.EventHadnlers;
 
 namespace NotificationService.UnitTests;
 
-// Локальный класс события верификации email для тестирования
-public record EmailVerifyEventTest(string To, string UserName, string Code);
+// Тестовая модель события. Добавлено поле VerificationLink для совпадения со структурой реального EmailVerifyEvent
+public record EmailVerifyEventTest(string To, string UserName, string Code, string VerificationLink = "");
 
 /// <summary>
-/// Модульные тесты для ConfimEmailHandler
+/// Модульные тесты для ConfirmEmailHandler
 /// Проверяют корректность обработки сообщений верификации email
 /// </summary>
 public class ConfirmEmailHandlerTests
@@ -29,7 +29,6 @@ public class ConfirmEmailHandlerTests
         var mockServiceScope = new Mock<IServiceScope>();
         var mockScopeFactory = new Mock<IServiceScopeFactory>();
 
-        // Настраиваем цепочку моков
         mockScopeFactory
             .Setup(x => x.CreateScope())
             .Returns(mockServiceScope.Object);
@@ -44,11 +43,11 @@ public class ConfirmEmailHandlerTests
 
         var handler = new ConfirmEmailHandler(mockScopeFactory.Object);
 
-        // Создаем тестовое событие
         var testEvent = new EmailVerifyEventTest(
             To: "user@example.com",
             UserName: "John Doe",
-            Code: "123456");
+            Code: "123456",
+            VerificationLink: "https://example.com/verify");
 
         var message = JsonSerializer.Serialize(testEvent);
 
@@ -60,7 +59,8 @@ public class ConfirmEmailHandlerTests
             x => x.SendVerifyEmailAsync(It.Is<EmailVerifyDTO>(dto =>
                 dto.To == "user@example.com" &&
                 dto.UserName == "John Doe" &&
-                dto.Code == "123456")),
+                dto.Code == "123456" &&
+                dto.VerificationLink == "https://example.com/verify")),
             Times.Once,
             "emailService.SendVerifyEmailAsync должен быть вызван с корректными данными");
     }
@@ -120,7 +120,7 @@ public class ConfirmEmailHandlerTests
     }
 
     /// <summary>
-    /// Проверяет, что VerificationLink всегда устанавливается в пустую строку
+    /// Проверяет, что VerificationLink правильно передается как пустая строка
     /// </summary>
     [Fact]
     public async Task HandleAsync_VerificationLinkAlwaysEmpty()
@@ -140,7 +140,8 @@ public class ConfirmEmailHandlerTests
         var testEvent = new EmailVerifyEventTest(
             To: "test@test.com",
             UserName: "Test User",
-            Code: "999");
+            Code: "999",
+            VerificationLink: ""); // Явно передаем пустую строку
 
         var message = JsonSerializer.Serialize(testEvent);
 
@@ -189,4 +190,3 @@ public class ConfirmEmailHandlerTests
         Assert.Equal("Email service error", exception.Message);
     }
 }
-
