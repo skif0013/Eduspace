@@ -16,9 +16,10 @@ COPY ["src/IdentityService/IdentityService.Application/IdentityService.Applicati
 COPY ["src/IdentityService/IdentityService.Domain/IdentityService.Domain.csproj", "src/IdentityService/IdentityService.Domain/"]
 COPY ["src/IdentityService/IdentityService.Infrastructure/IdentityService.Infrastructure.csproj", "src/IdentityService/IdentityService.Infrastructure/"]
 COPY ["src/BuildingBlocks/BuildingBlocks.Redis/BuildingBlocks.Redis.csproj", "src/BuildingBlocks/BuildingBlocks.Redis/"]
-RUN dotnet restore "src/IdentityService/IdentityService.API/IdentityService.API.csproj"
 COPY src/IdentityService/ src/IdentityService/
 COPY src/BuildingBlocks/ src/BuildingBlocks/
+COPY src/BuildingBlocks.Shared/ src/BuildingBlocks.Shared/
+RUN dotnet restore "src/IdentityService/IdentityService.API/IdentityService.API.csproj"
 WORKDIR /src/src/IdentityService/IdentityService.API
 RUN dotnet publish "IdentityService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
@@ -34,8 +35,8 @@ COPY ["src/CourseService/CourseService.WebApi/CourseService.WebApi.csproj", "src
 COPY ["src/CourseService/CourseService.Application/CourseService.Application.csproj", "src/CourseService/CourseService.Application/"]
 COPY ["src/CourseService/CourseService.Domain/CourseService.Domain.csproj", "src/CourseService/CourseService.Domain/"]
 COPY ["src/CourseService/CourseService.Infrastructure/CourseService.Infrastructure.csproj", "src/CourseService/CourseService.Infrastructure/"]
-RUN dotnet restore "src/CourseService/CourseService.WebApi/CourseService.WebApi.csproj"
 COPY src/CourseService/ src/CourseService/
+RUN dotnet restore "src/CourseService/CourseService.WebApi/CourseService.WebApi.csproj"
 WORKDIR /src/src/CourseService/CourseService.WebApi
 RUN dotnet publish "CourseService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
@@ -53,10 +54,12 @@ COPY ["src/NotificationService/NotificationService.Infrastructure/NotificationSe
 COPY ["src/QuizService/QuizService.Application/QuizService.Application.csproj", "src/QuizService/QuizService.Application/"]
 COPY ["src/QuizService/QuizService.Domain/QuizService.Domain.csproj", "src/QuizService/QuizService.Domain/"]
 COPY ["src/BuildingBlocks/BuildingBlocks.Redis/BuildingBlocks.Redis.csproj", "src/BuildingBlocks/BuildingBlocks.Redis/"]
-RUN dotnet restore "src/NotificationService/NotificationService.WebApi/NotificationService.WebApi.csproj"
 COPY src/NotificationService/ src/NotificationService/
 COPY src/QuizService/ src/QuizService/
+COPY src/CourseService/ src/CourseService/
 COPY src/BuildingBlocks/ src/BuildingBlocks/
+COPY src/BuildingBlocks.Shared/ src/BuildingBlocks.Shared/
+RUN dotnet restore "src/NotificationService/NotificationService.WebApi/NotificationService.WebApi.csproj"
 WORKDIR /src/src/NotificationService/NotificationService.WebApi
 RUN dotnet publish "NotificationService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
@@ -72,9 +75,10 @@ COPY ["src/QuizService/QuizService.Application/QuizService.Application.csproj", 
 COPY ["src/QuizService/QuizService.Domain/QuizService.Domain.csproj", "src/QuizService/QuizService.Domain/"]
 COPY ["src/QuizService/QuizService.Infrastructure/QuizService.Infrastructure.csproj", "src/QuizService/QuizService.Infrastructure/"]
 COPY ["src/BuildingBlocks/BuildingBlocks.Redis/BuildingBlocks.Redis.csproj", "src/BuildingBlocks/BuildingBlocks.Redis/"]
-RUN dotnet restore "src/QuizService/QuizService.WebApi/QuizService.WebApi.csproj"
 COPY src/QuizService/ src/QuizService/
 COPY src/BuildingBlocks/ src/BuildingBlocks/
+COPY src/BuildingBlocks.Shared/ src/BuildingBlocks.Shared/
+RUN dotnet restore "src/QuizService/QuizService.WebApi/QuizService.WebApi.csproj"
 WORKDIR /src/src/QuizService/QuizService.WebApi
 RUN dotnet publish "QuizService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
@@ -89,8 +93,8 @@ COPY ["src/FileService/FileService.WebApi/FileService.WebApi.csproj", "src/FileS
 COPY ["src/FileService/FileService.Application/FileService.Application.csproj", "src/FileService/FileService.Application/"]
 COPY ["src/FileService/FileService.Domain/FileService.Domain.csproj", "src/FileService/FileService.Domain/"]
 COPY ["src/FileService/FileService.Infrastructure/FileService.Infrastructure.csproj", "src/FileService/FileService.Infrastructure/"]
-RUN dotnet restore "src/FileService/FileService.WebApi/FileService.WebApi.csproj"
 COPY src/FileService/ src/FileService/
+RUN dotnet restore "src/FileService/FileService.WebApi/FileService.WebApi.csproj"
 WORKDIR /src/src/FileService/FileService.WebApi
 RUN dotnet publish "FileService.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
@@ -105,11 +109,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-gateway
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Gateway/OcelotGeatwey.csproj", "src/Gateway/"]
-RUN dotnet restore "src/Gateway/OcelotGeatwey.csproj"
 COPY src/Gateway/ src/Gateway/
+RUN dotnet restore "src/Gateway/OcelotGeatwey.csproj"
 WORKDIR /src/src/Gateway
 RUN dotnet publish "OcelotGeatwey.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM base9 AS final-gateway
+FROM base8 AS final-gateway
 COPY --from=build-gateway /app/publish .
 ENTRYPOINT ["dotnet", "OcelotGeatwey.dll"]
