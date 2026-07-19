@@ -45,6 +45,7 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddQuizApplicationServices();
 builder.Services.AddQuizInfrastructure(builder.Configuration, builder.Environment);
+builder.Services.AddScoped<UserContext>();
 ConfigureAuthentication(builder);
 
 

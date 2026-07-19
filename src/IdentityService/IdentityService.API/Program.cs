@@ -21,6 +21,7 @@ using StackExchange.Redis;
 using BuildingBlock.UserContextMiddleware.Middleware;
 using BuildingBlock.UserContextMiddleware.Models;
 using BuildingBlocks.Redis.Events.Handler;
+using BuildingBlocks.Redis;
 using NotificationService.Infrastructure.Redis.RedisBroker;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -110,6 +111,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
         };
         return ConnectionMultiplexer.Connect(config);
     });
+    builder.Services.AddSingleton<IEventPublisher, RedisEventPublisher>();
 }
 #endregion
 
@@ -148,7 +150,6 @@ builder.Services.AddSingleton<IDatabase>(sp =>
     return mux.GetDatabase();
 });
 
-builder.Services.AddSingleton<IScopedMessageHandler, User>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
