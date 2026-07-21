@@ -11,6 +11,6 @@ public interface ICourseService
     Task<Result<CourseResponse>> GetCourseByIdAsync(Guid courseId);
     Task<Result> PublishCourseAsync(Guid courseId, Guid authorId);
     Task<Result<CourseResponse>> UpdateCourseAsync(CourseDTO courseDTO, Guid courseId, Guid authorId);
-    Task<Result> DeleteCourseAsync(Guid courseId, Guid authorId);
+    Task<Result> DeleteCourseAsync(Guid courseId);
     Task<Result<CourseResponse>> FinishCourseAsync(Guid courseId);
 }
