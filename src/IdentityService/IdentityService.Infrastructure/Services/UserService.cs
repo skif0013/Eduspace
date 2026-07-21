@@ -183,7 +183,7 @@ public class UserService : IUserService
         return Result<string>.Success("Email confirmed");
     }
     
-    public async Task<Result<string>> UpdateUserAsync(UpdateUserDTO userDto) // TODO переделать на IUserContext + добавить смену пароля + добавить в будущем таблицу с юзер инфо где будет урла на его автарку
+    public async Task<Result<string>> UpdateUserAsync(UpdateUserDTO userDto)
     {
         var user = await _userManager.FindByIdAsync(userDto.Id.ToString());
         if (user == null)

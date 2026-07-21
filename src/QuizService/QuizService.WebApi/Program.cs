@@ -1,5 +1,4 @@
-
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -7,28 +6,17 @@ using Microsoft.OpenApi.Models;
 using QuizService.Application;
 using QuizService.Infrastructure;
 using QuizService.Infrastructure.Data;
-using System.Text;
 using BuildingBlock.UserContextMiddleware.Middleware;
 using BuildingBlock.UserContextMiddleware.Models;
-using DotNetEnv;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-
-using QuizService.Infrastructure.Data;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
-using QuizService.Infrastructure.Redis;
 using QuizService.Infrastructure.Redis.Configuration;
 using QuizService.Infrastructure.Repositories;
 using QuizService.Infrastructure.Persistence.UnitOfWork;
 using QuizService.Application.Repositories;
 using QuizService.Application.Services;
-using BuildingBlocks.Redis.Contracts;
-using BuildingBlocks.Redis.Contracts.Serealizer;
-using BuildingBlocks.Redis.Serialization;
-using Microsoft.OpenApi.Models;
+
 //using Microsoft.OpenApi;
 using StackExchange.Redis;
 
@@ -45,7 +33,6 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddQuizApplicationServices();
 builder.Services.AddQuizInfrastructure(builder.Configuration, builder.Environment);
-builder.Services.AddScoped<UserContext>();
 ConfigureAuthentication(builder);
 
 
