@@ -9,4 +9,5 @@ public interface ICourseRepository
     Task<Course> GetCourseByIdAsync(Guid courseId);
     Task<PagedResult<Course>> GetPagedCoursesAsync(int page, int pageSize);
     Task UpdateCourseAsync(Course course);
+    Task<Course> DeleteCourseAsync(Guid courseId);
 }

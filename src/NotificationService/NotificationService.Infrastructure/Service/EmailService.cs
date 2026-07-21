@@ -1,5 +1,5 @@
-﻿using System.Net.Mail;
-using Microsoft.Extensions.Configuration;
+using System.Net.Mail;
+using CourseService.Application.Courses.DTO;
 using NotificationService.Application.Contracts;
 using NotificationService.Application.DTOs;
 using NotificationService.Domain.Models;
@@ -12,11 +12,11 @@ public class EmailService : IEmailService
     private readonly IEmailCreateClient _emailCreateClient;
     private readonly EmailTemplates _emailTemplates;
     
-    public EmailService(EmailSettings emailSettings, IEmailCreateClient emailCreateClient, IConfiguration configuration)
+    public EmailService(EmailSettings emailSettings, IEmailCreateClient emailCreateClient, EmailTemplates emailTemplates)
     {
-        _emailTemplates = configuration.GetSection("EmailTemplates:Verification").Get<EmailTemplates>();
         _emailSettings = emailSettings;
         _emailCreateClient = emailCreateClient;
+        _emailTemplates = emailTemplates;
     }
 
     public async Task SendEmailAsync(EmailSendDTO dto)
@@ -56,5 +56,53 @@ public class EmailService : IEmailService
         emailMessage.To.Add(dto.To);
 
         await client.SendMailAsync(emailMessage); 
+    }
+
+    public async Task SendResetPasswordEmailAsync(ResetPasswordDTO dto)
+    {
+        
+        using var client = _emailCreateClient.CreateClient();
+    
+        
+        var body = _emailTemplates.body
+            .Replace("{ResetPasswordLink}", dto.Token ?? "");
+    
+        var subject = "Reset your password";
+
+       
+        using var emailMessage = new MailMessage
+        {
+            From = new MailAddress(_emailSettings.FromAddress, _emailSettings.Username),
+            Subject = subject,
+            Body = body,
+            IsBodyHtml = true
+        };
+    
+        emailMessage.To.Add(dto.To);
+        
+        await client.SendMailAsync(emailMessage);
+    }
+
+    public Task SendFinishCoursMailAsync(CourseFinishDTO dto)
+    {
+        using var client = _emailCreateClient.CreateClient();
+        
+        var body = _emailTemplates.body
+            .Replace("{UserName}", dto.UserName ?? "")
+            .Replace("{CourseName}", dto.CourseTitle ?? "");
+        
+        var subject = "Congratulations on completing the course!";
+        
+        using var emailMessage = new MailMessage
+        {
+            From = new MailAddress(_emailSettings.FromAddress, _emailSettings.Username),
+            Subject = subject,
+            Body = body,
+            IsBodyHtml = true
+        };
+        
+        emailMessage.To.Add(dto.To);
+        
+        return client.SendMailAsync(emailMessage);
     }
 }

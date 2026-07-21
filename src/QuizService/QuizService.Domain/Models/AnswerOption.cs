@@ -11,8 +11,7 @@ public class AnswerOption
     public DateTime CreatedOn { get; private set; }
     public DateTime ModifiedOn { get; private set; }
 
-
-    //for EF Core
+    
     public AnswerOption() {}
     
     
@@ -30,15 +29,6 @@ public class AnswerOption
         Score = score;
         Order = order;
         CreatedOn = DateTime.UtcNow;
-        ModifiedOn = DateTime.UtcNow;
-    }
-    
-    public void Update(string text, bool isCorrect, double score, int order)
-    {
-        Text = text;
-        IsCorrectAnswer = isCorrect;
-        Score = score;
-        Order = order;
         ModifiedOn = DateTime.UtcNow;
     }
 }

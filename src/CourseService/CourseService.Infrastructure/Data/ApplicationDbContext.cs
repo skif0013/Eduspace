@@ -1,7 +1,7 @@
 ﻿using CourseService.Domain.Abstractions;
 using CourseService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.X509Certificates;
+
 
 namespace CourseService.Infrastructure.Data;
 

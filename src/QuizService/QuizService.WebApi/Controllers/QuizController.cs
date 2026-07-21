@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.DTOs;
@@ -30,16 +30,10 @@ public class QuizController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<QuizResponseDTO>> GetById([FromRoute] Guid id)
     {
-        await _quizService.GetQuizByIdAsync(id);
-        return Ok();
-    }
-    
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<QuizResponseDTO>>> GetAll()
-    {
-        var result = await _quizService.GetAllQuizzesAsync();
+        var result = await _quizService.GetQuizByIdAsync(id);
         return Ok(result);
     }
+    
     
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] QuizUpdateRequestDTO request)
@@ -69,13 +63,6 @@ public class QuizController : ControllerBase
         [FromBody] SubmitAnswerRequestDTO request)
     {
         var result = await _attemptService.SubmitAnswerAsync(attemptId, request);
-        return Ok(result);
-    }
-
-    [HttpPatch("{id:guid}/publish")]
-    public async Task<ActionResult<QuizResponseDTO>> PublishQuiz([FromRoute] Guid id)
-    {
-        var result = await _quizService.PublishQuizAsync(id);
         return Ok(result);
     }
     

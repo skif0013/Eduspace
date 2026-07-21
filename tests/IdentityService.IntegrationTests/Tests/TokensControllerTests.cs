@@ -21,7 +21,6 @@ namespace IdentityService.IntegrationTests.Tests
         {
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Post, "/api/Tokens/RevokeRefreshToken");
-            // Пример: без Authorization (или с неверным токеном) — ожидаем 401/400 в зависимости от логики
             request.Content = new StringContent(JsonSerializer.Serialize(new { refreshToken = "invalid" }),
                 Encoding.UTF8, "application/json");
 
@@ -49,15 +48,13 @@ namespace IdentityService.IntegrationTests.Tests
         public async Task RevokeRefreshToken_WithValidAccessToken_ReturnsOk()
         {
             // Arrange
-            // 1) Зарегистрировать пользователя или подготовить запись в БД (вызовом endpoint'а регистрации или напрямую через DbContext)
-            // 2) Получить корректный access token (можно вызвать auth endpoint или сформировать через TokenService если есть helper)
-            // Ниже замените `validAccessToken` и `validRefreshToken` на реальные значения, полученные в Arrange
-            string validAccessToken = await Arrange_AndGetAccessTokenAsync();
-            string validRefreshToken = "тут-refresh-token-из-БД";
+            // Извлекаем оба реальных токена, сгенерированных при логине
+            var (validAccessToken, validRefreshToken) = await Arrange_AndGetTokensAsync();
 
             var request = new HttpRequestMessage(HttpMethod.Post, "/api/Tokens/RevokeRefreshToken");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", validAccessToken);
-            request.Content = new StringContent(JsonSerializer.Serialize(new { refreshToken = validRefreshToken }), Encoding.UTF8, "application/json");
+            request.Content = new StringContent(JsonSerializer.Serialize(new { refreshToken = validRefreshToken }), 
+                Encoding.UTF8, "application/json");
 
             // Act
             var response = await Client.SendAsync(request);
@@ -66,95 +63,63 @@ namespace IdentityService.IntegrationTests.Tests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
-        private async Task<string> Arrange_AndGetAccessTokenAsync()
-{
-    var email = "test@example.com";
-    var password = "P@ssw0rd1";
-    var userName = "testuser_" + Guid.NewGuid().ToString("N").Substring(0, 6);
-
-    // 1) Регистрация через API
-    var register = new { userName = userName, email = email, password = password };
-    var regResp = await Client.PostAsync("/api/Users/register",
-        new StringContent(JsonSerializer.Serialize(register), Encoding.UTF8, "application/json"));
-    regResp.EnsureSuccessStatusCode();
-
-    // 2) Ожидаем появление OutboxMessage и извлекаем код подтверждения
-    string? token = null;
-    var maxAttempts = 20;
-    var delayMs = 100;
-    for (int attempt = 0; attempt < maxAttempts; attempt++)
-    {
-        using var scope = Factory.Services.CreateScope();
-        var db = scope.ServiceProvider
-            .GetRequiredService<IdentityService.Infrastructure.Database.ApplicationDbContext>();
-
-        var outboxMsg = await db.OutboxMessages
-            .Where(m => m.Type == "identity.user.created" && m.Content.Contains(email))
-            .OrderByDescending(m => m.OccurredOnUtc)
-            .FirstOrDefaultAsync();
-
-        if (outboxMsg != null)
+        /// <summary>
+        /// Надежно создает подтвержденного пользователя напрямую в SQLite и логинит его через API
+        /// </summary>
+        private async Task<(string AccessToken, string RefreshToken)> Arrange_AndGetTokensAsync()
         {
-            try
+            var email = "test@example.com";
+            var password = "P@ssw0rd1";
+            var userName = "testuser_" + Guid.NewGuid().ToString("N").Substring(0, 6);
+
+            // 1) Создаем и подтверждаем пользователя напрямую в БД (обходим капризный Outbox)
+            using (var scope = Factory.Services.CreateScope())
             {
-                var evt =
-                    System.Text.Json.JsonSerializer.Deserialize<Shared.Messages.EmailVerifyEvent>(
-                        outboxMsg.Content);
-                token = evt?.Code;
-                if (!string.IsNullOrEmpty(token)) break;
+                var userManager = scope.ServiceProvider
+                    .GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<IdentityService.Domain.Entities.User>>();
+
+                var user = new IdentityService.Domain.Entities.User 
+                { 
+                    UserName = userName, 
+                    Email = email,
+                    EmailConfirmed = true // Подтверждаем почту сразу
+                };
+
+                var createResult = await userManager.CreateAsync(user, password);
+                if (!createResult.Succeeded)
+                {
+                    throw new InvalidOperationException($"Direct user creation failed: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
+                }
             }
-            catch
+
+            // 2) Логинимся через стандартный эндпоинт, чтобы IdentityService сгенерировал токены
+            var login = new { email = email, password = password };
+            var loginResp = await Client.PostAsync("/api/Users/login",
+                new StringContent(JsonSerializer.Serialize(login), Encoding.UTF8, "application/json"));
+            loginResp.EnsureSuccessStatusCode();
+
+            var json = await loginResp.Content.ReadAsStringAsync();
+            
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            
+            // 3) Извлекаем токены из ответа (с учетом возможной Result-обертки)
+            JsonElement dataElement;
+            if (root.TryGetProperty("data", out dataElement))
             {
-                // игнорируем парсинг-ошибки в попытках
+                var access = dataElement.GetProperty("accessToken").GetString()!;
+                var refresh = dataElement.GetProperty("refreshToken").GetString()!;
+                return (access, refresh);
             }
+            
+            if (root.TryGetProperty("accessToken", out var directToken))
+            {
+                var access = directToken.GetString()!;
+                var refresh = root.GetProperty("refreshToken").GetString()!;
+                return (access, refresh);
+            }
+            
+            throw new InvalidOperationException($"Could not find tokens in login response. Content: {json}");
         }
-
-        await Task.Delay(delayMs);
-    }
-
-    if (string.IsNullOrEmpty(token))
-    {
-        throw new InvalidOperationException("Confirmation token not found in Outbox messages.");
-    }
-
-    // 3) Подтверждаем email через UserManager
-    using (var scope = Factory.Services.CreateScope())
-    {
-        var userManager = scope.ServiceProvider
-            .GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<
-                IdentityService.Domain.Entities.User>>();
-        var user = await userManager.FindByEmailAsync(email);
-        if (user == null) throw new InvalidOperationException("User not found for confirm.");
-        var confirmResult = await userManager.ConfirmEmailAsync(user, token);
-        if (!confirmResult.Succeeded)
-            throw new InvalidOperationException($"ConfirmEmailAsync failed: {string.Join(", ", confirmResult.Errors.Select(e => e.Description))}");
-    }
-
-    // 4) Логинимся и возвращаем access token
-    var login = new { email = email, password = password };
-    var loginResp = await Client.PostAsync("/api/Users/login",
-        new StringContent(JsonSerializer.Serialize(login), Encoding.UTF8, "application/json"));
-    loginResp.EnsureSuccessStatusCode();
-
-    var json = await loginResp.Content.ReadAsStringAsync();
-    Console.WriteLine($"Login Response: {json}");
-    
-    using var doc = JsonDocument.Parse(json);
-    var root = doc.RootElement;
-    
-    // Попробуем найти поле "data" (вероятно, Response обернут в структуру Result)
-    if (root.TryGetProperty("data", out var dataElement) && dataElement.TryGetProperty("accessToken", out var tokenElement))
-    {
-        return tokenElement.GetString()!;
-    }
-    
-    // Или напрямую accessToken
-    if (root.TryGetProperty("accessToken", out var directToken))
-    {
-        return directToken.GetString()!;
-    }
-    
-    throw new InvalidOperationException($"Could not find accessToken in login response. Content: {json}");
-    }
     }
 }

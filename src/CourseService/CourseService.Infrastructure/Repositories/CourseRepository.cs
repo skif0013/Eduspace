@@ -70,5 +70,16 @@ namespace CourseService.Infrastructure.Repositories
             _dbContext.Update(course);
             await _dbContext.SaveChangesAsync();
         }
+        
+        //cascade
+        public async Task<Course> DeleteCourseAsync(Guid courseId)
+        {
+            var course = await GetCourseByIdAsync(courseId);
+            
+            _dbContext.Courses.Remove(course);
+            await _dbContext.SaveChangesAsync();
+
+            return course;
+        }
     }
 }

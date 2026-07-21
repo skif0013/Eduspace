@@ -1,21 +1,25 @@
-﻿using IdentityService.Application.Interfaces;
+﻿using BuildingBlocks.Redis;
 using IdentityService.Application.Interfaces.Repositories;
-using IdentityService.Application.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using IdentityService.Application.Interfaces; 
 
 namespace IdentityService.Infrastructure.BackgroundJobs;
 
 public class ProcessOutboxMessagesJob : BackgroundService
 {
-    private readonly IServiceProvider _serviceProvider;        // TODO почитать про IServiceScopeFactory
+    private readonly IServiceProvider _serviceProvider;        
     private readonly ILogger<ProcessOutboxMessagesJob> _logger;
+    private readonly IOutboxEventPublisher _eventPublisher;
+    
 
     public ProcessOutboxMessagesJob(
         IServiceProvider serviceProvider,
-        ILogger<ProcessOutboxMessagesJob> logger)
+        ILogger<ProcessOutboxMessagesJob> logger,
+        IOutboxEventPublisher outboxEventPublisher) 
     {
+        _eventPublisher = outboxEventPublisher;
         _serviceProvider = serviceProvider;
         _logger = logger;
     }
@@ -29,34 +33,38 @@ public class ProcessOutboxMessagesJob : BackgroundService
                 using var scope = _serviceProvider.CreateScope(); 
                 
                 var outboxRepository = scope.ServiceProvider.GetRequiredService<IOutboxRepository>();
-                var messageService = scope.ServiceProvider.GetRequiredService<IMessageService>();
-                var unitOfWorService = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>(); 
                 
                 var messages = await outboxRepository.GetUnprocessedMessagesAsync(20);
 
-                foreach (var message in messages)
+                if (messages.Any())
                 {
-                    try
+                    foreach (var message in messages)
                     {
-                        await messageService.SendMessageAsync(message.Type, message.Content);
-                        _logger.LogInformation("Sent outbox message {Id} to Redis stream", message.Id);
-                        message.ProcessedOnUtc = DateTime.UtcNow;
+                        try
+                        {
+                            await _eventPublisher.PublishRawAsync(message.Type, message.Content);
+                            
+                            _logger.LogInformation("Sent outbox message {Id} to Redis channel {Channel}", message.Id, message.Type);
+                            
+                            message.ProcessedOnUtc = DateTime.UtcNow;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error processing outbox message {Id}", message.Id);
+                            message.Error = ex.Message;
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error processing outbox message {Id}", message.Id);
-                        message.Error = ex.Message;
-                    }
+                    
+                    await unitOfWork.Commit();
                 }
-                
-                await unitOfWorService.Commit();
             }
             catch (Exception ex)
             {
                 _logger.LogCritical(ex, "Outbox worker failed unexpectedly");
             }
-            
-            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+            //for production more
+            await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
         }
     }
 }

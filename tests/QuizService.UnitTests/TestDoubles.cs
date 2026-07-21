@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
@@ -93,6 +93,9 @@ public sealed class FakeQuizRepository : IQuizRepository
             await RemoveHandler(quiz);
         }
     }
+
+    public Task GetUserQuizAsync(Guid userId, Guid quizId)
+        => Task.CompletedTask;
 
     public Task<Quiz?> GetWithQuestionsAndOptionsByIdAsync(Guid quizId)
         => GetWithQuestionsAndOptionsHandler?.Invoke(quizId)
@@ -196,10 +199,3 @@ public sealed class NoOpTokenService : ITokenService
     public string GetUserEmailFromToken(string token) => "test@example.com";
 }
 
-public sealed class NoOpEventPublisher : IQuizFinishedEventPublisher
-{
-    public Task PublishAsync(QuizFinishedEvent @event, CancellationToken cancellationToken = default)
-    {
-        return Task.CompletedTask;
-    }
-}

@@ -1,15 +1,14 @@
 ﻿using System.Text.Json;
+using BuildingBlocks.Redis;
+using BuildingBlocks.Redis.Events;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
-using IdentityService.Application.Interfaces.Repositories;
-using IdentityService.Application.Interfaces.Services;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Results;
 using IdentityService.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Shared.Messages;
-using BuildingBlocks.Redis.Events;
+
 
 namespace IdentityService.Infrastructure.Services;
 
@@ -20,6 +19,7 @@ public class UserService : IUserService
     private readonly RoleManager<RoleIdentity> _roleManager;
     private readonly ITokenService _tokenService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEventPublisher _eventPublisher;
 
     public UserService(
         UserManager<User> userManager,
@@ -33,7 +33,7 @@ public class UserService : IUserService
         _tokenService = tokenService;
         _unitOfWork = unitOfWork;
     }
-    
+
     public async Task<Result<string>> RegisterAsync(CreateUserDto createUserDto)
     {
         var user = new User
@@ -41,7 +41,8 @@ public class UserService : IUserService
             UserName = createUserDto.UserName,
             Email = createUserDto.Email,
         };
-        
+
+
         var result = await _userManager.CreateAsync(user, createUserDto.Password);
         if (!result.Succeeded)
         {
@@ -49,28 +50,31 @@ public class UserService : IUserService
             return Result<string>.Failure($"Error creating user: {errors}");
         }
 
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user); 
-        Console.WriteLine($"Email confirmation token for {user.Email}: {token}");
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
         
         var confirmEmailEvent = new EmailVerifyEvent()
         {
             To = user.Email,
             UserName = user.UserName,
-            VerificationLink = "",
+            VerificationLink = $"https://yourapp.com/auth/verify?email={user.Email}&token={token}", 
             Code = token
         };
-        
+
+
         var outboxMessage = new OutboxMessage()
         {
             Id = Guid.NewGuid(),
-            Type = "identity.user.created",
+            Type = "email:verify",
             Content = JsonSerializer.Serialize(confirmEmailEvent),
             OccurredOnUtc = DateTime.UtcNow
         };
-
-        await _unitOfWork.OutboxRepository.AddAsync(outboxMessage);
-        await _unitOfWork.Commit();
         
+        await _unitOfWork.OutboxRepository.AddAsync(outboxMessage);
+        
+        await _unitOfWork.Commit();
+
         return Result<string>.Success("user created successfully");
     }
 
@@ -122,7 +126,7 @@ public class UserService : IUserService
         
         var confirmEmailEvent = new UserResetPasswordEvent()
         {
-            UserEmail = request.Email,
+            To = request.Email,
             Token = token
         };
         
@@ -179,7 +183,7 @@ public class UserService : IUserService
         return Result<string>.Success("Email confirmed");
     }
     
-    public async Task<Result<string>> UpdateUserAsync(UpdateUserDTO userDto) // TODO переделать на IUserContext + добавить смену пароля + добавить в будущем таблицу с юзер инфо где будет урла на его автарку
+    public async Task<Result<string>> UpdateUserAsync(UpdateUserDTO userDto)
     {
         var user = await _userManager.FindByIdAsync(userDto.Id.ToString());
         if (user == null)

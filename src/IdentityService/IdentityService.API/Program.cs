@@ -7,7 +7,6 @@ using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure.Database;
 using IdentityService.Infrastructure.Database.InitialData;
 using IdentityService.Infrastructure.Identity;
-using IdentityService.Infrastructure.Redis;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using DotNetEnv;
@@ -21,6 +20,9 @@ using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using BuildingBlock.UserContextMiddleware.Middleware;
 using BuildingBlock.UserContextMiddleware.Models;
+using BuildingBlocks.Redis.Events.Handler;
+using BuildingBlocks.Redis;
+using NotificationService.Infrastructure.Redis.RedisBroker;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,6 +111,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
         };
         return ConnectionMultiplexer.Connect(config);
     });
+    builder.Services.AddSingleton<IEventPublisher, RedisEventPublisher>();
 }
 #endregion
 
@@ -147,13 +150,6 @@ builder.Services.AddSingleton<IDatabase>(sp =>
     return mux.GetDatabase();
 });
 
-builder.Services.AddSingleton<IMessageHandler, UserUpdatedHandler>();
-if (!builder.Environment.IsEnvironment("Testing"))
-{
-    builder.Services.AddSingleton<IRedisMessageBroker, RedisMessageBroker>();
-    builder.Services.AddHostedService<RedisSubscriberService>();
-}
-builder.Services.AddScoped<IMessageService, MessageService>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

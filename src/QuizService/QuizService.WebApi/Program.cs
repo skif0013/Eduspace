@@ -1,31 +1,28 @@
-﻿
-using System.Text;
-using BuildingBlock.UserContextMiddleware.Middleware;
-using BuildingBlock.UserContextMiddleware.Models;
-using DotNetEnv;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
+using Microsoft.OpenApi.Models;
+using QuizService.Application;
+using QuizService.Infrastructure;
 using QuizService.Infrastructure.Data;
+using BuildingBlock.UserContextMiddleware.Middleware;
+using BuildingBlock.UserContextMiddleware.Models;
 using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
-using QuizService.Infrastructure.Redis;
 using QuizService.Infrastructure.Redis.Configuration;
 using QuizService.Infrastructure.Repositories;
 using QuizService.Infrastructure.Persistence.UnitOfWork;
 using QuizService.Application.Repositories;
 using QuizService.Application.Services;
-using BuildingBlocks.Redis.Contracts;
-using BuildingBlocks.Redis.Serialization;
-using Microsoft.OpenApi.Models;
+
 //using Microsoft.OpenApi;
 using StackExchange.Redis;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Try to load .env if it exists (for local development)
 var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
 if (File.Exists(envPath))
 {
@@ -34,16 +31,8 @@ if (File.Exists(envPath))
 
 builder.Configuration.AddEnvironmentVariables();
 
-var configuration = builder.Configuration;
-
-var connectionString = configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
-
-RegisterApplicationServices(builder.Services);
-RegisterRedisServices(builder.Services, configuration);
+builder.Services.AddQuizApplicationServices();
+builder.Services.AddQuizInfrastructure(builder.Configuration, builder.Environment);
 ConfigureAuthentication(builder);
 
 
@@ -85,29 +74,24 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Database.Migrate();
+    }
 }
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{ 
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz Service API v1");
+    options.RoutePrefix = "swagger"; 
+});
 
-//app.UseSwagger();
-/*app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz Service API v1");
-    c.RoutePrefix = "";
-});*/
-
-
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    { 
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz Service API v1");
-        options.RoutePrefix = "swagger"; 
-    });
 
 
 app.UseHttpsRedirection();
@@ -152,14 +136,6 @@ static void RegisterRedisServices(IServiceCollection services, IConfiguration co
         var config = redisConfig.BuildConfigurationOptions();
         return ConnectionMultiplexer.Connect(config);
     });
-
-    services.AddSingleton<IStreamEventSerializer, JsonStreamEventSerializer>();
-
-    services.AddScoped<IQuizFinishedEventPublisher>(sp =>
-        new QuizFinishedEventStreamPublisher(
-            sp.GetRequiredService<ConnectionMultiplexer>(),
-            redisConfig,
-            sp.GetRequiredService<IStreamEventSerializer>()));
 }
 
 static void ConfigureAuthentication(WebApplicationBuilder builder)
@@ -182,32 +158,3 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
             };
         });
 }
-
-/*static void ConfigureSwagger(IServiceCollection services)
-{
-    services.AddSwaggerGen(options =>
-    {
-        options.SwaggerDoc("v1", new OpenApiInfo
-        {
-            Title = "Quiz Service API",
-            Version = "v1"
-        });
-
-        var securityScheme = new OpenApiSecurityScheme
-        {
-            Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer {token}'",
-            Name = "Authorization",
-            In = ParameterLocation.Header,
-            Type = SecuritySchemeType.Http,
-            Scheme = "bearer",
-            BearerFormat = "JWT"
-        };
-
-        options.AddSecurityDefinition("Bearer", securityScheme);
-        options.AddSecurityRequirement(new OpenApiSecurityRequirement
-        {
-            { securityScheme, Array.Empty<string>() }
-        });
-    });
-}*/
-

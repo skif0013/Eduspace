@@ -15,4 +15,14 @@ public class Course : Entity
 
     public ICollection<CourseRating> CourseRatings { get; set; } = new List<CourseRating>();
     public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+
+    public  void Finish()
+    {
+        if(Status == CourseStatus.Finish)
+        {
+            return;
+        }
+        
+        Status = CourseStatus.Finish;
+    }
 }

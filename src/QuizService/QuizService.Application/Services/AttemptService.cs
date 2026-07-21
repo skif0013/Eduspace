@@ -1,6 +1,7 @@
 ﻿using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
+using QuizService.Application.DTOs;
 using QuizService.Application.DTOs.QuizDTOs;
 using QuizService.Application.Repositories;
 using QuizService.Domain.Models;

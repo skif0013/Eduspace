@@ -11,6 +11,7 @@ using CourseService.Domain.Entities;
 using CourseService.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using BuildingBlock.UserContextMiddleware.Models;
 
 namespace CourseService.Application.Courses.Services;
 
@@ -22,8 +23,10 @@ public class CourseService : ICourseService
     private readonly IMapper _mapper;
     private readonly IMessagePublisher _publisher;
     private readonly IRedisKeyBuilder _keyBuilder;
+    private readonly UserContext _userContext;
 
     public CourseService(
+        UserContext userContext,
         ICourseRepository courseRepository,
         ICourseCache cache,
         ILogger<CourseService> logger,
@@ -31,6 +34,7 @@ public class CourseService : ICourseService
         IMessagePublisher publisher,
         IRedisKeyBuilder keyBuilder)
     {
+        _userContext = userContext;
         _courseRepository = courseRepository;
         _cache = cache;
         _logger = logger;
@@ -262,6 +266,45 @@ public class CourseService : ICourseService
             response.Id,
             authorId);
 
+        return Result<CourseResponse>.Success(response);
+    }
+
+    public async Task<Result> DeleteCourseAsync(Guid courseId)
+    {
+        
+        var userId = _userContext.UserId;
+        var findCourse = await _courseRepository.GetCourseByIdAsync(courseId);
+
+        if (userId != findCourse.AuthorId)
+        {
+            return Result<CourseResponse>.Failure(CourseErrors.NotCourseAuthor);
+        }
+        
+        await _courseRepository.DeleteCourseAsync(courseId);
+        
+        await _cache.IncrementCatalogVersionAsync();
+        
+        var key = _keyBuilder.GetCourseKey(courseId);
+        await _cache.RemoveAsync(key);
+        
+        return Result.Success();
+    }
+
+    public async Task<Result<CourseResponse>> FinishCourseAsync(Guid courseId)
+    {
+        var userId = _userContext.UserId;
+        
+        var course = await _courseRepository.GetCourseByIdAsync(courseId);
+        if (userId != course.AuthorId)
+        {
+            _logger.LogInformation("Course {CourseId} not found", courseId);
+
+            return Result<CourseResponse>.Failure(CourseErrors.CourseNotFound);
+        }
+
+        course.Finish();
+
+        var response = _mapper.Map<CourseResponse>(course);
         return Result<CourseResponse>.Success(response);
     }
 }
