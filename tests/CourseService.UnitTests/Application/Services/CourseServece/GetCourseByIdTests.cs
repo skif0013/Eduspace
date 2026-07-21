@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BuildingBlock.UserContextMiddleware.Models;
 using CourseService.Application.Caching;
 using CourseService.Application.Courses.DTO;
 using CourseService.Application.Courses.Errors;
@@ -20,12 +21,14 @@ public class GetCourseByIdTests
     private readonly Mock<IMapper> _mapperMock = new();
     private readonly Mock<IMessagePublisher> _publisherMock = new();
     private readonly Mock<IRedisKeyBuilder> _keyBuilderMock = new();
+    private readonly UserContext _userContext = new();
 
     private readonly CourseService.Application.Courses.Services.CourseService _courseService; // SUT
 
     public GetCourseByIdTests()
     {
         _courseService = new CourseService.Application.Courses.Services.CourseService(
+            _userContext,
             _courseRepositoryMock.Object,
             _cacheMock.Object,
             _loggerMock.Object,

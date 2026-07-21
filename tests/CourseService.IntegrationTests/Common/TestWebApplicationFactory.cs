@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using CourseService.IntegrationTests.Common.Fixtures;
+using BuildingBlock.UserContextMiddleware.Models;
 
 namespace CourseService.IntegrationTests.Common;
 
@@ -42,6 +43,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<IMessagePublisher>();
             services.RemoveAll<ICourseCache>();
             services.RemoveAll<IRedisKeyBuilder>();
+            services.RemoveAll<UserContext>();
 
             services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
             services.RemoveAll<ApplicationDbContext>();
@@ -50,6 +52,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             services.AddSingleton<IMessagePublisher, FakeMessagePublisher>();
             services.AddSingleton<ICourseCache, FakeCourseCache>();
             services.AddSingleton<IRedisKeyBuilder, FakeRedisKeyBuilder>();
+            services.AddScoped<UserContext>();
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
