@@ -11,16 +11,17 @@ public class ProcessOutboxMessagesJob : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;        
     private readonly ILogger<ProcessOutboxMessagesJob> _logger;
-    private readonly IEventPublisher _eventPublisher; 
+    private readonly IOutboxEventPublisher _eventPublisher;
+    
 
     public ProcessOutboxMessagesJob(
         IServiceProvider serviceProvider,
         ILogger<ProcessOutboxMessagesJob> logger,
-        IEventPublisher eventPublisher) 
+        IOutboxEventPublisher outboxEventPublisher) 
     {
+        _eventPublisher = outboxEventPublisher;
         _serviceProvider = serviceProvider;
         _logger = logger;
-        _eventPublisher = eventPublisher;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
