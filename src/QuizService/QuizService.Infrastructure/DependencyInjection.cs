@@ -2,13 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using QuizService.Application.Contracts;
 using QuizService.Application.Contracts.IQuizAttempt;
 using QuizService.Application.Contracts.QuestionsContract;
 using QuizService.Application.Repositories;
 using QuizService.Infrastructure.Data;
 using QuizService.Infrastructure.Repositories;
-using QuizService.Infrastructure.Services;
 
 namespace QuizService.Infrastructure;
 
@@ -25,7 +23,6 @@ public static class DependencyInjection
         }
 
         services.AddRepositories();
-        services.AddScoped<IQuizIntegrationEventService, NoOpQuizIntegrationEventService>();
 
         return services;
     }
