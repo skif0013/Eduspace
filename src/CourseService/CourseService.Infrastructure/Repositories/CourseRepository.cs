@@ -75,13 +75,7 @@ namespace CourseService.Infrastructure.Repositories
         public async Task<Course> DeleteCourseAsync(Guid courseId)
         {
             var course = await GetCourseByIdAsync(courseId);
-            if (course == null)
-            {
-                throw new InvalidOperationException("Course not found");
-            }
             
-            
-
             _dbContext.Courses.Remove(course);
             await _dbContext.SaveChangesAsync();
 
