@@ -5,22 +5,20 @@ namespace BuildingBlocks.Redis;
 
 public class RedisEventPublisher : IEventPublisher
 {
-    private readonly IConnectionMultiplexer _connection;
+    private readonly ISubscriber _subscriber;
     public RedisEventPublisher(IConnectionMultiplexer connection)
     {
-        _connection = connection;
+        _subscriber = connection.GetSubscriber();
     }
     public Task PublishAsync<TEvent>(string channel, TEvent @event) where TEvent : class
     {
-        var subscriber = _connection.GetSubscriber();
-        
         string message = JsonSerializer.Serialize(@event);
-        return subscriber.PublishAsync(RedisChannel.Literal(channel), message);
+        
+        return _subscriber.PublishAsync(RedisChannel.Literal(channel), message);
     }
 
     public async Task PublishRawAsync(string channel, string rawJsonMessage)
-    {
-        var subscriber = _connection.GetSubscriber();
-        await subscriber.PublishAsync(RedisChannel.Literal(channel), rawJsonMessage);
+    { 
+        await _subscriber.PublishAsync(RedisChannel.Literal(channel), rawJsonMessage);
     }
 }
